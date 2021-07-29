@@ -16,13 +16,11 @@ from typing import Optional
 class Repo:
     """
     An object representing the Sample Programs repository.
+
+    :param source_dir: the location of the repo (e.g., C://.../sample-programs)
     """
 
     def __init__(self, source_dir: str) -> None:
-        """
-        Constructs an instance of Repo.
-        :param source_dir: the location of the repo (e.g., C://.../sample-programs)
-        """
         self._source_dir: str = source_dir
         self.languages: list[LanguageCollection] = list()
         self.total_snippets: int = 0
@@ -34,6 +32,7 @@ class Repo:
     def _collect_languages(self) -> None:
         """
         Builds a list of language collections.
+
         :return: None
         """
         for root, directories, files in os.walk(self._source_dir):
@@ -44,6 +43,7 @@ class Repo:
     def _analyze_repo(self) -> None:
         """
         Provides analytics for the repo.
+
         :return: None
         """
         for language in self.languages:
@@ -53,6 +53,7 @@ class Repo:
     def _organize_repo(self) -> None:
         """
         Sorts the repo in alphabetical order by language name.
+
         :return: None
         """
         self.languages.sort(key=lambda lang: lang.name.casefold())
@@ -79,15 +80,13 @@ class Repo:
 class LanguageCollection:
     """
     An object representing a collection of sample programs files for a particular programming language.
+
+    :param name: the name of the language (e.g., python)
+    :param path: the path of the language (e.g., .../archive/p/python/)
+    :param file_list: the list of files in language collection
     """
 
     def __init__(self, name: str, path: str, file_list: list[str]) -> None:
-        """
-        Constructs an instance of LanguageCollection.
-        :param name: the name of the language (e.g., python)
-        :param path: the path of the language (e.g., .../archive/p/python/)
-        :param file_list: the list of files in language collection
-        """
         self.name: str = name
         self.path: str = path
         self.file_list: list[str] = file_list
@@ -109,6 +108,7 @@ class LanguageCollection:
     def _collect_sample_programs(self) -> None:
         """
         Generates a list of sample program objects from all of the files in this language collection.
+
         :return: None
         """
         for file in self.file_list:
@@ -124,6 +124,7 @@ class LanguageCollection:
     def _analyze_language_collection(self) -> None:
         """
         Runs some analytics on the collection of sample programs.
+
         :return: None
         """
         for sample_program in self.sample_programs:
@@ -166,15 +167,13 @@ class LanguageCollection:
 class SampleProgram:
     """
     An object representing a sample program in the repo.
+
+    :param path: the path to the sample program without the file name
+    :param file_name: the name of the file including the extension
+    :param language: the programming language of this sample program
     """
 
-    def __init__(self, path: str, file_name: str, language: str):
-        """
-        Constructs a sample program.
-        :param path: the path to the sample program without the file name
-        :param file_name: the name of the file including the extension
-        :param language: the programming language of this sample program
-        """
+    def __init__(self, path: str, file_name: str, language: str) -> None:
         self.path = path
         self.file_name = file_name
         self.language = language
@@ -187,6 +186,7 @@ class SampleProgram:
     def get_size(self) -> int:
         """
         Computes the size of the sample program using the file path.
+
         :return: the size of the sample program in bytes
         """
         relative_path = os.path.join(self.path, self.file_name)
@@ -195,6 +195,7 @@ class SampleProgram:
     def get_language(self) -> str:
         """
         Retrieves the language name for this sample program.
+
         :return: the language of the sample program
         """
         return self.language
