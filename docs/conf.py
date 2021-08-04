@@ -50,8 +50,8 @@ html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
 github_url = "https://github.com/TheRenegadeCoder/subete"
-# html_logo = "_static/icon.png"
-# html_favicon = '_static/favicon.ico'
+html_logo = "_static/icon.png"
+html_favicon = '_static/favicon.ico'
 issues_github_path = "TheRenegadeCoder/subete"
 
 html_theme_options = {
