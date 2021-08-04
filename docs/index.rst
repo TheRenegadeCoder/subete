@@ -1,8 +1,9 @@
 Welcome to subete's Documentation!
 ===================================
 
-SnakeMD is a library for generating markdown files
-using Python. Use the links below to navigate the docs.
+Subete is a library for interacting with the code found
+in the Sample Programs repository. Use the links below to 
+navigate the docs.
 
 .. toctree::
     :maxdepth: 1
