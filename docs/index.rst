@@ -8,6 +8,8 @@ navigate the docs.
 .. toctree::
     :maxdepth: 1
 
+    subete
+
 Indices and tables
 ==================
 
