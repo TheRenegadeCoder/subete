@@ -1,12 +1,3 @@
-"""
-The repo module contains all the classes need to represent the Sample Programs repo.
-This file was designed with the intent of creating read-only objects that fully
-represent the underlying repo. Ideally, classes that make use of these objects
-should not need to know how they were generated. For example, we do not want users
-to poke around the source directory that was used to generate these files. As a result,
-users should make use of the public fields only.
-"""
-
 import os
 import re
 import yaml
@@ -140,9 +131,11 @@ class LanguageCollection:
     def get_readable_name(self) -> str:
         """
         Generates as close to the proper language name as possible given a language
-        name in plain text separated by hyphens
-            EX: google-apps-script -> Google Apps Script
-            EX: c-sharp -> C#
+        name in plain text separated by hyphens.
+
+        | Example: google-apps-script -> Google Apps Script
+        | Example: c-sharp -> C#
+
         :return: a readable representation of the language name
         """
         text_to_symbol = {
