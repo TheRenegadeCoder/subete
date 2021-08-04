@@ -12,7 +12,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 MAJOR = 0
-MINOR = 7
+MINOR = 2
 PATCH = 0
 
 name = "subete"
@@ -29,22 +29,19 @@ setuptools.setup(
     url="https://github.com/TheRenegadeCoder/subete",
     packages=setuptools.find_packages(),
     install_requires=[
-        "sphinx",
-        "sphinx_rtd_theme",
-        "sphinx-issues"
     ],
-    classifiers=(
+    classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
-    ),
+    ],
     cmdclass=cmdclass,
     command_options={
         'build_sphinx': {
             'project': ('setup.py', name),
             'version': ('setup.py', version),
             'release': ('setup.py', release),
-            'source_dir': ('setup.py', 'docsrc'),
-            'build_dir': ('setup.py', 'docsrc/_build'),
+            'source_dir': ('setup.py', 'docs'),
+            'build_dir': ('setup.py', 'docs'),
             'builder': ("setup.py", "dirhtml")
         }
     }
