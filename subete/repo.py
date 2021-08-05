@@ -251,7 +251,13 @@ class SampleProgram:
         return f"{self._sample_program_req_url}/{self._language}"
 
     def _generate_issue_url(self) -> str:
+        """
+        A helper method for generating the expected issues URL for
+        this sample program. 
+
+        :return: the expected issues URL
+        """
         issue_url_base = "https://github.com//TheRenegadeCoder/" \
                          "sample-programs-website/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+"
         program = self._normalized_name.replace("-", "+")
-        return = f"{issue_url_base}{program}+{self._language}"
+        return f"{issue_url_base}{program}+{self._language}"
