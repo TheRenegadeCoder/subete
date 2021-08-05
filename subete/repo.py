@@ -226,6 +226,12 @@ class SampleProgram:
         return url
 
     def _generate_requirements_url(self) -> str:
+        """
+        A helper method for generating the expected requirements URL 
+        for this sample program.
+
+        :return: the expected requirements URL 
+        """
         doc_url_base = "https://sample-programs.therenegadecoder.com/projects"
         if "export" in self._normalized_name or "import" in self._normalized_name:
             return f"{doc_url_base}/import-export"
