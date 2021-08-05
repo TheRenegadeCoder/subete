@@ -208,6 +208,11 @@ class SampleProgram:
         return Path(self._path, self._file_name).read_text()
 
     def get_line_count(self) -> int:
+        """
+        Retrieves the number of lines in the sample program.
+
+        :return: the number of lines for the sample program
+        """
         return len(self.get_code().splitlines())
 
     def _normalize_program_name(self) -> str:
