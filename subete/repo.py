@@ -1,5 +1,6 @@
 import os
 import re
+from pathlib import Path
 from typing import Optional, List
 
 import yaml
@@ -173,9 +174,9 @@ class SampleProgram:
     """
 
     def __init__(self, path: str, file_name: str, language: str) -> None:
-        self.path = path
-        self.file_name = file_name
-        self.language = language
+        self._path = path
+        self._file_name = file_name
+        self._language = language
         self.sample_program_doc_url: Optional[str] = None
         self.sample_program_req_url: Optional[str] = None
         self.sample_program_issue_url: Optional[str] = None
@@ -188,7 +189,7 @@ class SampleProgram:
 
         :return: the size of the sample program in bytes
         """
-        relative_path = os.path.join(self.path, self.file_name)
+        relative_path = os.path.join(self._path, self._file_name)
         return os.path.getsize(relative_path)
 
     def get_language(self) -> str:
@@ -197,10 +198,18 @@ class SampleProgram:
 
         :return: the language of the sample program
         """
-        return self.language
+        return self._language
+
+    def get_code(self) -> str:
+        """
+        Retrieves the code for this sample program.
+
+        :return: the code for the sample program
+        """
+        return Path(self._path, self._file_name).read_text()
 
     def _normalize_program_name(self):
-        stem = os.path.splitext(self.file_name)[0]
+        stem = os.path.splitext(self._file_name)[0]
         if len(stem.split("-")) > 1:
             url = stem.lower()
         elif len(stem.split("_")) > 1:
@@ -225,8 +234,8 @@ class SampleProgram:
             self.sample_program_req_url = f"{doc_url_base}/{self.normalized_name}"
 
         # doc URL
-        self.sample_program_doc_url = f"{self.sample_program_req_url}/{self.language}"
+        self.sample_program_doc_url = f"{self.sample_program_req_url}/{self._language}"
 
         # issue URL
         program = self.normalized_name.replace("-", "+")
-        self.sample_program_issue_url = f"{issue_url_base}{program}+{self.language}"
+        self.sample_program_issue_url = f"{issue_url_base}{program}+{self._language}"
