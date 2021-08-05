@@ -15,3 +15,7 @@ def test_sample_program_code():
 def test_sample_program_line_count():
     test = SampleProgram(TEST_FILE_PATH, TEST_FILE_NAME, TEST_LANG)
     assert test.line_count() == 1
+
+def test_sample_program_size():
+    test = SampleProgram(TEST_FILE_PATH, TEST_FILE_NAME, TEST_LANG)
+    assert test.size() == 24
