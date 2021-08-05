@@ -12,8 +12,8 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 MAJOR = 0
-MINOR = 2
-PATCH = 2
+MINOR = 3
+PATCH = 0
 
 name = "subete"
 version = f"{MAJOR}.{MINOR}"
