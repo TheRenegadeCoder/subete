@@ -132,7 +132,7 @@ class LanguageCollection:
 
     def _organize_collection(self):
         self.sample_programs.sort(
-            key=lambda program: program.normalized_name.casefold())
+            key=lambda program: program._normalized_name.casefold())
 
     def get_readable_name(self) -> str:
         """
@@ -177,10 +177,10 @@ class SampleProgram:
         self._path = path
         self._file_name = file_name
         self._language = language
-        self.sample_program_doc_url: Optional[str] = None
-        self.sample_program_req_url: Optional[str] = None
-        self.sample_program_issue_url: Optional[str] = None
-        self.normalized_name: Optional[str] = None
+        self._sample_program_doc_url: Optional[str] = None
+        self._sample_program_req_url: Optional[str] = None
+        self._sample_program_issue_url: Optional[str] = None
+        self._normalized_name: Optional[str] = None
         self._generate_urls()
 
     def get_size(self) -> int:
@@ -231,17 +231,17 @@ class SampleProgram:
         issue_url_base = "https://github.com//TheRenegadeCoder/" \
                          "sample-programs-website/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+"
 
-        self.normalized_name = self._normalize_program_name()
+        self._normalized_name = self._normalize_program_name()
 
         # req URL
-        if "export" in self.normalized_name or "import" in self.normalized_name:
-            self.sample_program_req_url = f"{doc_url_base}/import-export"
+        if "export" in self._normalized_name or "import" in self._normalized_name:
+            self._sample_program_req_url = f"{doc_url_base}/import-export"
         else:
-            self.sample_program_req_url = f"{doc_url_base}/{self.normalized_name}"
+            self._sample_program_req_url = f"{doc_url_base}/{self._normalized_name}"
 
         # doc URL
-        self.sample_program_doc_url = f"{self.sample_program_req_url}/{self._language}"
+        self._sample_program_doc_url = f"{self._sample_program_req_url}/{self._language}"
 
         # issue URL
-        program = self.normalized_name.replace("-", "+")
-        self.sample_program_issue_url = f"{issue_url_base}{program}+{self._language}"
+        program = self._normalized_name.replace("-", "+")
+        self._sample_program_issue_url = f"{issue_url_base}{program}+{self._language}"
