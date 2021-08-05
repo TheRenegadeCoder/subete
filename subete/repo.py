@@ -207,6 +207,9 @@ class SampleProgram:
         """
         return Path(self._path, self._file_name).read_text()
 
+    def get_line_count(self) -> int:
+        return len(self.get_code().splitlines())
+
     def _normalize_program_name(self) -> str:
         """
         A helper function which converts the program name into
