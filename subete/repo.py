@@ -217,6 +217,16 @@ class SampleProgram:
         """
         return len(self.code().splitlines())
 
+    def requirements_url(self) -> str:
+        """
+        Retrieves the URL to the requirements documentation for
+        this sample program. Requirements URL is assumed to exist
+        and therefore not validated. 
+
+        :return: the requirments URL as a string 
+        """
+        return self._sample_program_req_url
+
     def _normalize_program_name(self) -> str:
         """
         A helper function which converts the program name into
