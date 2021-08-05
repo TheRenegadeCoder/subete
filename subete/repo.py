@@ -177,11 +177,10 @@ class SampleProgram:
         self._path = path
         self._file_name = file_name
         self._language = language
-        self._sample_program_doc_url: Optional[str] = None
-        self._sample_program_req_url: Optional[str] = None
-        self._sample_program_issue_url: Optional[str] = None
-        self._normalized_name: Optional[str] = None
-        self._generate_urls()
+        self._normalized_name: str = self._normalize_program_name()
+        self._sample_program_req_url: str = self._generate_requirements_url()
+        self._sample_program_doc_url: str = self._generate_doc_url()
+        self._sample_program_issue_url: str = self._generate_issue_url()
 
     def get_size(self) -> int:
         """
@@ -226,22 +225,18 @@ class SampleProgram:
                 '((?<=[a-z])[A-Z0-9]|(?!^)[A-Z](?=[a-z]))', r'-\1', stem).lower()
         return url
 
-    def _generate_urls(self) -> None:
+    def _generate_requirements_url(self) -> str:
         doc_url_base = "https://sample-programs.therenegadecoder.com/projects"
+        if "export" in self._normalized_name or "import" in self._normalized_name:
+            return f"{doc_url_base}/import-export"
+        else:
+            return f"{doc_url_base}/{self._normalized_name}"
+
+    def _generate_doc_url(self) -> str:
+        return f"{self._sample_program_req_url}/{self._language}"
+
+    def _generate_issue_url(self) -> str:
         issue_url_base = "https://github.com//TheRenegadeCoder/" \
                          "sample-programs-website/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+"
-
-        self._normalized_name = self._normalize_program_name()
-
-        # req URL
-        if "export" in self._normalized_name or "import" in self._normalized_name:
-            self._sample_program_req_url = f"{doc_url_base}/import-export"
-        else:
-            self._sample_program_req_url = f"{doc_url_base}/{self._normalized_name}"
-
-        # doc URL
-        self._sample_program_doc_url = f"{self._sample_program_req_url}/{self._language}"
-
-        # issue URL
         program = self._normalized_name.replace("-", "+")
-        self._sample_program_issue_url = f"{issue_url_base}{program}+{self._language}"
+        return = f"{issue_url_base}{program}+{self._language}"
