@@ -124,7 +124,7 @@ class LanguageCollection:
         :return: None
         """
         for sample_program in self.sample_programs:
-            self.total_dir_size += sample_program.get_size()
+            self.total_dir_size += sample_program.size()
         self.total_snippets = len(self.sample_programs)
 
     def _generate_urls(self) -> None:
@@ -182,38 +182,40 @@ class SampleProgram:
         self._sample_program_doc_url: str = self._generate_doc_url()
         self._sample_program_issue_url: str = self._generate_issue_url()
 
-    def get_size(self) -> int:
+    def size(self) -> int:
         """
-        Computes the size of the sample program using the file path.
+        Retrieves the size of the sample program in bytes.
 
-        :return: the size of the sample program in bytes
+        :return: the size of the sample program as an integer
         """
         relative_path = os.path.join(self._path, self._file_name)
         return os.path.getsize(relative_path)
 
-    def get_language(self) -> str:
+    def language(self) -> str:
         """
         Retrieves the language name for this sample program.
 
-        :return: the language of the sample program
+        TODO: describe the behavior of this function
+
+        :return: the language of the sample program as a string
         """
         return self._language
 
-    def get_code(self) -> str:
+    def code(self) -> str:
         """
         Retrieves the code for this sample program.
 
-        :return: the code for the sample program
+        :return: the code for the sample program as a string
         """
         return Path(self._path, self._file_name).read_text()
 
-    def get_line_count(self) -> int:
+    def line_count(self) -> int:
         """
         Retrieves the number of lines in the sample program.
 
-        :return: the number of lines for the sample program
+        :return: the number of lines for the sample program as an integer
         """
-        return len(self.get_code().splitlines())
+        return len(self.code().splitlines())
 
     def _normalize_program_name(self) -> str:
         """
