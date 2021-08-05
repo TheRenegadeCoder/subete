@@ -1,6 +1,6 @@
 import os
 import re
-from typing import Optional
+from typing import Optional, List
 
 import yaml
 
@@ -14,7 +14,7 @@ class Repo:
 
     def __init__(self, source_dir: str) -> None:
         self._source_dir: str = source_dir
-        self.languages: list[LanguageCollection] = list()
+        self.languages: List[LanguageCollection] = list()
         self.total_snippets: int = 0
         self.total_tests: int = 0
         self._collect_languages()
@@ -80,7 +80,7 @@ class LanguageCollection:
     :param file_list: the list of files in language collection
     """
 
-    def __init__(self, name: str, path: str, file_list: list[str]) -> None:
+    def __init__(self, name: str, path: str, file_list: List[str]) -> None:
         self.name: str = name
         self.path: str = path
         self.file_list: list[str] = file_list

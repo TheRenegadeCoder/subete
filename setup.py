@@ -27,6 +27,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/TheRenegadeCoder/subete",
+    python_requires="<=3.8",
     packages=setuptools.find_packages(),
     install_requires=[
         "PyYAML>=5"
