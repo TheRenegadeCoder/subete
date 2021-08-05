@@ -83,9 +83,9 @@ class LanguageCollection:
     def __init__(self, name: str, path: str, file_list: List[str]) -> None:
         self.name: str = name
         self.path: str = path
-        self.file_list: list[str] = file_list
+        self.file_list: List[str] = file_list
         self.first_letter: str = name[0]
-        self.sample_programs: list[SampleProgram] = list()
+        self.sample_programs: List[SampleProgram] = list()
         self.test_file_path: Optional[str] = None
         self.read_me_path: Optional[str] = None
         self.sample_program_url: Optional[str] = None
