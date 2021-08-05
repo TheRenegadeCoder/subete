@@ -239,6 +239,15 @@ class SampleProgram:
             return f"{doc_url_base}/{self._normalized_name}"
 
     def _generate_doc_url(self) -> str:
+        """
+        A helper method for generating the expected docs URL for
+        this sample program.
+
+        FYI: this function depends on _sample_program_req_url, so
+        it must be generated first. 
+
+        :return: the expected docs URL
+        """
         return f"{self._sample_program_req_url}/{self._language}"
 
     def _generate_issue_url(self) -> str:
