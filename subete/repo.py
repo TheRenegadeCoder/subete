@@ -1,7 +1,8 @@
 import os
 import re
-import yaml
 from typing import Optional
+
+import yaml
 
 
 class Repo:
@@ -28,7 +29,8 @@ class Repo:
         """
         for root, directories, files in os.walk(self._source_dir):
             if not directories:
-                language = LanguageCollection(os.path.basename(root), root, files)
+                language = LanguageCollection(
+                    os.path.basename(root), root, files)
                 self.languages.append(language)
 
     def _analyze_repo(self) -> None:
@@ -56,7 +58,8 @@ class Repo:
         :param letter: a character to search by
         :return: a list of programming languages starting with the provided letter
         """
-        language_list = [language for language in self.languages if language.name.startswith(letter)]
+        language_list = [
+            language for language in self.languages if language.name.startswith(letter)]
         return sorted(language_list, key=lambda s: s.name.casefold())
 
     def get_sorted_language_letters(self):
@@ -106,7 +109,8 @@ class LanguageCollection:
             file_name, file_ext = os.path.splitext(file)
             file_ext = file_ext.lower()
             if file_ext not in (".md", "", ".yml"):
-                self.sample_programs.append(SampleProgram(self.path, file, self.name))
+                self.sample_programs.append(
+                    SampleProgram(self.path, file, self.name))
             elif file_ext == ".yml":
                 self.test_file_path = os.path.join(file)
             elif file_name == "README":
@@ -126,7 +130,8 @@ class LanguageCollection:
         self.sample_program_url = f"https://sample-programs.therenegadecoder.com/languages/{self.name}"
 
     def _organize_collection(self):
-        self.sample_programs.sort(key=lambda program: program.normalized_name.casefold())
+        self.sample_programs.sort(
+            key=lambda program: program.normalized_name.casefold())
 
     def get_readable_name(self) -> str:
         """
@@ -143,7 +148,8 @@ class LanguageCollection:
             "sharp": "#",
             "star": r"\*"
         }
-        tokens = [text_to_symbol.get(token, token) for token in self.name.split("-")]
+        tokens = [text_to_symbol.get(token, token)
+                  for token in self.name.split("-")]
         if any(token in text_to_symbol.values() for token in tokens):
             return "".join(tokens).title()
         else:
@@ -201,7 +207,8 @@ class SampleProgram:
             url = stem.replace("_", "-").lower()
         else:
             # TODO: this is brutal. At some point, we should loop in the glotter test file.
-            url = re.sub('((?<=[a-z])[A-Z0-9]|(?!^)[A-Z](?=[a-z]))', r'-\1', stem).lower()
+            url = re.sub(
+                '((?<=[a-z])[A-Z0-9]|(?!^)[A-Z](?=[a-z]))', r'-\1', stem).lower()
         return url
 
     def _generate_urls(self) -> None:

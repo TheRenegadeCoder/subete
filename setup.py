@@ -13,7 +13,7 @@ with open("README.md", "r") as fh:
 
 MAJOR = 0
 MINOR = 2
-PATCH = 1
+PATCH = 2
 
 name = "subete"
 version = f"{MAJOR}.{MINOR}"
@@ -23,12 +23,13 @@ setuptools.setup(
     version=release,
     author="The Renegade Coder",
     author_email="jeremy.grifski@therenegadecoder.com",
-    description="The Sample Programs API",
+    description="The Sample Programs API in Python",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/TheRenegadeCoder/subete",
     packages=setuptools.find_packages(),
     install_requires=[
+        "PyYAML>=5"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
