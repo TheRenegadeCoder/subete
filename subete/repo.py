@@ -208,7 +208,13 @@ class SampleProgram:
         """
         return Path(self._path, self._file_name).read_text()
 
-    def _normalize_program_name(self):
+    def _normalize_program_name(self) -> str:
+        """
+        A helper function which converts the program name into
+        a standard representation (i.e. hello_world -> hello-world).
+
+        :return: the sample program as a lowercase string separated by hyphens
+        """
         stem = os.path.splitext(self._file_name)[0]
         if len(stem.split("-")) > 1:
             url = stem.lower()
