@@ -55,7 +55,12 @@ class SampleProgram:
 
     def size(self) -> int:
         """
-        Retrieves the size of the sample program in bytes.
+        Retrieves the size of the sample program in bytes. 
+
+        Assuming you have a SampleProgram object called program, 
+        here's how you would use this method::
+
+            size: int = program.size()
 
         :return: the size of the sample program as an integer
         """
@@ -64,7 +69,14 @@ class SampleProgram:
 
     def language(self) -> str:
         """
-        Retrieves the language name for this sample program.
+        Retrieves the language name for this sample program. Language
+        name is generated from a call to str() for the source
+        LanguageCollection. 
+
+        Assuming you have a SampleProgram object called program, 
+        here's how you would use this method::
+
+            name: str = program.language()
 
         :return: the language of the sample program as a string
         """
