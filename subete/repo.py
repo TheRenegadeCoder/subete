@@ -41,8 +41,8 @@ class Repo:
         :return: None
         """
         for language in self.languages:
-            self.total_snippets += language.total_snippets
-            self.total_tests += 1 if language.test_file_path else 0
+            self.total_snippets += language._total_snippets
+            self.total_tests += 1 if language._test_file_path else 0
 
     def _organize_repo(self) -> None:
         """
@@ -84,21 +84,21 @@ class LanguageCollection:
     def __init__(self, name: str, path: str, file_list: List[str]) -> None:
         self._name: str = name
         self._path: str = path
-        self.file_list: List[str] = file_list
-        self.first_letter: str = name[0]
-        self.sample_programs: List[SampleProgram] = list()
-        self.test_file_path: Optional[str] = None
-        self.read_me_path: Optional[str] = None
-        self.sample_program_url: Optional[str] = None
-        self.total_snippets: int = 0
-        self.total_dir_size: int = 0
+        self._file_list: List[str] = file_list
+        self._first_letter: str = name[0]
+        self._sample_programs: List[SampleProgram] = list()
+        self._test_file_path: Optional[str] = None
+        self._read_me_path: Optional[str] = None
+        self._sample_program_url: Optional[str] = None
+        self._total_snippets: int = 0
+        self._total_dir_size: int = 0
         self._collect_sample_programs()
         self._analyze_language_collection()
         self._generate_urls()
         self._organize_collection()
 
     def __str__(self) -> str:
-        return self._name + ";" + str(self.total_snippets) + ";" + str(self.total_dir_size)
+        return self._name + ";" + str(self._total_snippets) + ";" + str(self._total_dir_size)
 
     def _collect_sample_programs(self) -> None:
         """
@@ -106,16 +106,16 @@ class LanguageCollection:
 
         :return: None
         """
-        for file in self.file_list:
+        for file in self._file_list:
             file_name, file_ext = os.path.splitext(file)
             file_ext = file_ext.lower()
             if file_ext not in (".md", "", ".yml"):
-                self.sample_programs.append(
+                self._sample_programs.append(
                     SampleProgram(self._path, file, self._name))
             elif file_ext == ".yml":
-                self.test_file_path = os.path.join(file)
+                self._test_file_path = os.path.join(file)
             elif file_name == "README":
-                self.read_me_path = os.path.join(self._path, file)
+                self._read_me_path = os.path.join(self._path, file)
 
     def _analyze_language_collection(self) -> None:
         """
@@ -123,15 +123,15 @@ class LanguageCollection:
 
         :return: None
         """
-        for sample_program in self.sample_programs:
-            self.total_dir_size += sample_program.size()
-        self.total_snippets = len(self.sample_programs)
+        for sample_program in self._sample_programs:
+            self._total_dir_size += sample_program.size()
+        self._total_snippets = len(self._sample_programs)
 
     def _generate_urls(self) -> None:
-        self.sample_program_url = f"https://sample-programs.therenegadecoder.com/languages/{self._name}"
+        self._sample_program_url = f"https://sample-programs.therenegadecoder.com/languages/{self._name}"
 
     def _organize_collection(self):
-        self.sample_programs.sort(
+        self._sample_programs.sort(
             key=lambda program: program._normalized_name.casefold())
 
     def get_readable_name(self) -> str:
@@ -158,8 +158,8 @@ class LanguageCollection:
 
     def get_test_data(self) -> Optional[dict]:
         test_data = None
-        if self.test_file_path:
-            with open(os.path.join(self._path, self.test_file_path)) as test_file:
+        if self._test_file_path:
+            with open(os.path.join(self._path, self._test_file_path)) as test_file:
                 test_data = yaml.safe_load(test_file)
         return test_data
 
@@ -183,6 +183,11 @@ class SampleProgram:
         self._sample_program_issue_url: str = self._generate_issue_url()
 
     def __str__(self) -> str:
+        """
+        Renders the Sample Program in the following form: {name} in {language}.
+        
+        :return: the sample program as a string
+        """
         return f'{self._normalized_name.replace("-", " ").title()} in {self._language.title()}'
 
     def size(self) -> int:
