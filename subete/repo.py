@@ -26,6 +26,7 @@ class SampleProgram:
         self._sample_program_req_url: str = self._generate_requirements_url()
         self._sample_program_doc_url: str = self._generate_doc_url()
         self._sample_program_issue_url: str = self._generate_issue_url()
+        self._line_count: int = len(self.code().splitlines())
 
     def __str__(self) -> str:
         """
@@ -68,7 +69,7 @@ class SampleProgram:
 
         :return: the number of lines for the sample program as an integer
         """
-        return len(self.code().splitlines())
+        return self._line_count
 
     def requirements_url(self) -> str:
         """
@@ -240,10 +241,10 @@ class LanguageCollection:
         self._sample_programs: List[SampleProgram] = self._collect_sample_programs()
         self._test_file_path: Optional[str] = self._collect_test_file()
         self._read_me_path: Optional[str] = self._collect_readme()
-        self._sample_program_url: Optional[str] = None
+        self._sample_program_url: Optional[str] = f"https://sample-programs.therenegadecoder.com/languages/{self._name}"
         self._total_snippets: int = len(self._sample_programs)
         self._total_dir_size: int = sum(x.size() for x in self._sample_programs)
-        self._generate_urls()
+        self._total_line_count: int = sum(x.line_count() for x in self._sample_programs)
         self._organize_collection()
 
     def __str__(self) -> str:
@@ -282,9 +283,6 @@ class LanguageCollection:
         """
         if "README.md" in self._file_list:
             return os.path.join(self._path, "README.md")
-
-    def _generate_urls(self) -> None:
-        self._sample_program_url = f"https://sample-programs.therenegadecoder.com/languages/{self._name}"
 
     def _organize_collection(self):
         self._sample_programs.sort(
