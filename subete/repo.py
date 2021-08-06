@@ -9,6 +9,154 @@ import yaml
 logger = logging.getLogger(__name__)
 
 
+class SampleProgram:
+    """
+    An object representing a sample program in the repo.
+
+    :param path: the path to the sample program without the file name
+    :param file_name: the name of the file including the extension
+    :param language: the programming language of this sample program
+    """
+
+    def __init__(self, path: str, file_name: str, language: str) -> None:
+        self._path = path
+        self._file_name = file_name
+        self._language = language
+        self._normalized_name: str = self._normalize_program_name()
+        self._sample_program_req_url: str = self._generate_requirements_url()
+        self._sample_program_doc_url: str = self._generate_doc_url()
+        self._sample_program_issue_url: str = self._generate_issue_url()
+
+    def __str__(self) -> str:
+        """
+        Renders the Sample Program in the following form: {name} in {language}.
+
+        :return: the sample program as a string
+        """
+        return f'{self._normalized_name.replace("-", " ").title()} in {self._language.title()}'
+
+    def size(self) -> int:
+        """
+        Retrieves the size of the sample program in bytes.
+
+        :return: the size of the sample program as an integer
+        """
+        relative_path = os.path.join(self._path, self._file_name)
+        return os.path.getsize(relative_path)
+
+    def language(self) -> str:
+        """
+        Retrieves the language name for this sample program.
+
+        :return: the language of the sample program as a string
+        """
+        return self._language
+
+    def code(self) -> str:
+        """
+        Retrieves the code for this sample program.
+
+        :return: the code for the sample program as a string
+        """
+        logger.debug(
+            f"Attempting to retrieve code from {self._path}/{self._file_name}")
+        return Path(self._path, self._file_name).read_text()
+
+    def line_count(self) -> int:
+        """
+        Retrieves the number of lines in the sample program.
+
+        :return: the number of lines for the sample program as an integer
+        """
+        return len(self.code().splitlines())
+
+    def requirements_url(self) -> str:
+        """
+        Retrieves the URL to the requirements documentation for
+        this sample program. Requirements URL is assumed to exist
+        and therefore not validated. 
+
+        :return: the requirments URL as a string 
+        """
+        return self._sample_program_req_url
+
+    def documentation_url(self) -> str:
+        """
+        Retrieves the URL to the documentation for this
+        sample program. Documentation URL is assumed to exist
+        and therefore not validated.
+
+        :return: the documentation URL as a string
+        """
+        return self._sample_program_doc_url
+
+    def issue_query_url(self) -> str:
+        """
+        Retrieves the URL to the issue query for this sample
+        program. Issue query URL is guaranteed to be a valid
+        search query on GitHub, but it is not guaranteed to 
+        have any results.
+
+        :return: the issue query URL as a string
+        """
+        return self._sample_program_issue_url
+
+    def _normalize_program_name(self) -> str:
+        """
+        A helper function which converts the program name into
+        a standard representation (i.e. hello_world -> hello-world).
+
+        :return: the sample program as a lowercase string separated by hyphens
+        """
+        stem = os.path.splitext(self._file_name)[0]
+        if len(stem.split("-")) > 1:
+            url = stem.lower()
+        elif len(stem.split("_")) > 1:
+            url = stem.replace("_", "-").lower()
+        else:
+            # TODO: this is brutal. At some point, we should loop in the glotter test file.
+            url = re.sub(
+                '((?<=[a-z])[A-Z0-9]|(?!^)[A-Z](?=[a-z]))', r'-\1', stem).lower()
+        return url
+
+    def _generate_requirements_url(self) -> str:
+        """
+        A helper method for generating the expected requirements URL 
+        for this sample program.
+
+        :return: the expected requirements URL 
+        """
+        doc_url_base = "https://sample-programs.therenegadecoder.com/projects"
+        if "export" in self._normalized_name or "import" in self._normalized_name:
+            return f"{doc_url_base}/import-export"
+        else:
+            return f"{doc_url_base}/{self._normalized_name}"
+
+    def _generate_doc_url(self) -> str:
+        """
+        A helper method for generating the expected docs URL for
+        this sample program.
+
+        FYI: this function depends on _sample_program_req_url, so
+        it must be generated first. 
+
+        :return: the expected docs URL
+        """
+        return f"{self._sample_program_req_url}/{self._language}"
+
+    def _generate_issue_url(self) -> str:
+        """
+        A helper method for generating the expected issues URL for
+        this sample program. 
+
+        :return: the expected issues URL
+        """
+        issue_url_base = "https://github.com//TheRenegadeCoder/" \
+                         "sample-programs-website/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+"
+        program = self._normalized_name.replace("-", "+")
+        return f"{issue_url_base}{program}+{self._language}"
+
+
 class Repo:
     """
     An object representing the Sample Programs repository.
@@ -181,151 +329,3 @@ class LanguageCollection:
             with open(os.path.join(self._path, self._test_file_path)) as test_file:
                 test_data = yaml.safe_load(test_file)
         return test_data
-
-
-class SampleProgram:
-    """
-    An object representing a sample program in the repo.
-
-    :param path: the path to the sample program without the file name
-    :param file_name: the name of the file including the extension
-    :param language: the programming language of this sample program
-    """
-
-    def __init__(self, path: str, file_name: str, language: str) -> None:
-        self._path = path
-        self._file_name = file_name
-        self._language = language
-        self._normalized_name: str = self._normalize_program_name()
-        self._sample_program_req_url: str = self._generate_requirements_url()
-        self._sample_program_doc_url: str = self._generate_doc_url()
-        self._sample_program_issue_url: str = self._generate_issue_url()
-
-    def __str__(self) -> str:
-        """
-        Renders the Sample Program in the following form: {name} in {language}.
-
-        :return: the sample program as a string
-        """
-        return f'{self._normalized_name.replace("-", " ").title()} in {self._language.title()}'
-
-    def size(self) -> int:
-        """
-        Retrieves the size of the sample program in bytes.
-
-        :return: the size of the sample program as an integer
-        """
-        relative_path = os.path.join(self._path, self._file_name)
-        return os.path.getsize(relative_path)
-
-    def language(self) -> str:
-        """
-        Retrieves the language name for this sample program.
-
-        :return: the language of the sample program as a string
-        """
-        return self._language
-
-    def code(self) -> str:
-        """
-        Retrieves the code for this sample program.
-
-        :return: the code for the sample program as a string
-        """
-        logger.debug(
-            f"Attempting to retrieve code from {self.path}/{self._file_name}")
-        return Path(self._path, self._file_name).read_text()
-
-    def line_count(self) -> int:
-        """
-        Retrieves the number of lines in the sample program.
-
-        :return: the number of lines for the sample program as an integer
-        """
-        return len(self.code().splitlines())
-
-    def requirements_url(self) -> str:
-        """
-        Retrieves the URL to the requirements documentation for
-        this sample program. Requirements URL is assumed to exist
-        and therefore not validated. 
-
-        :return: the requirments URL as a string 
-        """
-        return self._sample_program_req_url
-
-    def documentation_url(self) -> str:
-        """
-        Retrieves the URL to the documentation for this
-        sample program. Documentation URL is assumed to exist
-        and therefore not validated.
-
-        :return: the documentation URL as a string
-        """
-        return self._sample_program_doc_url
-
-    def issue_query_url(self) -> str:
-        """
-        Retrieves the URL to the issue query for this sample
-        program. Issue query URL is guaranteed to be a valid
-        search query on GitHub, but it is not guaranteed to 
-        have any results.
-
-        :return: the issue query URL as a string
-        """
-        return self._sample_program_issue_url
-
-    def _normalize_program_name(self) -> str:
-        """
-        A helper function which converts the program name into
-        a standard representation (i.e. hello_world -> hello-world).
-
-        :return: the sample program as a lowercase string separated by hyphens
-        """
-        stem = os.path.splitext(self._file_name)[0]
-        if len(stem.split("-")) > 1:
-            url = stem.lower()
-        elif len(stem.split("_")) > 1:
-            url = stem.replace("_", "-").lower()
-        else:
-            # TODO: this is brutal. At some point, we should loop in the glotter test file.
-            url = re.sub(
-                '((?<=[a-z])[A-Z0-9]|(?!^)[A-Z](?=[a-z]))', r'-\1', stem).lower()
-        return url
-
-    def _generate_requirements_url(self) -> str:
-        """
-        A helper method for generating the expected requirements URL 
-        for this sample program.
-
-        :return: the expected requirements URL 
-        """
-        doc_url_base = "https://sample-programs.therenegadecoder.com/projects"
-        if "export" in self._normalized_name or "import" in self._normalized_name:
-            return f"{doc_url_base}/import-export"
-        else:
-            return f"{doc_url_base}/{self._normalized_name}"
-
-    def _generate_doc_url(self) -> str:
-        """
-        A helper method for generating the expected docs URL for
-        this sample program.
-
-        FYI: this function depends on _sample_program_req_url, so
-        it must be generated first. 
-
-        :return: the expected docs URL
-        """
-        return f"{self._sample_program_req_url}/{self._language}"
-
-    def _generate_issue_url(self) -> str:
-        """
-        A helper method for generating the expected issues URL for
-        this sample program. 
-
-        :return: the expected issues URL
-        """
-        issue_url_base = "https://github.com//TheRenegadeCoder/" \
-                         "sample-programs-website/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+"
-        program = self._normalized_name.replace("-", "+")
-        return f"{issue_url_base}{program}+{self._language}"
