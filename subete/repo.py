@@ -155,12 +155,22 @@ class SampleProgram:
         """
         return self._sample_program_doc_url
 
-    def issue_query_url(self) -> str:
+    def article_issue_query_url(self) -> str:
         """
-        Retrieves the URL to the issue query for this sample
-        program. Issue query URL is guaranteed to be a valid
-        search query on GitHub, but it is not guaranteed to 
-        have any results.
+        Retrieves the URL to the article issue query for this sample
+        program. The article issue query URL is guaranteed to be a valid
+        search query on GitHub, but it is not guaranteed to have any 
+        results. The issue query url is in the following form:
+
+        ``https://github.com//TheRenegadeCoder/sample-programs-website/issues?{query}"``
+
+        For example, here is a link to the
+        `Hello World in Python query <https://github.com/TheRenegadeCoder/sample-programs-website/issues?q=is%3Aissue+is%3Aopen+hello+world+python>`_. 
+
+        Assuming you have a SampleProgram object called program, 
+        here's how you would use this method::
+
+            url: str = program.article_issue_query_url()
 
         :return: the issue query URL as a string
         """

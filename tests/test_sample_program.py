@@ -44,4 +44,4 @@ def test_sample_program_documentation_url():
 
 def test_sample_program_issue_query_url():
     test = SampleProgram(TEST_FILE_PATH, TEST_FILE_NAME, TEST_LANG)
-    assert test.issue_query_url() == "https://github.com//TheRenegadeCoder/sample-programs-website/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+hello+world+python"
+    assert test.article_issue_query_url() == "https://github.com//TheRenegadeCoder/sample-programs-website/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+hello+world+python"
