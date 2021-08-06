@@ -293,7 +293,10 @@ class LanguageCollection:
     def testinfo_url(self) -> str:
         """
         Retrieves the URL to the testinfo file on GitHub. The testinfo URL is
-        assumed to exist and therefore not validated. 
+        assumed to exist and therefore not validated. The testinfo URL is
+        in the following form:
+
+        https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/{letter}/{lang}/testinfo.yml
 
         :return: the testinfo URL as a string
         """
