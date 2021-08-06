@@ -27,3 +27,7 @@ def test_language_collection_total_programs():
 def test_language_collection_total_size():
     test = LanguageCollection(TEST_LANG, TEST_PATH, TEST_FILES)
     assert test.total_size() > 0
+
+def test_language_collection_total_line_count():
+    test = LanguageCollection(TEST_LANG, TEST_PATH, TEST_FILES)
+    assert test.total_line_count() == 1
