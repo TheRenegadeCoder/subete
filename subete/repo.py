@@ -468,14 +468,17 @@ class Repo:
         self._temp_dir = tempfile.TemporaryDirectory()
         self._source_dir: str = self._generate_source_dir(source_dir)
         self._languages: List[LanguageCollection] = self._collect_languages()
-        self._total_snippets: int = sum(
-            x.total_programs() for x in self._languages)
-        self._total_tests: int = sum(
-            1 for x in self._languages if x.has_testinfo())
+        self._total_snippets: int = sum(x.total_programs() for x in self._languages)
+        self._total_tests: int = sum(1 for x in self._languages if x.has_testinfo())
 
     def language_collections(self) -> List[LanguageCollection]:
         """
         Retrieves the list of language collections in the Sample Programs repo.
+
+        Assuming you have a Repo object called repo, here’s how you would use 
+        this method::
+
+            languages: List[LanguageCollection] = repo.language_collections()
 
         :return: the list of the language collections
         """
@@ -484,6 +487,13 @@ class Repo:
     def total_programs(self) -> int:
         """
         Retrieves the total number of programs in the sample programs repo.
+        This total does not include any additional files such as README
+        or testinfo files. 
+
+        Assuming you have a Repo object called repo, here’s how you would use 
+        this method::
+
+            count: int = repo.total_programs()
 
         :return: the total number of programs as an int
         """
