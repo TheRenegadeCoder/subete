@@ -12,8 +12,8 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 MAJOR = 0
-MINOR = 2
-PATCH = 2
+MINOR = 3
+PATCH = 0
 
 name = "subete"
 version = f"{MAJOR}.{MINOR}"
@@ -27,14 +27,21 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/TheRenegadeCoder/subete",
-    python_requires="<=3.8",
     packages=setuptools.find_packages(),
+    python_requires=">=3.6",
     install_requires=[
-        "PyYAML>=5"
+        "PyYAML>=5",
+        "GitPython>=3"
     ],
     classifiers=[
-        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Operating System :: OS Independent",
+        "Topic :: Documentation :: Sphinx",
+        "Development Status :: 3 - Alpha"
     ],
     cmdclass=cmdclass,
     command_options={
