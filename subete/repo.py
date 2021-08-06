@@ -251,7 +251,12 @@ class LanguageCollection:
 
     def sample_programs(self) -> List[SampleProgram]:
         """
-        Retrieves the list of sample programs.
+        Retrieves the list of sample programs associated with this language.
+
+        Assuming you have a LanguageCollection object called language, here's
+        here's how you would use this method::
+
+            programs: List[SampleProgram] = language.sample_programs()
 
         :return: the list of sample programs
         """
