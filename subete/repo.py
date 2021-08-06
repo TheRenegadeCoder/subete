@@ -232,9 +232,15 @@ class LanguageCollection:
                 test_data = yaml.safe_load(test_file)
         return test_data
 
-    def has_test(self) -> bool:
+    def has_testinfo(self) -> bool:
         """
-        Retrieves the state of the test info file.
+        Retrieves the state of the testinfo file. Helpful when
+        trying to figure out if this language has a testinfo file.
+
+        Assuming you have a LanguageCollection object called language, here's
+        here's how you would use this method::
+
+            state: bool = language.has_testinfo()
 
         :return: True if a test info file exists; False otherwise
         """
@@ -242,7 +248,13 @@ class LanguageCollection:
 
     def readme(self) -> Optional[str]:
         """
-        Retrieves the README contents.
+        Retrieves the README contents. README contents are in
+        the form of a markdown string.
+
+        Assuming you have a LanguageCollection object called language, here's
+        here's how you would use this method::
+
+            contents: str = language.readme()
 
         :return: the README contents as a string
         """
@@ -396,7 +408,7 @@ class Repo:
         self._total_snippets: int = sum(
             x.total_programs() for x in self._languages)
         self._total_tests: int = sum(
-            1 for x in self._languages if x.has_test())
+            1 for x in self._languages if x.has_testinfo())
         self._temp_dir.cleanup()
 
     def language_collections(self) -> List[LanguageCollection]:
