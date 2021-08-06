@@ -261,6 +261,11 @@ class LanguageCollection:
         """
         Retrieves the total number of sample programs in the language collection.
 
+        Assuming you have a LanguageCollection object called language, here's
+        here's how you would use this method::
+
+            programs_count: int = language.total_programs()
+
         :return: the number of sample programs as an int
         """
         return self._total_snippets
@@ -271,6 +276,11 @@ class LanguageCollection:
         Size is computed from the size of all sample programs and is not computed
         from the testinfo or README files. 
 
+        Assuming you have a LanguageCollection object called language, here's
+        here's how you would use this method::
+
+            size: int = language.total_size()
+
         :return: the total byte size of the language collection as an int
         """
         return self._total_dir_size
@@ -280,6 +290,11 @@ class LanguageCollection:
         Retrieves the total line count of the language collection. Line count
         is computed from the sample programs only and does not include lines of
         code in testinfo or README files. 
+
+        Assuming you have a LanguageCollection object called language, here's
+        here's how you would use this method::
+
+            lines: int = language.total_line_count() 
 
         :return: the total line count of the language collection as an int
         """
@@ -296,6 +311,11 @@ class LanguageCollection:
         For example, here is a link to the
         `Python documentation <https://sample-programs.therenegadecoder.com/languages/python/>`_. 
 
+        Assuming you have a LanguageCollection object called language, here's
+        here's how you would use this method::
+
+            link: str = language.lang_docs_url() 
+
         :return: the language documentation URL as a string
         """
         return self._lang_docs_url
@@ -310,6 +330,11 @@ class LanguageCollection:
 
         For example, here is a link to the
         `Python testinfo file <https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/p/python/testinfo.yml>`_.
+
+        Assuming you have a LanguageCollection object called language, here's
+        here's how you would use this method::
+
+            link: str = language.testinfo_url()  
 
         :return: the testinfo URL as a string
         """
