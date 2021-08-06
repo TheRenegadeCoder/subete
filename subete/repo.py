@@ -222,7 +222,13 @@ class LanguageCollection:
 
     def testinfo(self) -> Optional[dict]:
         """
-        Retrieves the test data from the test info file.
+        Retrieves the test data from the testinfo file. The YAML data
+        is loaded into a Python dictionary.
+
+        Assuming you have a LanguageCollection object called language, 
+        here's how you would use this method::
+
+            data: dict = language.testinfo()
 
         :return: the test info data as a dictionary
         """
