@@ -245,7 +245,6 @@ class LanguageCollection:
         self._total_snippets: int = len(self._sample_programs)
         self._total_dir_size: int = sum(x.size() for x in self._sample_programs)
         self._total_line_count: int = sum(x.line_count() for x in self._sample_programs)
-        self._organize_collection()
 
     def __str__(self) -> str:
         return self._name + ";" + str(self._total_snippets) + ";" + str(self._total_dir_size)
@@ -262,6 +261,7 @@ class LanguageCollection:
             file_ext = file_ext.lower()
             if file_ext not in (".md", "", ".yml"):
                 sample_programs.append(SampleProgram(self._path, file, self._name))
+        sample_programs.sort(key=lambda program: program._normalized_name.casefold())
         return sample_programs
 
     def _collect_test_file(self) -> Optional[str]:
@@ -283,10 +283,6 @@ class LanguageCollection:
         """
         if "README.md" in self._file_list:
             return os.path.join(self._path, "README.md")
-
-    def _organize_collection(self):
-        self._sample_programs.sort(
-            key=lambda program: program._normalized_name.casefold())
 
     def get_readable_name(self) -> str:
         """
