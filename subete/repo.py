@@ -379,7 +379,7 @@ class Repo:
         A utility method for retrieving all language collections that start with a particular letter.
 
         :param letter: a character to search by
-        :return: a list of programming languages starting with the provided letter
+        :return: a list of language collections where the language starts with the provided letter
         """
         language_list = [
             language for language in self._languages if language._name.startswith(letter)]
