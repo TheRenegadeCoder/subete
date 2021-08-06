@@ -1,9 +1,13 @@
 import os
 import re
+import logging
 from pathlib import Path
 from typing import Optional, List
 
 import yaml
+
+
+logger = logging.getLogger(__name__)
 
 
 class Repo:
@@ -213,6 +217,7 @@ class SampleProgram:
 
         :return: the code for the sample program as a string
         """
+        logger.debug(f"Attempting to retrieve code from {self.path}/{self._file_name}")
         return Path(self._path, self._file_name).read_text()
 
     def line_count(self) -> int:
