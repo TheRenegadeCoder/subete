@@ -194,7 +194,7 @@ class LanguageCollection:
             _, file_ext = os.path.splitext(file)
             file_ext = file_ext.lower()
             if file_ext not in (".md", "", ".yml"):
-                sample_programs.append(SampleProgram(self._path, file, self._name))
+                sample_programs.append(SampleProgram(self._path, file, self.get_readable_name()))
         sample_programs.sort(key=lambda program: str(program).casefold())
         return sample_programs
 
@@ -241,6 +241,11 @@ class LanguageCollection:
             return " ".join(tokens).title()
 
     def get_test_data(self) -> Optional[dict]:
+        """
+        Retrieves the test data from the test info file.
+
+        :return: the test info data as a dictionary
+        """
         test_data = None
         if self._test_file_path:
             with open(os.path.join(self._path, self._test_file_path)) as test_file:
