@@ -237,7 +237,7 @@ class LanguageCollection:
         Retrieves the state of the testinfo file. Helpful when
         trying to figure out if this language has a testinfo file.
 
-        Assuming you have a LanguageCollection object called language, here's
+        Assuming you have a LanguageCollection object called language, 
         here's how you would use this method::
 
             state: bool = language.has_testinfo()
@@ -251,7 +251,7 @@ class LanguageCollection:
         Retrieves the README contents. README contents are in
         the form of a markdown string.
 
-        Assuming you have a LanguageCollection object called language, here's
+        Assuming you have a LanguageCollection object called language, 
         here's how you would use this method::
 
             contents: str = language.readme()
@@ -265,7 +265,7 @@ class LanguageCollection:
         """
         Retrieves the list of sample programs associated with this language.
 
-        Assuming you have a LanguageCollection object called language, here's
+        Assuming you have a LanguageCollection object called language, 
         here's how you would use this method::
 
             programs: List[SampleProgram] = language.sample_programs()
@@ -278,7 +278,7 @@ class LanguageCollection:
         """
         Retrieves the total number of sample programs in the language collection.
 
-        Assuming you have a LanguageCollection object called language, here's
+        Assuming you have a LanguageCollection object called language, 
         here's how you would use this method::
 
             programs_count: int = language.total_programs()
@@ -293,7 +293,7 @@ class LanguageCollection:
         Size is computed from the size of all sample programs and is not computed
         from the testinfo or README files. 
 
-        Assuming you have a LanguageCollection object called language, here's
+        Assuming you have a LanguageCollection object called language, 
         here's how you would use this method::
 
             size: int = language.total_size()
@@ -308,7 +308,7 @@ class LanguageCollection:
         is computed from the sample programs only and does not include lines of
         code in testinfo or README files. 
 
-        Assuming you have a LanguageCollection object called language, here's
+        Assuming you have a LanguageCollection object called language, 
         here's how you would use this method::
 
             lines: int = language.total_line_count() 
@@ -328,7 +328,7 @@ class LanguageCollection:
         For example, here is a link to the
         `Python documentation <https://sample-programs.therenegadecoder.com/languages/python/>`_. 
 
-        Assuming you have a LanguageCollection object called language, here's
+        Assuming you have a LanguageCollection object called language, 
         here's how you would use this method::
 
             link: str = language.lang_docs_url() 
@@ -348,7 +348,7 @@ class LanguageCollection:
         For example, here is a link to the
         `Python testinfo file <https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/p/python/testinfo.yml>`_.
 
-        Assuming you have a LanguageCollection object called language, here's
+        Assuming you have a LanguageCollection object called language, 
         here's how you would use this method::
 
             link: str = language.testinfo_url()  
