@@ -241,9 +241,8 @@ class LanguageCollection:
         self._test_file_path: Optional[str] = self._collect_test_file()
         self._read_me_path: Optional[str] = self._collect_readme()
         self._sample_program_url: Optional[str] = None
-        self._total_snippets: int = 0
-        self._total_dir_size: int = 0
-        self._analyze_language_collection()
+        self._total_snippets: int = len(self._sample_programs)
+        self._total_dir_size: int = sum(x.size() for x in self._sample_programs)
         self._generate_urls()
         self._organize_collection()
 
@@ -283,16 +282,6 @@ class LanguageCollection:
         """
         if "README.md" in self._file_list:
             return os.path.join(self._path, "README.md")
-        
-    def _analyze_language_collection(self) -> None:
-        """
-        Runs some analytics on the collection of sample programs.
-
-        :return: None
-        """
-        for sample_program in self._sample_programs:
-            self._total_dir_size += sample_program.size()
-        self._total_snippets = len(self._sample_programs)
 
     def _generate_urls(self) -> None:
         self._sample_program_url = f"https://sample-programs.therenegadecoder.com/languages/{self._name}"
