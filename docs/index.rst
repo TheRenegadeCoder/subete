@@ -10,6 +10,7 @@ navigate the docs.
 
     usage
     subete
+    changelog
 
 Indices and tables
 ==================

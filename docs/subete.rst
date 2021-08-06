@@ -2,7 +2,7 @@ Documentation
 =============
 
 The documentation page lists out all of the relevant classes
-and functions for generating markdown documents in Python.
+and functions for interacting with the Sample Programs repo.
 
 subete
 -------------------
