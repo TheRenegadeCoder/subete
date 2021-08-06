@@ -235,6 +235,17 @@ class SampleProgram:
         """
         return self._sample_program_doc_url
 
+    def issue_query_url(self) -> str:
+        """
+        Retrieves the URL to the issue query for this sample
+        program. Issue query URL is guaranteed to be a valid
+        search query on GitHub, but it is not guaranteed to 
+        have any results.
+
+        :return: the issue query URL as a string
+        """
+        return self._sample_program_issue_url
+
     def _normalize_program_name(self) -> str:
         """
         A helper function which converts the program name into
