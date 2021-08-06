@@ -89,13 +89,12 @@ class LanguageCollection:
         self._path: str = path
         self._file_list: List[str] = file_list
         self._first_letter: str = name[0]
-        self._sample_programs: List[SampleProgram] = list()
-        self._test_file_path: Optional[str] = None
-        self._read_me_path: Optional[str] = None
+        self._sample_programs: List[SampleProgram] = self._collect_sample_programs()
+        self._test_file_path: Optional[str] = self._collect_test_file()
+        self._read_me_path: Optional[str] = self._collect_readme()
         self._sample_program_url: Optional[str] = None
         self._total_snippets: int = 0
         self._total_dir_size: int = 0
-        self._collect_sample_programs()
         self._analyze_language_collection()
         self._generate_urls()
         self._organize_collection()
@@ -103,23 +102,40 @@ class LanguageCollection:
     def __str__(self) -> str:
         return self._name + ";" + str(self._total_snippets) + ";" + str(self._total_dir_size)
 
-    def _collect_sample_programs(self) -> None:
+    def _collect_sample_programs(self) -> List[SampleProgram]:
         """
         Generates a list of sample program objects from all of the files in this language collection.
 
-        :return: None
+        :return: a collection of sample programs
         """
+        sample_programs = []
         for file in self._file_list:
-            file_name, file_ext = os.path.splitext(file)
+            _, file_ext = os.path.splitext(file)
             file_ext = file_ext.lower()
             if file_ext not in (".md", "", ".yml"):
-                self._sample_programs.append(
-                    SampleProgram(self._path, file, self._name))
-            elif file_ext == ".yml":
-                self._test_file_path = os.path.join(file)
-            elif file_name == "README":
-                self._read_me_path = os.path.join(self._path, file)
+                sample_programs.append(SampleProgram(self._path, file, self._name))
+        return sample_programs
 
+    def _collect_test_file(self) -> Optional[str]:
+        """
+        Generates the path to a test file for this language collection
+        if it exists.
+
+        :return: the path to a test info file
+        """
+        if "testinfo.yml" in self._file_list:
+            return os.path.join()
+
+    def _collect_readme(self) -> Optional[str]:
+        """
+        Generates the path to the README for this language collection
+        if it exists.
+
+        :return: the path to a readme
+        """
+        if "README.md" in self._file_list:
+            return os.path.join(self._path, "README.md")
+        
     def _analyze_language_collection(self) -> None:
         """
         Runs some analytics on the collection of sample programs.
