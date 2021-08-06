@@ -50,7 +50,7 @@ class Repo:
 
         :return: None
         """
-        self.languages.sort(key=lambda lang: lang.name.casefold())
+        self.languages.sort(key=lambda lang: lang._name.casefold())
 
     def get_languages_by_letter(self, letter: str) -> list:
         """
@@ -60,8 +60,8 @@ class Repo:
         :return: a list of programming languages starting with the provided letter
         """
         language_list = [
-            language for language in self.languages if language.name.startswith(letter)]
-        return sorted(language_list, key=lambda s: s.name.casefold())
+            language for language in self.languages if language._name.startswith(letter)]
+        return sorted(language_list, key=lambda s: s._name.casefold())
 
     def get_sorted_language_letters(self):
         """
@@ -82,8 +82,8 @@ class LanguageCollection:
     """
 
     def __init__(self, name: str, path: str, file_list: List[str]) -> None:
-        self.name: str = name
-        self.path: str = path
+        self._name: str = name
+        self._path: str = path
         self.file_list: List[str] = file_list
         self.first_letter: str = name[0]
         self.sample_programs: List[SampleProgram] = list()
@@ -98,7 +98,7 @@ class LanguageCollection:
         self._organize_collection()
 
     def __str__(self) -> str:
-        return self.name + ";" + str(self.total_snippets) + ";" + str(self.total_dir_size)
+        return self._name + ";" + str(self.total_snippets) + ";" + str(self.total_dir_size)
 
     def _collect_sample_programs(self) -> None:
         """
@@ -111,11 +111,11 @@ class LanguageCollection:
             file_ext = file_ext.lower()
             if file_ext not in (".md", "", ".yml"):
                 self.sample_programs.append(
-                    SampleProgram(self.path, file, self.name))
+                    SampleProgram(self._path, file, self._name))
             elif file_ext == ".yml":
                 self.test_file_path = os.path.join(file)
             elif file_name == "README":
-                self.read_me_path = os.path.join(self.path, file)
+                self.read_me_path = os.path.join(self._path, file)
 
     def _analyze_language_collection(self) -> None:
         """
@@ -128,7 +128,7 @@ class LanguageCollection:
         self.total_snippets = len(self.sample_programs)
 
     def _generate_urls(self) -> None:
-        self.sample_program_url = f"https://sample-programs.therenegadecoder.com/languages/{self.name}"
+        self.sample_program_url = f"https://sample-programs.therenegadecoder.com/languages/{self._name}"
 
     def _organize_collection(self):
         self.sample_programs.sort(
@@ -150,7 +150,7 @@ class LanguageCollection:
             "star": r"\*"
         }
         tokens = [text_to_symbol.get(token, token)
-                  for token in self.name.split("-")]
+                  for token in self._name.split("-")]
         if any(token in text_to_symbol.values() for token in tokens):
             return "".join(tokens).title()
         else:
@@ -159,7 +159,7 @@ class LanguageCollection:
     def get_test_data(self) -> Optional[dict]:
         test_data = None
         if self.test_file_path:
-            with open(os.path.join(self.path, self.test_file_path)) as test_file:
+            with open(os.path.join(self._path, self.test_file_path)) as test_file:
                 test_data = yaml.safe_load(test_file)
         return test_data
 
@@ -181,6 +181,9 @@ class SampleProgram:
         self._sample_program_req_url: str = self._generate_requirements_url()
         self._sample_program_doc_url: str = self._generate_doc_url()
         self._sample_program_issue_url: str = self._generate_issue_url()
+
+    def __str__(self) -> str:
+        return f'{self._normalized_name.replace("-", " ").title()} in {self._language.title()}'
 
     def size(self) -> int:
         """

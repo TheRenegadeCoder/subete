@@ -4,6 +4,10 @@ TEST_FILE_NAME = "hello_world.py"
 TEST_FILE_PATH = "tests/samples/"
 TEST_LANG = "python"
 
+def test_sample_program_str():
+    test = SampleProgram(TEST_FILE_PATH, TEST_FILE_NAME, TEST_LANG)
+    assert str(test) == "Hello World in Python"
+
 def test_sample_program_language():
     test = SampleProgram(TEST_FILE_PATH, TEST_FILE_NAME, TEST_LANG)
     assert test.language() == TEST_LANG
