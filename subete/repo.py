@@ -350,6 +350,22 @@ class Repo:
             1 for x in self._languages if x.has_test())
         self._temp_dir.cleanup()
 
+    def language_collections(self) -> List[LanguageCollection]:
+        """
+        Retrieves the list of language collections in the Sample Programs repo.
+
+        :return: the list of the language collections
+        """
+        return self._languages
+
+    def total_programs(self) -> int:
+        """
+        Retrieves the total number of programs in the sample programs repo.
+
+        :return: the total number of programs as an int
+        """
+        return self._total_snippets
+
     def get_languages_by_letter(self, letter: str) -> list:
         """
         A utility method for retrieving all language collections that start with a particular letter.
