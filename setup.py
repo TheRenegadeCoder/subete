@@ -29,7 +29,8 @@ setuptools.setup(
     url="https://github.com/TheRenegadeCoder/subete",
     packages=setuptools.find_packages(),
     install_requires=[
-        "PyYAML>=5"
+        "PyYAML>=5",
+        "GitPython>=3"
     ],
     classifiers=[
         "License :: OSI Approved :: MIT License",
