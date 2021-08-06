@@ -195,8 +195,6 @@ class SampleProgram:
         """
         Retrieves the language name for this sample program.
 
-        TODO: describe the behavior of this function
-
         :return: the language of the sample program as a string
         """
         return self._language

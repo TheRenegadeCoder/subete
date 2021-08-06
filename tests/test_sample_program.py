@@ -19,3 +19,7 @@ def test_sample_program_line_count():
 def test_sample_program_size():
     test = SampleProgram(TEST_FILE_PATH, TEST_FILE_NAME, TEST_LANG)
     assert test.size() == 24
+
+def test_sample_program_requirements_url():
+    test = SampleProgram(TEST_FILE_PATH, TEST_FILE_NAME, TEST_LANG)
+    assert test.requirements_url() == "https://sample-programs.therenegadecoder.com/projects/hello-world"
