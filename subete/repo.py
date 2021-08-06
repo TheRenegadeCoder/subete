@@ -249,13 +249,21 @@ class LanguageCollection:
         """
         return self._sample_programs
 
-    def total_snippets(self) -> int:
+    def total_programs(self) -> int:
         """
-        Retrieves the total number of snippets in the language collection.
+        Retrieves the total number of sample programs in the language collection.
 
         :return: the number of sample programs as an int
         """
         return self._total_snippets
+
+    def total_size(self) -> int:
+        """
+        Retrieves the total byte size of the language collection.
+
+        :return: the total byte size of the language collection as an int
+        """
+        return self._total_dir_size
 
     def _collect_sample_programs(self) -> List[SampleProgram]:
         """
