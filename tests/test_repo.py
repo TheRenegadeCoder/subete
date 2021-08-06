@@ -1,6 +1,6 @@
-from subete import Repo
+import subete
 
-TEST_REPO = Repo()
+TEST_REPO = subete.load()
 
 
 def test_repo_languages():

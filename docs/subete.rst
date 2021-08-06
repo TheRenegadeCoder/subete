@@ -14,6 +14,9 @@ should not need to know how they were generated. For example, we do not want use
 to poke around the source directory that was used to generate these files. As a result,
 users should make use of the public fields only.
 
+.. automodule:: subete
+   :members:
+
 .. automodule:: subete.repo
    :members:
    :undoc-members:
