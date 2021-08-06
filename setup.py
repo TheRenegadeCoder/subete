@@ -33,8 +33,12 @@ setuptools.setup(
         "PyYAML>=5"
     ],
     classifiers=[
-        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
         "Operating System :: OS Independent",
+        "Topic :: Documentation :: Sphinx",
+        "Development Status :: 3 - Alpha"
     ],
     cmdclass=cmdclass,
     command_options={
