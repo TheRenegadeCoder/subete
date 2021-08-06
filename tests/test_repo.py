@@ -9,3 +9,7 @@ def test_repo_languages():
 
 def test_repo_total_programs():
     assert TEST_REPO.total_programs() > 0
+
+
+def test_repo_total_tests():
+    assert TEST_REPO.total_tests() > 0

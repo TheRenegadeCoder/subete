@@ -366,6 +366,14 @@ class Repo:
         """
         return self._total_snippets
 
+    def total_tests(self) -> int:
+        """
+        Retrieves the total number of tested languages in the repo.
+
+        :return: the total number of tested languages as an int
+        """
+        return self._total_tests
+
     def get_languages_by_letter(self, letter: str) -> list:
         """
         A utility method for retrieving all language collections that start with a particular letter.
