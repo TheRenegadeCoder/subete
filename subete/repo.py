@@ -431,8 +431,7 @@ class LanguageCollection:
             _, file_ext = os.path.splitext(file)
             file_ext = file_ext.lower()
             if file_ext not in (".md", "", ".yml"):
-                sample_programs.append(SampleProgram(
-                    self._path, file, self.name()))
+                sample_programs.append(SampleProgram(self._path, file, str(self)))
         sample_programs.sort(key=lambda program: str(program).casefold())
         return sample_programs
 
