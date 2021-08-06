@@ -206,7 +206,7 @@ class LanguageCollection:
         :return: the path to a test info file
         """
         if "testinfo.yml" in self._file_list:
-            return os.path.join()
+            return os.path.join("testinfo.yml")
 
     def _collect_readme(self) -> Optional[str]:
         """
@@ -216,7 +216,7 @@ class LanguageCollection:
         :return: the path to a readme
         """
         if "README.md" in self._file_list:
-            return os.path.join(self._path, "README.md")
+            return os.path.join("README.md")
 
     def get_readable_name(self) -> str:
         """

@@ -1,7 +1,7 @@
 from subete import SampleProgram
 
 TEST_FILE_NAME = "hello_world.py"
-TEST_FILE_PATH = "tests/samples/"
+TEST_FILE_PATH = "tests/python/"
 TEST_LANG = "python"
 
 def test_sample_program_str():
