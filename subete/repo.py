@@ -268,6 +268,8 @@ class LanguageCollection:
     def total_size(self) -> int:
         """
         Retrieves the total byte size of the sample programs in the language collection.
+        Size is computed from the size of all sample programs and is not computed
+        from the testinfo or README files. 
 
         :return: the total byte size of the language collection as an int
         """
@@ -275,7 +277,9 @@ class LanguageCollection:
 
     def total_line_count(self) -> int:
         """
-        Retrieves the total line count of the language collection.
+        Retrieves the total line count of the language collection. Line count
+        is computed from the sample programs only and does not include lines of
+        code in testinfo or README files. 
 
         :return: the total line count of the language collection as an int
         """
