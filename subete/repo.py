@@ -36,6 +36,21 @@ class SampleProgram:
         """
         return f'{self._normalized_name.replace("-", " ").title()} in {self._language.title()}'
 
+    def __eq__(self, o: object) -> bool:
+        """
+        Compares an object to the sample program. Returns True if the object
+        is an instance of SampleProgram and has the following three fields:
+
+            - _file_name
+            - _path
+            - _language
+
+        :return: True if the object matches the Sample Program; False otherwise.
+        """
+        if isinstance(o, self.__class__):
+            return self._file_name == o._file_name and self._path == self._path and self._language == o._language
+        return False
+
     def size(self) -> int:
         """
         Retrieves the size of the sample program in bytes.
@@ -225,6 +240,14 @@ class LanguageCollection:
         """
         if self._read_me_path:
             return Path(self._read_me_path).read_text()
+
+    def sample_programs(self) -> List[SampleProgram]:
+        """
+        Retrieves the list of sample programs.
+
+        :return: the list of sample programs
+        """
+        return self._sample_programs
 
     def _collect_sample_programs(self) -> List[SampleProgram]:
         """
