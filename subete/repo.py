@@ -158,6 +158,96 @@ class SampleProgram:
         return f"{issue_url_base}{program}+{self._language}"
 
 
+class LanguageCollection:
+    """
+    An object representing a collection of sample programs files for a particular programming language.
+
+    :param name: the name of the language (e.g., python)
+    :param path: the path of the language (e.g., .../archive/p/python/)
+    :param file_list: the list of files in language collection
+    """
+
+    def __init__(self, name: str, path: str, file_list: List[str]) -> None:
+        self._name: str = name
+        self._path: str = path
+        self._file_list: List[str] = file_list
+        self._first_letter: str = name[0]
+        self._sample_programs: List[SampleProgram] = self._collect_sample_programs()
+        self._test_file_path: Optional[str] = self._collect_test_file()
+        self._read_me_path: Optional[str] = self._collect_readme()
+        self._sample_program_url: Optional[str] = f"https://sample-programs.therenegadecoder.com/languages/{self._name}"
+        self._total_snippets: int = len(self._sample_programs)
+        self._total_dir_size: int = sum(x.size() for x in self._sample_programs)
+        self._total_line_count: int = sum(x.line_count() for x in self._sample_programs)
+
+    def __str__(self) -> str:
+        return self._name + ";" + str(self._total_snippets) + ";" + str(self._total_dir_size)
+
+    def _collect_sample_programs(self) -> List[SampleProgram]:
+        """
+        Generates a list of sample program objects from all of the files in this language collection.
+
+        :return: a collection of sample programs
+        """
+        sample_programs = []
+        for file in self._file_list:
+            _, file_ext = os.path.splitext(file)
+            file_ext = file_ext.lower()
+            if file_ext not in (".md", "", ".yml"):
+                sample_programs.append(SampleProgram(self._path, file, self._name))
+        sample_programs.sort(key=lambda program: str(program).casefold())
+        return sample_programs
+
+    def _collect_test_file(self) -> Optional[str]:
+        """
+        Generates the path to a test file for this language collection
+        if it exists.
+
+        :return: the path to a test info file
+        """
+        if "testinfo.yml" in self._file_list:
+            return os.path.join()
+
+    def _collect_readme(self) -> Optional[str]:
+        """
+        Generates the path to the README for this language collection
+        if it exists.
+
+        :return: the path to a readme
+        """
+        if "README.md" in self._file_list:
+            return os.path.join(self._path, "README.md")
+
+    def get_readable_name(self) -> str:
+        """
+        Generates as close to the proper language name as possible given a language
+        name in plain text separated by hyphens.
+
+        | Example: google-apps-script -> Google Apps Script
+        | Example: c-sharp -> C#
+
+        :return: a readable representation of the language name
+        """
+        text_to_symbol = {
+            "plus": "+",
+            "sharp": "#",
+            "star": r"\*"
+        }
+        tokens = [text_to_symbol.get(token, token)
+                  for token in self._name.split("-")]
+        if any(token in text_to_symbol.values() for token in tokens):
+            return "".join(tokens).title()
+        else:
+            return " ".join(tokens).title()
+
+    def get_test_data(self) -> Optional[dict]:
+        test_data = None
+        if self._test_file_path:
+            with open(os.path.join(self._path, self._test_file_path)) as test_file:
+                test_data = yaml.safe_load(test_file)
+        return test_data
+
+
 class Repo:
     """
     An object representing the Sample Programs repository.
@@ -222,93 +312,3 @@ class Repo:
         """
         unsorted_letters = os.listdir(self._source_dir)
         return sorted(unsorted_letters, key=lambda s: s.casefold())
-
-
-class LanguageCollection:
-    """
-    An object representing a collection of sample programs files for a particular programming language.
-
-    :param name: the name of the language (e.g., python)
-    :param path: the path of the language (e.g., .../archive/p/python/)
-    :param file_list: the list of files in language collection
-    """
-
-    def __init__(self, name: str, path: str, file_list: List[str]) -> None:
-        self._name: str = name
-        self._path: str = path
-        self._file_list: List[str] = file_list
-        self._first_letter: str = name[0]
-        self._sample_programs: List[SampleProgram] = self._collect_sample_programs()
-        self._test_file_path: Optional[str] = self._collect_test_file()
-        self._read_me_path: Optional[str] = self._collect_readme()
-        self._sample_program_url: Optional[str] = f"https://sample-programs.therenegadecoder.com/languages/{self._name}"
-        self._total_snippets: int = len(self._sample_programs)
-        self._total_dir_size: int = sum(x.size() for x in self._sample_programs)
-        self._total_line_count: int = sum(x.line_count() for x in self._sample_programs)
-
-    def __str__(self) -> str:
-        return self._name + ";" + str(self._total_snippets) + ";" + str(self._total_dir_size)
-
-    def _collect_sample_programs(self) -> List[SampleProgram]:
-        """
-        Generates a list of sample program objects from all of the files in this language collection.
-
-        :return: a collection of sample programs
-        """
-        sample_programs = []
-        for file in self._file_list:
-            _, file_ext = os.path.splitext(file)
-            file_ext = file_ext.lower()
-            if file_ext not in (".md", "", ".yml"):
-                sample_programs.append(SampleProgram(self._path, file, self._name))
-        sample_programs.sort(key=lambda program: program._normalized_name.casefold())
-        return sample_programs
-
-    def _collect_test_file(self) -> Optional[str]:
-        """
-        Generates the path to a test file for this language collection
-        if it exists.
-
-        :return: the path to a test info file
-        """
-        if "testinfo.yml" in self._file_list:
-            return os.path.join()
-
-    def _collect_readme(self) -> Optional[str]:
-        """
-        Generates the path to the README for this language collection
-        if it exists.
-
-        :return: the path to a readme
-        """
-        if "README.md" in self._file_list:
-            return os.path.join(self._path, "README.md")
-
-    def get_readable_name(self) -> str:
-        """
-        Generates as close to the proper language name as possible given a language
-        name in plain text separated by hyphens.
-
-        | Example: google-apps-script -> Google Apps Script
-        | Example: c-sharp -> C#
-
-        :return: a readable representation of the language name
-        """
-        text_to_symbol = {
-            "plus": "+",
-            "sharp": "#",
-            "star": r"\*"
-        }
-        tokens = [text_to_symbol.get(token, token)
-                  for token in self._name.split("-")]
-        if any(token in text_to_symbol.values() for token in tokens):
-            return "".join(tokens).title()
-        else:
-            return " ".join(tokens).title()
-
-    def get_test_data(self) -> Optional[dict]:
-        test_data = None
-        if self._test_file_path:
-            with open(os.path.join(self._path, self._test_file_path)) as test_file:
-                test_data = yaml.safe_load(test_file)
-        return test_data
