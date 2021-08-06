@@ -235,6 +235,14 @@ class LanguageCollection:
                 test_data = yaml.safe_load(test_file)
         return test_data
 
+    def has_test(self) -> bool:
+        """
+        Retrieves the state of the test info file.
+
+        :return: True if a test info file exists; False otherwise
+        """
+        return bool(self._test_file_path)
+
     def readme(self) -> Optional[str]:
         """
         Retrieves the README contents.
@@ -331,41 +339,24 @@ class Repo:
     def __init__(self, source_dir: Optional[str] = None) -> None:
         self._temp_dir = tempfile.TemporaryDirectory()
         self._source_dir: str = self._generate_source_dir(source_dir)
-        self.languages: List[LanguageCollection] = list()
-        self.total_snippets: int = 0
-        self.total_tests: int = 0
-        self._collect_languages()
-        self._analyze_repo()
-        self._organize_repo()
+        self._languages: List[LanguageCollection] = self._collect_languages()
+        self._total_snippets: int = sum(x.total_programs() for x in self._languages)
+        self._total_tests: int = sum(1 for x in self._languages if x.has_test())
+        self._temp_dir.cleanup()
 
-    def _collect_languages(self) -> None:
+    def _collect_languages(self) -> List[LanguageCollection]:
         """
         Builds a list of language collections.
 
-        :return: None
+        :return: the list of language collections
         """
+        languages = []
         for root, directories, files in os.walk(self._source_dir):
             if not directories:
                 language = LanguageCollection(os.path.basename(root), root, files)
-                self.languages.append(language)
-
-    def _analyze_repo(self) -> None:
-        """
-        Provides analytics for the repo.
-
-        :return: None
-        """
-        for language in self.languages:
-            self.total_snippets += language._total_snippets
-            self.total_tests += 1 if language._test_file_path else 0
-
-    def _organize_repo(self) -> None:
-        """
-        Sorts the repo in alphabetical order by language name.
-
-        :return: None
-        """
-        self.languages.sort(key=lambda lang: lang._name.casefold())
+                languages.append(language)
+        languages.sort(key=lambda lang: lang._name.casefold())
+        return languages
 
     def get_languages_by_letter(self, letter: str) -> list:
         """
@@ -375,7 +366,7 @@ class Repo:
         :return: a list of programming languages starting with the provided letter
         """
         language_list = [
-            language for language in self.languages if language._name.startswith(letter)]
+            language for language in self._languages if language._name.startswith(letter)]
         return sorted(language_list, key=lambda s: s._name.casefold())
 
     def get_sorted_language_letters(self):

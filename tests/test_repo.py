@@ -4,4 +4,4 @@ TEST_REPO = Repo()
 
 
 def test_repo_init():
-    assert len(TEST_REPO.languages) > 0
+    assert len(TEST_REPO._languages) > 0
