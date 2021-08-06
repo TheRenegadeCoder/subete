@@ -501,7 +501,13 @@ class Repo:
 
     def total_tests(self) -> int:
         """
-        Retrieves the total number of tested languages in the repo.
+        Retrieves the total number of tested languages in the repo. This value
+        is based on the number of testinfo files in the repo.
+
+        Assuming you have a Repo object called repo, here’s how you would use 
+        this method::
+
+            count: int = repo.total_tests()
 
         :return: the total number of tested languages as an int
         """
@@ -509,7 +515,13 @@ class Repo:
 
     def get_languages_by_letter(self, letter: str) -> List[LanguageCollection]:
         """
-        A utility method for retrieving all language collections that start with a particular letter.
+        A convenience method for retrieving all language collections that start with a 
+        particular letter.
+
+        Assuming you have a Repo object called repo, here’s how you would use 
+        this method::
+
+            langs: List[LanguageCollection] = repo.get_languages_by_letter("p")
 
         :param letter: a character to search by
         :return: a list of language collections where the language starts with the provided letter
@@ -520,7 +532,14 @@ class Repo:
 
     def get_sorted_language_letters(self) -> List[str]:
         """
-        A utility method which generates a list of sorted letters from the sample programs archive.
+        A convenience method which generates a list of sorted letters from the sample 
+        programs archive. This will return a list of letters that match the directory
+        structure of the archive.
+
+        Assuming you have a Repo object called repo, here’s how you would use 
+        this method::
+
+            letters: List[str] = repo.get_sorted_language_letters()
 
         :return: a sorted list of letters
         """
