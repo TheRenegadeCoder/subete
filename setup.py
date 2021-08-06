@@ -28,6 +28,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/TheRenegadeCoder/subete",
     packages=setuptools.find_packages(),
+    python_requires=">=3.7",
     install_requires=[
         "PyYAML>=5",
         "GitPython>=3"
@@ -36,6 +37,7 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Operating System :: OS Independent",
         "Topic :: Documentation :: Sphinx",
         "Development Status :: 3 - Alpha"
