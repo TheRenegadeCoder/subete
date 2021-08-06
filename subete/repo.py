@@ -1,8 +1,11 @@
 import logging
 import os
 import re
+import git
+import tempfile
 from pathlib import Path
 from typing import List, Optional
+
 
 import yaml
 
@@ -76,7 +79,7 @@ class SampleProgram:
         """
         logger.debug(
             f"Attempting to retrieve code from {self._path}/{self._file_name}")
-        return Path(self._path, self._file_name).read_text()
+        return Path(self._path, self._file_name).read_text(errors="replace")
 
     def line_count(self) -> int:
         """
@@ -322,11 +325,12 @@ class Repo:
     """
     An object representing the Sample Programs repository.
 
-    :param source_dir: the location of the repo (e.g., C://.../sample-programs)
+    :param source_dir: the location of the repo archive (e.g., C://.../sample-programs/archive)
     """
 
-    def __init__(self, source_dir: str) -> None:
-        self._source_dir: str = source_dir
+    def __init__(self, source_dir: Optional[str] = None) -> None:
+        self._temp_dir = tempfile.TemporaryDirectory()
+        self._source_dir: str = self._generate_source_dir(source_dir)
         self.languages: List[LanguageCollection] = list()
         self.total_snippets: int = 0
         self.total_tests: int = 0
@@ -342,8 +346,7 @@ class Repo:
         """
         for root, directories, files in os.walk(self._source_dir):
             if not directories:
-                language = LanguageCollection(
-                    os.path.basename(root), root, files)
+                language = LanguageCollection(os.path.basename(root), root, files)
                 self.languages.append(language)
 
     def _analyze_repo(self) -> None:
@@ -382,3 +385,8 @@ class Repo:
         """
         unsorted_letters = os.listdir(self._source_dir)
         return sorted(unsorted_letters, key=lambda s: s.casefold())
+
+    def _generate_source_dir(self, source_dir: Optional[str]) -> str:
+        if not source_dir:
+            git.Repo.clone_from("https://github.com/TheRenegadeCoder/sample-programs.git", self._temp_dir.name)
+            return os.path.join(self._temp_dir.name, "archive")
