@@ -1,12 +1,11 @@
 import logging
 import os
 import re
-import git
 import tempfile
 from pathlib import Path
 from typing import List, Optional
 
-
+import git
 import yaml
 
 logger = logging.getLogger(__name__)
@@ -190,13 +189,17 @@ class LanguageCollection:
         self._path: str = path
         self._file_list: List[str] = file_list
         self._first_letter: str = name[0]
-        self._sample_programs: List[SampleProgram] = self._collect_sample_programs()
+        self._sample_programs: List[SampleProgram] = self._collect_sample_programs(
+        )
         self._test_file_path: Optional[str] = self._collect_test_file()
         self._read_me_path: Optional[str] = self._collect_readme()
-        self._sample_program_url: Optional[str] = f"https://sample-programs.therenegadecoder.com/languages/{self._name}"
+        self._sample_program_url: Optional[
+            str] = f"https://sample-programs.therenegadecoder.com/languages/{self._name}"
         self._total_snippets: int = len(self._sample_programs)
-        self._total_dir_size: int = sum(x.size() for x in self._sample_programs)
-        self._total_line_count: int = sum(x.line_count() for x in self._sample_programs)
+        self._total_dir_size: int = sum(x.size()
+                                        for x in self._sample_programs)
+        self._total_line_count: int = sum(
+            x.line_count() for x in self._sample_programs)
 
     def __str__(self) -> str:
         return self._name + ";" + str(self._total_snippets) + ";" + str(self._total_dir_size)
@@ -304,7 +307,8 @@ class LanguageCollection:
             _, file_ext = os.path.splitext(file)
             file_ext = file_ext.lower()
             if file_ext not in (".md", "", ".yml"):
-                sample_programs.append(SampleProgram(self._path, file, self.name()))
+                sample_programs.append(SampleProgram(
+                    self._path, file, self.name()))
         sample_programs.sort(key=lambda program: str(program).casefold())
         return sample_programs
 
@@ -340,23 +344,11 @@ class Repo:
         self._temp_dir = tempfile.TemporaryDirectory()
         self._source_dir: str = self._generate_source_dir(source_dir)
         self._languages: List[LanguageCollection] = self._collect_languages()
-        self._total_snippets: int = sum(x.total_programs() for x in self._languages)
-        self._total_tests: int = sum(1 for x in self._languages if x.has_test())
+        self._total_snippets: int = sum(
+            x.total_programs() for x in self._languages)
+        self._total_tests: int = sum(
+            1 for x in self._languages if x.has_test())
         self._temp_dir.cleanup()
-
-    def _collect_languages(self) -> List[LanguageCollection]:
-        """
-        Builds a list of language collections.
-
-        :return: the list of language collections
-        """
-        languages = []
-        for root, directories, files in os.walk(self._source_dir):
-            if not directories:
-                language = LanguageCollection(os.path.basename(root), root, files)
-                languages.append(language)
-        languages.sort(key=lambda lang: lang._name.casefold())
-        return languages
 
     def get_languages_by_letter(self, letter: str) -> list:
         """
@@ -369,15 +361,38 @@ class Repo:
             language for language in self._languages if language._name.startswith(letter)]
         return sorted(language_list, key=lambda s: s._name.casefold())
 
-    def get_sorted_language_letters(self):
+    def get_sorted_language_letters(self) -> List[str]:
         """
         A utility method which generates a list of sorted letters from the sample programs archive.
+
         :return: a sorted list of letters
         """
         unsorted_letters = os.listdir(self._source_dir)
         return sorted(unsorted_letters, key=lambda s: s.casefold())
 
+    def _collect_languages(self) -> List[LanguageCollection]:
+        """
+        Builds a list of language collections.
+
+        :return: the list of language collections
+        """
+        languages = []
+        for root, directories, files in os.walk(self._source_dir):
+            if not directories:
+                language = LanguageCollection(
+                    os.path.basename(root), root, files)
+                languages.append(language)
+        languages.sort(key=lambda lang: lang._name.casefold())
+        return languages
+
     def _generate_source_dir(self, source_dir: Optional[str]) -> str:
+        """
+        A helper method which generates the Sample Programs repo
+        from Git if it's not provided on the source directory.
+
+        :return: a path to the source directory of the archive directory
+        """
         if not source_dir:
-            git.Repo.clone_from("https://github.com/TheRenegadeCoder/sample-programs.git", self._temp_dir.name)
+            git.Repo.clone_from(
+                "https://github.com/TheRenegadeCoder/sample-programs.git", self._temp_dir.name)
             return os.path.join(self._temp_dir.name, "archive")
