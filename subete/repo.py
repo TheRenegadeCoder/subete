@@ -259,11 +259,19 @@ class LanguageCollection:
 
     def total_size(self) -> int:
         """
-        Retrieves the total byte size of the language collection.
+        Retrieves the total byte size of the sample programs in the language collection.
 
         :return: the total byte size of the language collection as an int
         """
         return self._total_dir_size
+
+    def total_line_count(self) -> int:
+        """
+        Retrieves the total line count of the language collection.
+
+        :return: the total line count of the language collection as an int
+        """
+        return self._total_line_count
 
     def _collect_sample_programs(self) -> List[SampleProgram]:
         """
