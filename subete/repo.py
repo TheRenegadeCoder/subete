@@ -55,7 +55,12 @@ class SampleProgram:
 
     def size(self) -> int:
         """
-        Retrieves the size of the sample program in bytes.
+        Retrieves the size of the sample program in bytes. 
+
+        Assuming you have a SampleProgram object called program, 
+        here's how you would use this method::
+
+            size: int = program.size()
 
         :return: the size of the sample program as an integer
         """
@@ -64,7 +69,14 @@ class SampleProgram:
 
     def language(self) -> str:
         """
-        Retrieves the language name for this sample program.
+        Retrieves the language name for this sample program. Language
+        name is generated from a call to str() for the source
+        LanguageCollection. 
+
+        Assuming you have a SampleProgram object called program, 
+        here's how you would use this method::
+
+            name: str = program.language()
 
         :return: the language of the sample program as a string
         """
@@ -72,17 +84,30 @@ class SampleProgram:
 
     def code(self) -> str:
         """
-        Retrieves the code for this sample program.
+        Retrieves the code for this sample program. To save space
+        in memory, code is loaded from the source file on each invocation 
+        of this method. As a result, there may be an IO performance
+        penalty if this function is used many times. It's recommended
+        to store the result of this function if it is used often.
+
+        Assuming you have a SampleProgram object called program, 
+        here's how you would use this method::
+        
+            code: str = program.code()
 
         :return: the code for the sample program as a string
         """
-        logger.debug(
-            f"Attempting to retrieve code from {self._path}/{self._file_name}")
+        logger.debug(f"Attempting to retrieve code from {self._path}/{self._file_name}")
         return Path(self._path, self._file_name).read_text(errors="replace")
 
     def line_count(self) -> int:
         """
-        Retrieves the number of lines in the sample program.
+        Retrieves the number of lines in the sample program. 
+
+        Assuming you have a SampleProgram object called program, 
+        here's how you would use this method::
+
+            code: int = program.line_count()
 
         :return: the number of lines for the sample program as an integer
         """
@@ -92,7 +117,18 @@ class SampleProgram:
         """
         Retrieves the URL to the requirements documentation for
         this sample program. Requirements URL is assumed to exist
-        and therefore not validated. 
+        and therefore not validated. The requirements documentation 
+        URL is in the following form:
+
+        ``https://sample-programs.therenegadecoder.com/projects/{project}/``
+
+        For example, here is a link to the
+        `Hello World documentation <https://sample-programs.therenegadecoder.com/projects/hello-world/>`_. 
+
+        Assuming you have a SampleProgram object called program, 
+        here's how you would use this method::
+
+            url: str = program.requirements_url()
 
         :return: the requirments URL as a string 
         """
@@ -102,18 +138,39 @@ class SampleProgram:
         """
         Retrieves the URL to the documentation for this
         sample program. Documentation URL is assumed to exist
-        and therefore not validated.
+        and therefore not validated. The documentation 
+        URL is in the following form:
+
+        ``https://sample-programs.therenegadecoder.com/projects/{project}/{lang}/``
+
+        For example, here is a link to the
+        `Hello World in Python documentation <https://sample-programs.therenegadecoder.com/projects/hello-world/python/>`_. 
+
+        Assuming you have a SampleProgram object called program, 
+        here's how you would use this method::
+        
+            url: str = program.documentation_url()
 
         :return: the documentation URL as a string
         """
         return self._sample_program_doc_url
 
-    def issue_query_url(self) -> str:
+    def article_issue_query_url(self) -> str:
         """
-        Retrieves the URL to the issue query for this sample
-        program. Issue query URL is guaranteed to be a valid
-        search query on GitHub, but it is not guaranteed to 
-        have any results.
+        Retrieves the URL to the article issue query for this sample
+        program. The article issue query URL is guaranteed to be a valid
+        search query on GitHub, but it is not guaranteed to have any 
+        results. The issue query url is in the following form:
+
+        ``https://github.com//TheRenegadeCoder/sample-programs-website/issues?{query}"``
+
+        For example, here is a link to the
+        `Hello World in Python query <https://github.com/TheRenegadeCoder/sample-programs-website/issues?q=is%3Aissue+is%3Aopen+hello+world+python>`_. 
+
+        Assuming you have a SampleProgram object called program, 
+        here's how you would use this method::
+
+            url: str = program.article_issue_query_url()
 
         :return: the issue query URL as a string
         """
@@ -189,22 +246,16 @@ class LanguageCollection:
         self._path: str = path
         self._file_list: List[str] = file_list
         self._first_letter: str = name[0]
-        self._sample_programs: List[SampleProgram] = self._collect_sample_programs(
-        )
+        self._sample_programs: List[SampleProgram] = self._collect_sample_programs()
         self._test_file_path: Optional[str] = self._collect_test_file()
         self._read_me_path: Optional[str] = self._collect_readme()
-        self._sample_program_url: Optional[
-            str] = f"https://sample-programs.therenegadecoder.com/languages/{self._name}"
+        self._lang_docs_url: str = f"https://sample-programs.therenegadecoder.com/languages/{self._name}"
+        self._testinfo_url: str = f"https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/{self._name[0]}/{self._name}/testinfo.yml"
         self._total_snippets: int = len(self._sample_programs)
-        self._total_dir_size: int = sum(x.size()
-                                        for x in self._sample_programs)
-        self._total_line_count: int = sum(
-            x.line_count() for x in self._sample_programs)
+        self._total_dir_size: int = sum(x.size() for x in self._sample_programs)
+        self._total_line_count: int = sum(x.line_count() for x in self._sample_programs)
 
     def __str__(self) -> str:
-        return self._name + ";" + str(self._total_snippets) + ";" + str(self._total_dir_size)
-
-    def name(self) -> str:
         """
         Generates as close to the proper language name as possible given a language
         name in plain text separated by hyphens.
@@ -228,7 +279,13 @@ class LanguageCollection:
 
     def testinfo(self) -> Optional[dict]:
         """
-        Retrieves the test data from the test info file.
+        Retrieves the test data from the testinfo file. The YAML data
+        is loaded into a Python dictionary.
+
+        Assuming you have a LanguageCollection object called language, 
+        here's how you would use this method::
+
+            data: dict = language.testinfo()
 
         :return: the test info data as a dictionary
         """
@@ -238,9 +295,15 @@ class LanguageCollection:
                 test_data = yaml.safe_load(test_file)
         return test_data
 
-    def has_test(self) -> bool:
+    def has_testinfo(self) -> bool:
         """
-        Retrieves the state of the test info file.
+        Retrieves the state of the testinfo file. Helpful when
+        trying to figure out if this language has a testinfo file.
+
+        Assuming you have a LanguageCollection object called language, 
+        here's how you would use this method::
+
+            state: bool = language.has_testinfo()
 
         :return: True if a test info file exists; False otherwise
         """
@@ -248,7 +311,13 @@ class LanguageCollection:
 
     def readme(self) -> Optional[str]:
         """
-        Retrieves the README contents.
+        Retrieves the README contents. README contents are in
+        the form of a markdown string.
+
+        Assuming you have a LanguageCollection object called language, 
+        here's how you would use this method::
+
+            contents: str = language.readme()
 
         :return: the README contents as a string
         """
@@ -257,7 +326,12 @@ class LanguageCollection:
 
     def sample_programs(self) -> List[SampleProgram]:
         """
-        Retrieves the list of sample programs.
+        Retrieves the list of sample programs associated with this language.
+
+        Assuming you have a LanguageCollection object called language, 
+        here's how you would use this method::
+
+            programs: List[SampleProgram] = language.sample_programs()
 
         :return: the list of sample programs
         """
@@ -267,6 +341,11 @@ class LanguageCollection:
         """
         Retrieves the total number of sample programs in the language collection.
 
+        Assuming you have a LanguageCollection object called language, 
+        here's how you would use this method::
+
+            programs_count: int = language.total_programs()
+
         :return: the number of sample programs as an int
         """
         return self._total_snippets
@@ -274,6 +353,13 @@ class LanguageCollection:
     def total_size(self) -> int:
         """
         Retrieves the total byte size of the sample programs in the language collection.
+        Size is computed from the size of all sample programs and is not computed
+        from the testinfo or README files. 
+
+        Assuming you have a LanguageCollection object called language, 
+        here's how you would use this method::
+
+            size: int = language.total_size()
 
         :return: the total byte size of the language collection as an int
         """
@@ -281,20 +367,58 @@ class LanguageCollection:
 
     def total_line_count(self) -> int:
         """
-        Retrieves the total line count of the language collection.
+        Retrieves the total line count of the language collection. Line count
+        is computed from the sample programs only and does not include lines of
+        code in testinfo or README files. 
+
+        Assuming you have a LanguageCollection object called language, 
+        here's how you would use this method::
+
+            lines: int = language.total_line_count() 
 
         :return: the total line count of the language collection as an int
         """
         return self._total_line_count
 
-    def language_url(self) -> str:
+    def lang_docs_url(self) -> str:
         """
-        Retrieves the URL to the language documentation. Language URL is assumed
-        to exist and therefore not validated.
+        Retrieves the URL to the language documentation. The language URL is assumed
+        to exist and therefore not validated. The language documentation URL is
+        in the following form:
+
+        ``https://sample-programs.therenegadecoder.com/languages/{lang}/``
+
+        For example, here is a link to the
+        `Python documentation <https://sample-programs.therenegadecoder.com/languages/python/>`_. 
+
+        Assuming you have a LanguageCollection object called language, 
+        here's how you would use this method::
+
+            link: str = language.lang_docs_url() 
 
         :return: the language documentation URL as a string
         """
-        return self._sample_program_url
+        return self._lang_docs_url
+
+    def testinfo_url(self) -> str:
+        """
+        Retrieves the URL to the testinfo file for this language on GitHub. 
+        The testinfo URL is assumed to exist and therefore not validated. The 
+        testinfo URL is in the following form:
+
+        ``https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/{letter}/{lang}/testinfo.yml``
+
+        For example, here is a link to the
+        `Python testinfo file <https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/p/python/testinfo.yml>`_.
+
+        Assuming you have a LanguageCollection object called language, 
+        here's how you would use this method::
+
+            link: str = language.testinfo_url()  
+
+        :return: the testinfo URL as a string
+        """
+        return self._testinfo_url
 
     def _collect_sample_programs(self) -> List[SampleProgram]:
         """
@@ -307,8 +431,7 @@ class LanguageCollection:
             _, file_ext = os.path.splitext(file)
             file_ext = file_ext.lower()
             if file_ext not in (".md", "", ".yml"):
-                sample_programs.append(SampleProgram(
-                    self._path, file, self.name()))
+                sample_programs.append(SampleProgram(self._path, file, str(self)))
         sample_programs.sort(key=lambda program: str(program).casefold())
         return sample_programs
 
@@ -344,15 +467,17 @@ class Repo:
         self._temp_dir = tempfile.TemporaryDirectory()
         self._source_dir: str = self._generate_source_dir(source_dir)
         self._languages: List[LanguageCollection] = self._collect_languages()
-        self._total_snippets: int = sum(
-            x.total_programs() for x in self._languages)
-        self._total_tests: int = sum(
-            1 for x in self._languages if x.has_test())
-        self._temp_dir.cleanup()
+        self._total_snippets: int = sum(x.total_programs() for x in self._languages)
+        self._total_tests: int = sum(1 for x in self._languages if x.has_testinfo())
 
     def language_collections(self) -> List[LanguageCollection]:
         """
         Retrieves the list of language collections in the Sample Programs repo.
+
+        Assuming you have a Repo object called repo, here’s how you would use 
+        this method::
+
+            languages: List[LanguageCollection] = repo.language_collections()
 
         :return: the list of the language collections
         """
@@ -361,6 +486,13 @@ class Repo:
     def total_programs(self) -> int:
         """
         Retrieves the total number of programs in the sample programs repo.
+        This total does not include any additional files such as README
+        or testinfo files. 
+
+        Assuming you have a Repo object called repo, here’s how you would use 
+        this method::
+
+            count: int = repo.total_programs()
 
         :return: the total number of programs as an int
         """
@@ -368,7 +500,13 @@ class Repo:
 
     def total_tests(self) -> int:
         """
-        Retrieves the total number of tested languages in the repo.
+        Retrieves the total number of tested languages in the repo. This value
+        is based on the number of testinfo files in the repo.
+
+        Assuming you have a Repo object called repo, here’s how you would use 
+        this method::
+
+            count: int = repo.total_tests()
 
         :return: the total number of tested languages as an int
         """
@@ -376,7 +514,13 @@ class Repo:
 
     def get_languages_by_letter(self, letter: str) -> List[LanguageCollection]:
         """
-        A utility method for retrieving all language collections that start with a particular letter.
+        A convenience method for retrieving all language collections that start with a 
+        particular letter.
+
+        Assuming you have a Repo object called repo, here’s how you would use 
+        this method::
+
+            langs: List[LanguageCollection] = repo.get_languages_by_letter("p")
 
         :param letter: a character to search by
         :return: a list of language collections where the language starts with the provided letter
@@ -387,7 +531,14 @@ class Repo:
 
     def get_sorted_language_letters(self) -> List[str]:
         """
-        A utility method which generates a list of sorted letters from the sample programs archive.
+        A convenience method which generates a list of sorted letters from the sample 
+        programs archive. This will return a list of letters that match the directory
+        structure of the archive.
+
+        Assuming you have a Repo object called repo, here’s how you would use 
+        this method::
+
+            letters: List[str] = repo.get_sorted_language_letters()
 
         :return: a sorted list of letters
         """

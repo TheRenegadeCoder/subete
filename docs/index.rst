@@ -8,7 +8,9 @@ navigate the docs.
 .. toctree::
     :maxdepth: 1
 
+    usage
     subete
+    changelog
 
 Indices and tables
 ==================
