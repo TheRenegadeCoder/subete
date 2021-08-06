@@ -420,3 +420,4 @@ class Repo:
             git.Repo.clone_from(
                 "https://github.com/TheRenegadeCoder/sample-programs.git", self._temp_dir.name)
             return os.path.join(self._temp_dir.name, "archive")
+        return source_dir
