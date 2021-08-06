@@ -23,3 +23,7 @@ def test_sample_program_size():
 def test_sample_program_requirements_url():
     test = SampleProgram(TEST_FILE_PATH, TEST_FILE_NAME, TEST_LANG)
     assert test.requirements_url() == "https://sample-programs.therenegadecoder.com/projects/hello-world"
+
+def test_sample_program_documentation_url():
+    test = SampleProgram(TEST_FILE_PATH, TEST_FILE_NAME, TEST_LANG)
+    assert test.documentation_url() == "https://sample-programs.therenegadecoder.com/projects/hello-world/python"

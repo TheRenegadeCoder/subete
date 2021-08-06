@@ -225,6 +225,16 @@ class SampleProgram:
         """
         return self._sample_program_req_url
 
+    def documentation_url(self) -> str:
+        """
+        Retrieves the URL to the documentation for this
+        sample program. Documentation URL is assumed to exist
+        and therefore not validated.
+
+        :return: the documentation URL as a string
+        """
+        return self._sample_program_doc_url
+
     def _normalize_program_name(self) -> str:
         """
         A helper function which converts the program name into
