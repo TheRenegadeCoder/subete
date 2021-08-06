@@ -374,7 +374,7 @@ class Repo:
         """
         return self._total_tests
 
-    def get_languages_by_letter(self, letter: str) -> list:
+    def get_languages_by_letter(self, letter: str) -> List[LanguageCollection]:
         """
         A utility method for retrieving all language collections that start with a particular letter.
 
