@@ -283,8 +283,14 @@ class LanguageCollection:
 
     def lang_docs_url(self) -> str:
         """
-        Retrieves the URL to the language documentation. Language URL is assumed
-        to exist and therefore not validated.
+        Retrieves the URL to the language documentation. The language URL is assumed
+        to exist and therefore not validated. The language documentation URL is
+        in the following form:
+
+        ``https://sample-programs.therenegadecoder.com/languages/{lang}/``
+
+        For example, here is a link to the
+        `Python documentation <https://sample-programs.therenegadecoder.com/languages/python/>`_. 
 
         :return: the language documentation URL as a string
         """
@@ -298,9 +304,8 @@ class LanguageCollection:
 
         ``https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/{letter}/{lang}/testinfo.yml``
 
-        For example, 
-        `here is a link <https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/p/python/testinfo.yml>`_ 
-        to the Python testinfo file.
+        For example, here is a link to the
+        `Python testinfo file <https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/p/python/testinfo.yml>`_.
 
         :return: the testinfo URL as a string
         """
