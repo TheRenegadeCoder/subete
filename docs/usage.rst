@@ -6,7 +6,7 @@ library in Python? Then subete is the official way
 to do it! To get started, download and install subete 
 using pip:
 
-.. code-block:: Python
+.. code-block:: Shell
 
     pip install subete
 

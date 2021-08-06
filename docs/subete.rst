@@ -12,7 +12,7 @@ This module was designed with the intent of creating read-only objects that full
 represent the underlying repo. Ideally, classes that make use of these objects
 should not need to know how they were generated. For example, we do not want users
 to poke around the source directory that was used to generate these files. As a result,
-users should make use of the public fields only.
+users should make use of the public methods only.
 
 .. automodule:: subete
    :members:
