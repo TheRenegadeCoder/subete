@@ -296,7 +296,11 @@ class LanguageCollection:
         assumed to exist and therefore not validated. The testinfo URL is
         in the following form:
 
-        https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/{letter}/{lang}/testinfo.yml
+        ``https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/{letter}/{lang}/testinfo.yml``
+
+        For example, 
+        `here is a link <https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/p/python/testinfo.yml>`_ 
+        to the Python testinfo file.
 
         :return: the testinfo URL as a string
         """
