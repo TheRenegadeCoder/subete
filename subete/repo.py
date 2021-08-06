@@ -189,22 +189,16 @@ class LanguageCollection:
         self._path: str = path
         self._file_list: List[str] = file_list
         self._first_letter: str = name[0]
-        self._sample_programs: List[SampleProgram] = self._collect_sample_programs(
-        )
+        self._sample_programs: List[SampleProgram] = self._collect_sample_programs()
         self._test_file_path: Optional[str] = self._collect_test_file()
         self._read_me_path: Optional[str] = self._collect_readme()
-        self._sample_program_url: Optional[
-            str] = f"https://sample-programs.therenegadecoder.com/languages/{self._name}"
+        self._lang_docs_url: str = f"https://sample-programs.therenegadecoder.com/languages/{self._name}"
+        self._testinfo_url: str = f"https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/{self._name[0]}/{self._name}/testinfo.yml"
         self._total_snippets: int = len(self._sample_programs)
-        self._total_dir_size: int = sum(x.size()
-                                        for x in self._sample_programs)
-        self._total_line_count: int = sum(
-            x.line_count() for x in self._sample_programs)
+        self._total_dir_size: int = sum(x.size() for x in self._sample_programs)
+        self._total_line_count: int = sum(x.line_count() for x in self._sample_programs)
 
     def __str__(self) -> str:
-        return self._name + ";" + str(self._total_snippets) + ";" + str(self._total_dir_size)
-
-    def name(self) -> str:
         """
         Generates as close to the proper language name as possible given a language
         name in plain text separated by hyphens.
@@ -287,14 +281,23 @@ class LanguageCollection:
         """
         return self._total_line_count
 
-    def language_url(self) -> str:
+    def lang_docs_url(self) -> str:
         """
         Retrieves the URL to the language documentation. Language URL is assumed
         to exist and therefore not validated.
 
         :return: the language documentation URL as a string
         """
-        return self._sample_program_url
+        return self._lang_docs_url
+
+    def testinfo_url(self) -> str:
+        """
+        Retrieves the URL to the testinfo file on GitHub. The testinfo URL is
+        assumed to exist and therefore not validated. 
+
+        :return: the testinfo URL as a string
+        """
+        return self._testinfo_url
 
     def _collect_sample_programs(self) -> List[SampleProgram]:
         """
