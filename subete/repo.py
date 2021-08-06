@@ -84,12 +84,20 @@ class SampleProgram:
 
     def code(self) -> str:
         """
-        Retrieves the code for this sample program.
+        Retrieves the code for this sample program. To save space
+        in memory, code is loaded from the source file on each invocation 
+        of this method. As a result, there may be an IO performance
+        penalty if this function is used many times. It's recommended
+        to store the result of this function if it is used often.
+
+        Assuming you have a SampleProgram object called program, 
+        here's how you would use this method::
+        
+            code: str = program.code()
 
         :return: the code for the sample program as a string
         """
-        logger.debug(
-            f"Attempting to retrieve code from {self._path}/{self._file_name}")
+        logger.debug(f"Attempting to retrieve code from {self._path}/{self._file_name}")
         return Path(self._path, self._file_name).read_text(errors="replace")
 
     def line_count(self) -> int:
@@ -427,7 +435,6 @@ class Repo:
             x.total_programs() for x in self._languages)
         self._total_tests: int = sum(
             1 for x in self._languages if x.has_testinfo())
-        self._temp_dir.cleanup()
 
     def language_collections(self) -> List[LanguageCollection]:
         """
