@@ -31,3 +31,7 @@ def test_language_collection_total_size():
 def test_language_collection_total_line_count():
     test = LanguageCollection(TEST_LANG, TEST_PATH, TEST_FILES)
     assert test.total_line_count() == 1
+
+def test_language_collection_language_url():
+    test = LanguageCollection(TEST_LANG, TEST_PATH, TEST_FILES)
+    assert test.language_url() == "https://sample-programs.therenegadecoder.com/languages/python"

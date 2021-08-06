@@ -273,6 +273,15 @@ class LanguageCollection:
         """
         return self._total_line_count
 
+    def language_url(self) -> str:
+        """
+        Retrieves the URL to the language documentation. Language URL is assumed
+        to exist and therefore not validated.
+
+        :return: the language documentation URL as a string
+        """
+        return self._sample_program_url
+
     def _collect_sample_programs(self) -> List[SampleProgram]:
         """
         Generates a list of sample program objects from all of the files in this language collection.
