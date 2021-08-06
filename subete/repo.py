@@ -183,42 +183,7 @@ class LanguageCollection:
     def __str__(self) -> str:
         return self._name + ";" + str(self._total_snippets) + ";" + str(self._total_dir_size)
 
-    def _collect_sample_programs(self) -> List[SampleProgram]:
-        """
-        Generates a list of sample program objects from all of the files in this language collection.
-
-        :return: a collection of sample programs
-        """
-        sample_programs = []
-        for file in self._file_list:
-            _, file_ext = os.path.splitext(file)
-            file_ext = file_ext.lower()
-            if file_ext not in (".md", "", ".yml"):
-                sample_programs.append(SampleProgram(self._path, file, self.get_readable_name()))
-        sample_programs.sort(key=lambda program: str(program).casefold())
-        return sample_programs
-
-    def _collect_test_file(self) -> Optional[str]:
-        """
-        Generates the path to a test file for this language collection
-        if it exists.
-
-        :return: the path to a test info file
-        """
-        if "testinfo.yml" in self._file_list:
-            return os.path.join("testinfo.yml")
-
-    def _collect_readme(self) -> Optional[str]:
-        """
-        Generates the path to the README for this language collection
-        if it exists.
-
-        :return: the path to a readme
-        """
-        if "README.md" in self._file_list:
-            return os.path.join("README.md")
-
-    def get_readable_name(self) -> str:
+    def name(self) -> str:
         """
         Generates as close to the proper language name as possible given a language
         name in plain text separated by hyphens.
@@ -240,7 +205,7 @@ class LanguageCollection:
         else:
             return " ".join(tokens).title()
 
-    def get_test_data(self) -> Optional[dict]:
+    def testinfo(self) -> Optional[dict]:
         """
         Retrieves the test data from the test info file.
 
@@ -248,9 +213,53 @@ class LanguageCollection:
         """
         test_data = None
         if self._test_file_path:
-            with open(os.path.join(self._path, self._test_file_path)) as test_file:
+            with open(self._test_file_path) as test_file:
                 test_data = yaml.safe_load(test_file)
         return test_data
+
+    def readme(self) -> Optional[str]:
+        """
+        Retrieves the README contents.
+
+        :return: the README contents as a string
+        """
+        if self._read_me_path:
+            return Path(self._read_me_path).read_text()
+
+    def _collect_sample_programs(self) -> List[SampleProgram]:
+        """
+        Generates a list of sample program objects from all of the files in this language collection.
+
+        :return: a collection of sample programs
+        """
+        sample_programs = []
+        for file in self._file_list:
+            _, file_ext = os.path.splitext(file)
+            file_ext = file_ext.lower()
+            if file_ext not in (".md", "", ".yml"):
+                sample_programs.append(SampleProgram(self._path, file, self.name()))
+        sample_programs.sort(key=lambda program: str(program).casefold())
+        return sample_programs
+
+    def _collect_test_file(self) -> Optional[str]:
+        """
+        Generates the path to a test file for this language collection
+        if it exists.
+
+        :return: the path to a test info file
+        """
+        if "testinfo.yml" in self._file_list:
+            return os.path.join(self._path, "testinfo.yml")
+
+    def _collect_readme(self) -> Optional[str]:
+        """
+        Generates the path to the README for this language collection
+        if it exists.
+
+        :return: the path to a readme
+        """
+        if "README.md" in self._file_list:
+            return os.path.join(self._path, "README.md")
 
 
 class Repo:
