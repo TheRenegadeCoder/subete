@@ -102,7 +102,12 @@ class SampleProgram:
 
     def line_count(self) -> int:
         """
-        Retrieves the number of lines in the sample program.
+        Retrieves the number of lines in the sample program. 
+
+        Assuming you have a SampleProgram object called program, 
+        here's how you would use this method::
+
+            code: int = program.line_count()
 
         :return: the number of lines for the sample program as an integer
         """
@@ -112,7 +117,18 @@ class SampleProgram:
         """
         Retrieves the URL to the requirements documentation for
         this sample program. Requirements URL is assumed to exist
-        and therefore not validated. 
+        and therefore not validated. The requirements documentation 
+        URL is in the following form:
+
+        ``https://sample-programs.therenegadecoder.com/projects/{project}/``
+
+        For example, here is a link to the
+        `Hello World documentation <https://sample-programs.therenegadecoder.com/projects/hello-world/>`_. 
+
+        Assuming you have a SampleProgram object called program, 
+        here's how you would use this method::
+
+            url: str = program.requirements_url()
 
         :return: the requirments URL as a string 
         """
@@ -122,7 +138,18 @@ class SampleProgram:
         """
         Retrieves the URL to the documentation for this
         sample program. Documentation URL is assumed to exist
-        and therefore not validated.
+        and therefore not validated. The documentation 
+        URL is in the following form:
+
+        ``https://sample-programs.therenegadecoder.com/projects/{project}/{lang}/``
+
+        For example, here is a link to the
+        `Hello World in Python documentation <https://sample-programs.therenegadecoder.com/projects/hello-world/python/>`_. 
+
+        Assuming you have a SampleProgram object called program, 
+        here's how you would use this method::
+        
+            url: str = program.documentation_url()
 
         :return: the documentation URL as a string
         """
