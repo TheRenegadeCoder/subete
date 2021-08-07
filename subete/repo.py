@@ -575,6 +575,7 @@ class Repo:
         """
         language = random.choice(list(self.language_collections().values()))
         program = random.choice(list(language.sample_programs().values()))
+        logger.debug(f"Generated random program: {program}")
         return program
 
     def languages_by_letter(self, letter: str) -> List[LanguageCollection]:
