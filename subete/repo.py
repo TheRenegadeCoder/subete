@@ -487,8 +487,15 @@ class Repo:
         self._total_snippets: int = sum(x.total_programs() for _, x in self._languages.items())
         self._total_tests: int = sum(1 for _, x in self._languages.items() if x.has_testinfo())
 
-    def __getitem__(self, index) -> LanguageCollection:
-        return self._languages[index]
+    def __getitem__(self, language) -> LanguageCollection:
+        """
+        Makes a repo subscriptable. In this case, the subscript retrieves a 
+        language collection. 
+
+        :param language: the name of the language to lookup
+        :return: the language collection by name
+        """
+        return self._languages[language]
 
     def language_collections(self) -> Dict[str, LanguageCollection]:
         """
