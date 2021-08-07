@@ -290,8 +290,15 @@ class LanguageCollection:
         else:
             return " ".join(tokens).title()
 
-    def __getitem__(self, index) -> str:
-        return self._sample_programs[index]
+    def __getitem__(self, program) -> str:
+        """
+        Makes a language collection subscriptable. In this case, the subscript 
+        retrieves a sample program. 
+
+        :param program: the name of the program to lookup
+        :return: the sample program by name
+        """
+        return self._sample_programs[program]
 
     def testinfo(self) -> Optional[dict]:
         """
