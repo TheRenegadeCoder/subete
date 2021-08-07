@@ -290,6 +290,9 @@ class LanguageCollection:
         else:
             return " ".join(tokens).title()
 
+    def __getitem__(self, index) -> str:
+        return self._sample_programs[index]
+
     def testinfo(self) -> Optional[dict]:
         """
         Retrieves the test data from the testinfo file. The YAML data
@@ -483,6 +486,9 @@ class Repo:
         self._languages: Dict[str: LanguageCollection] = self._collect_languages()
         self._total_snippets: int = sum(x.total_programs() for _, x in self._languages.items())
         self._total_tests: int = sum(1 for _, x in self._languages.items() if x.has_testinfo())
+
+    def __getitem__(self, index) -> LanguageCollection:
+        return self._languages[index]
 
     def language_collections(self) -> Dict[str, LanguageCollection]:
         """
