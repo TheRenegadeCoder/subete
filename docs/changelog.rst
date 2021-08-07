@@ -1,6 +1,12 @@
 Changelog
 =========
 
+* v0.6.0
+    * Added random program functionality
+    * Fixed several documentation issues
+    * Renamed some repo functions to match naming conventions
+    * Expanded testing to include tests for random functions
+
 * v0.5.0
     * Updated README to indicate alpha stage of project
     * Added logging support
