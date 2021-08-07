@@ -3,7 +3,7 @@ import os
 import re
 import tempfile
 from pathlib import Path
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 import git
 import yaml
@@ -36,7 +36,7 @@ class SampleProgram:
 
         :return: the sample program as a string
         """
-        return f'{self._normalized_name.replace("-", " ").title()} in {self._language.title()}'
+        return f'{self.project()} in {self.language()}'
 
     def __eq__(self, o: object) -> bool:
         """
@@ -78,9 +78,23 @@ class SampleProgram:
 
             name: str = program.language()
 
-        :return: the language of the sample program as a string
+        :return: the programming language as a titlecase string
         """
         return self._language
+
+    def project(self) -> str:
+        """
+        Retrieves the project name of this sample program. Project name is
+        generated from the file name.
+
+        Assuming you have a SampleProgram object called program, 
+        here's how you would use this method::
+
+            name: str = program.project()
+
+        :return: the project name as a titlecase string
+        """
+        return self._normalized_name.replace("-", " ").title()
 
     def code(self) -> str:
         """
@@ -217,7 +231,7 @@ class SampleProgram:
 
         :return: the expected docs URL
         """
-        return f"{self._sample_program_req_url}/{self._language}"
+        return f"{self._sample_program_req_url}/{Path(self._path).name}"
 
     def _generate_issue_url(self) -> str:
         """
@@ -229,7 +243,7 @@ class SampleProgram:
         issue_url_base = "https://github.com//TheRenegadeCoder/" \
                          "sample-programs-website/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+"
         program = self._normalized_name.replace("-", "+")
-        return f"{issue_url_base}{program}+{self._language}"
+        return f"{issue_url_base}{program}+{self._language.replace(' ', '+').lower()}"
 
 
 class LanguageCollection:
@@ -246,14 +260,14 @@ class LanguageCollection:
         self._path: str = path
         self._file_list: List[str] = file_list
         self._first_letter: str = name[0]
-        self._sample_programs: List[SampleProgram] = self._collect_sample_programs()
+        self._sample_programs: Dict[str, SampleProgram] = self._collect_sample_programs()
         self._test_file_path: Optional[str] = self._collect_test_file()
         self._read_me_path: Optional[str] = self._collect_readme()
         self._lang_docs_url: str = f"https://sample-programs.therenegadecoder.com/languages/{self._name}"
         self._testinfo_url: str = f"https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/{self._name[0]}/{self._name}/testinfo.yml"
         self._total_snippets: int = len(self._sample_programs)
-        self._total_dir_size: int = sum(x.size() for x in self._sample_programs)
-        self._total_line_count: int = sum(x.line_count() for x in self._sample_programs)
+        self._total_dir_size: int = sum(x.size() for _, x in self._sample_programs.items())
+        self._total_line_count: int = sum(x.line_count() for _, x in self._sample_programs.items())
 
     def __str__(self) -> str:
         """
@@ -270,8 +284,7 @@ class LanguageCollection:
             "sharp": "#",
             "star": r"\*"
         }
-        tokens = [text_to_symbol.get(token, token)
-                  for token in self._name.split("-")]
+        tokens = [text_to_symbol.get(token, token) for token in self._name.split("-")]
         if any(token in text_to_symbol.values() for token in tokens):
             return "".join(tokens).title()
         else:
@@ -420,19 +433,21 @@ class LanguageCollection:
         """
         return self._testinfo_url
 
-    def _collect_sample_programs(self) -> List[SampleProgram]:
+    def _collect_sample_programs(self) -> Dict[str, SampleProgram]:
         """
         Generates a list of sample program objects from all of the files in this language collection.
 
         :return: a collection of sample programs
         """
-        sample_programs = []
+        sample_programs = {}
         for file in self._file_list:
             _, file_ext = os.path.splitext(file)
             file_ext = file_ext.lower()
             if file_ext not in (".md", "", ".yml"):
-                sample_programs.append(SampleProgram(self._path, file, str(self)))
-        sample_programs.sort(key=lambda program: str(program).casefold())
+                program = SampleProgram(self._path, file, str(self))
+                print(program)
+                sample_programs[program.project()] = program
+        sample_programs = dict(sorted(sample_programs.items()))
         return sample_programs
 
     def _collect_test_file(self) -> Optional[str]:
@@ -466,20 +481,21 @@ class Repo:
     def __init__(self, source_dir: Optional[str] = None) -> None:
         self._temp_dir = tempfile.TemporaryDirectory()
         self._source_dir: str = self._generate_source_dir(source_dir)
-        self._languages: List[LanguageCollection] = self._collect_languages()
-        self._total_snippets: int = sum(x.total_programs() for x in self._languages)
-        self._total_tests: int = sum(1 for x in self._languages if x.has_testinfo())
+        self._languages: Dict[str: LanguageCollection] = self._collect_languages()
+        self._total_snippets: int = sum(x.total_programs() for _, x in self._languages.items())
+        self._total_tests: int = sum(1 for _, x in self._languages.items() if x.has_testinfo())
 
-    def language_collections(self) -> List[LanguageCollection]:
+    def language_collections(self) -> Dict[str, LanguageCollection]:
         """
-        Retrieves the list of language collections in the Sample Programs repo.
+        Retrieves the list of language names mapped to their language collections in 
+        the Sample Programs repo.
 
         Assuming you have a Repo object called repo, here’s how you would use 
         this method::
 
-            languages: List[LanguageCollection] = repo.language_collections()
+            languages: Dict[str, LanguageCollection] = repo.language_collections()
 
-        :return: the list of the language collections
+        :return: the dictionary of language names mapped to language collections
         """
         return self._languages
 
@@ -526,7 +542,10 @@ class Repo:
         :return: a list of language collections where the language starts with the provided letter
         """
         language_list = [
-            language for language in self._languages if language._name.startswith(letter)]
+            language 
+            for name, language in self._languages.items() 
+            if name.lower().startswith(letter)
+        ]
         return sorted(language_list, key=lambda s: s._name.casefold())
 
     def get_sorted_language_letters(self) -> List[str]:
@@ -545,19 +564,18 @@ class Repo:
         unsorted_letters = os.listdir(self._source_dir)
         return sorted(unsorted_letters, key=lambda s: s.casefold())
 
-    def _collect_languages(self) -> List[LanguageCollection]:
+    def _collect_languages(self) -> Dict[str, LanguageCollection]:
         """
         Builds a list of language collections.
 
         :return: the list of language collections
         """
-        languages = []
+        languages = {}
         for root, directories, files in os.walk(self._source_dir):
             if not directories:
-                language = LanguageCollection(
-                    os.path.basename(root), root, files)
-                languages.append(language)
-        languages.sort(key=lambda lang: lang._name.casefold())
+                language = LanguageCollection(os.path.basename(root), root, files)
+                languages[str(language)] = language
+        languages = dict(sorted(languages.items()))
         return languages
 
     def _generate_source_dir(self, source_dir: Optional[str]) -> str:
