@@ -204,8 +204,8 @@ class SampleProgram:
             url = stem.replace("_", "-").lower()
         else:
             # TODO: this is brutal. At some point, we should loop in the glotter test file.
-            url = re.sub(
-                '((?<=[a-z])[A-Z0-9]|(?!^)[A-Z](?=[a-z]))', r'-\1', stem).lower()
+            url = re.sub('((?<=[a-z])[A-Z0-9]|(?!^)[A-Z](?=[a-z]))', r'-\1', stem).lower()
+        logger.info(f"Constructed a normalized form of the program {url}")
         return url
 
     def _generate_requirements_url(self) -> str:
@@ -467,6 +467,7 @@ class LanguageCollection:
             if file_ext not in (".md", "", ".yml"):
                 program = SampleProgram(self._path, file, str(self))
                 sample_programs[program.project()] = program
+                logger.debug(f"New sample program collected: {program}")
         sample_programs = dict(sorted(sample_programs.items()))
         return sample_programs
 
@@ -478,6 +479,7 @@ class LanguageCollection:
         :return: the path to a test info file
         """
         if "testinfo.yml" in self._file_list:
+            logger.debug(f"New test file collected for {self}")
             return os.path.join(self._path, "testinfo.yml")
 
     def _collect_readme(self) -> Optional[str]:
@@ -488,6 +490,7 @@ class LanguageCollection:
         :return: the path to a readme
         """
         if "README.md" in self._file_list:
+            logger.debug(f"New README collected for {self}")
             return os.path.join(self._path, "README.md")
 
 
@@ -605,6 +608,7 @@ class Repo:
             if not directories:
                 language = LanguageCollection(os.path.basename(root), root, files)
                 languages[str(language)] = language
+                logger.debug(f"New language collected: {language}")
         languages = dict(sorted(languages.items()))
         return languages
 
