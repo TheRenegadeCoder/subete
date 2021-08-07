@@ -616,7 +616,8 @@ class Repo:
         :return: a path to the source directory of the archive directory
         """
         if not source_dir:
-            git.Repo.clone_from(
-                "https://github.com/TheRenegadeCoder/sample-programs.git", self._temp_dir.name)
+            logger.info(f"Source directory is not provided. Cloning the Sample Programs repo to a temporary directory: {self._temp_dir.name}.")
+            git.Repo.clone_from("https://github.com/TheRenegadeCoder/sample-programs.git", self._temp_dir.name)
             return os.path.join(self._temp_dir.name, "archive")
+        logger.info(f"Source directory provided: {self._source_dir}")
         return source_dir
