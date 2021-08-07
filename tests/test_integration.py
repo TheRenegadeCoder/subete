@@ -14,4 +14,4 @@ def test_testinfo_url_multiword_lang():
 def test_requirements_url_multiword_lang():
     language: LanguageCollection = TEST_REPO.language_collections()["Google Apps Script"]
     program: SampleProgram = language.sample_programs()["Hello World"]
-    assert program.requirements_url() == "https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/g/google-apps-script/testinfo.yml"
+    assert program.requirements_url() == "https://sample-programs.therenegadecoder.com/projects/hello-world"
