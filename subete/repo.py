@@ -231,7 +231,7 @@ class SampleProgram:
 
         :return: the expected docs URL
         """
-        return f"{self._sample_program_req_url}/{self.language().replace(' ', '-').lower()}"
+        return f"{self._sample_program_req_url}/{Path(self._path).name}"
 
     def _generate_issue_url(self) -> str:
         """
