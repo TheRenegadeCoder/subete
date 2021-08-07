@@ -1,8 +1,9 @@
-# subete
- 
-The plan for this repo is to extract the repo traversal utilities
-from the sample-programs-docs-generator. I really like this as 
-a way of providing a Python library which interfaces with the
-Sample Programs repo. I can already see this being useful for
-our own internal documentation but also useful for anyone who
-just wants to explore code in a bunch of different languages. 
+# Subete
+
+Subete is a Python library for interacting with the Sample Programs
+repository. It works by cloning the repository and analyzing its
+contents. It is currently in its alpha form, but you can already
+see it being used in various Sample Programs projects. 
+
+If you're interested in exploring the repo programatically,
+check out the [official documentation](https://subete.therenegadecoder.com). 
