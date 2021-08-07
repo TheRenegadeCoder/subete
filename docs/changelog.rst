@@ -1,6 +1,17 @@
 Changelog
 =========
 
+* v0.5.0
+    * Updated README to indicate alpha stage of project
+    * Added logging support
+    * Added method of retrieving pathlike name of LanguageCollection
+    * Fixed type hinting of sample_programs() method
+    * Removed extraneous print statement
+    * Made Repo and LanguageCollection subscriptable
+
+* v0.4.1
+    * Fixed an issue where generated links were broken
+
 * v0.4.0
     * Forced a convention for LanguageCollection and SampleProgram as strings
     * Added test URL functionality to LanguageCollection

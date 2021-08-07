@@ -204,8 +204,8 @@ class SampleProgram:
             url = stem.replace("_", "-").lower()
         else:
             # TODO: this is brutal. At some point, we should loop in the glotter test file.
-            url = re.sub(
-                '((?<=[a-z])[A-Z0-9]|(?!^)[A-Z](?=[a-z]))', r'-\1', stem).lower()
+            url = re.sub('((?<=[a-z])[A-Z0-9]|(?!^)[A-Z](?=[a-z]))', r'-\1', stem).lower()
+        logger.info(f"Constructed a normalized form of the program {url}")
         return url
 
     def _generate_requirements_url(self) -> str:
@@ -290,6 +290,26 @@ class LanguageCollection:
         else:
             return " ".join(tokens).title()
 
+    def __getitem__(self, program) -> str:
+        """
+        Makes a language collection subscriptable. In this case, the subscript 
+        retrieves a sample program. 
+
+        :param program: the name of the program to lookup
+        :return: the sample program by name
+        """
+        return self._sample_programs[program]
+
+    def pathlike_name(self):
+        """
+        Retrieves a pathlike name for this language. For example,
+        instead of returning C# it would return c-sharp. Names
+        are based on the folder names in the Sample Programs repo.
+
+        :return: the pathlike name of this programming language
+        """
+        return self._name
+
     def testinfo(self) -> Optional[dict]:
         """
         Retrieves the test data from the testinfo file. The YAML data
@@ -337,16 +357,17 @@ class LanguageCollection:
         if self._read_me_path:
             return Path(self._read_me_path).read_text()
 
-    def sample_programs(self) -> List[SampleProgram]:
+    def sample_programs(self) -> Dict[str, SampleProgram]:
         """
-        Retrieves the list of sample programs associated with this language.
+        Retrieves the dictionary of sample programs associated with this language.
+        Each sample program can be looked up by name (e.g., Hello World)
 
         Assuming you have a LanguageCollection object called language, 
         here's how you would use this method::
 
-            programs: List[SampleProgram] = language.sample_programs()
+            programs: Dict[SampleProgram] = language.sample_programs()
 
-        :return: the list of sample programs
+        :return: the dictionary of sample programs
         """
         return self._sample_programs
 
@@ -445,8 +466,8 @@ class LanguageCollection:
             file_ext = file_ext.lower()
             if file_ext not in (".md", "", ".yml"):
                 program = SampleProgram(self._path, file, str(self))
-                print(program)
                 sample_programs[program.project()] = program
+                logger.debug(f"New sample program collected: {program}")
         sample_programs = dict(sorted(sample_programs.items()))
         return sample_programs
 
@@ -458,6 +479,7 @@ class LanguageCollection:
         :return: the path to a test info file
         """
         if "testinfo.yml" in self._file_list:
+            logger.debug(f"New test file collected for {self}")
             return os.path.join(self._path, "testinfo.yml")
 
     def _collect_readme(self) -> Optional[str]:
@@ -468,6 +490,7 @@ class LanguageCollection:
         :return: the path to a readme
         """
         if "README.md" in self._file_list:
+            logger.debug(f"New README collected for {self}")
             return os.path.join(self._path, "README.md")
 
 
@@ -484,6 +507,16 @@ class Repo:
         self._languages: Dict[str: LanguageCollection] = self._collect_languages()
         self._total_snippets: int = sum(x.total_programs() for _, x in self._languages.items())
         self._total_tests: int = sum(1 for _, x in self._languages.items() if x.has_testinfo())
+
+    def __getitem__(self, language) -> LanguageCollection:
+        """
+        Makes a repo subscriptable. In this case, the subscript retrieves a 
+        language collection. 
+
+        :param language: the name of the language to lookup
+        :return: the language collection by name
+        """
+        return self._languages[language]
 
     def language_collections(self) -> Dict[str, LanguageCollection]:
         """
@@ -575,6 +608,7 @@ class Repo:
             if not directories:
                 language = LanguageCollection(os.path.basename(root), root, files)
                 languages[str(language)] = language
+                logger.debug(f"New language collected: {language}")
         languages = dict(sorted(languages.items()))
         return languages
 
@@ -586,7 +620,8 @@ class Repo:
         :return: a path to the source directory of the archive directory
         """
         if not source_dir:
-            git.Repo.clone_from(
-                "https://github.com/TheRenegadeCoder/sample-programs.git", self._temp_dir.name)
+            logger.info(f"Source directory is not provided. Cloning the Sample Programs repo to a temporary directory: {self._temp_dir.name}.")
+            git.Repo.clone_from("https://github.com/TheRenegadeCoder/sample-programs.git", self._temp_dir.name)
             return os.path.join(self._temp_dir.name, "archive")
+        logger.info(f"Source directory provided: {self._source_dir}")
         return source_dir
