@@ -34,7 +34,7 @@ def test_documentation_url_multiword_lang():
     program: SampleProgram = language.sample_programs()["Hello World"]
     assert program.documentation_url() == "https://sample-programs.therenegadecoder.com/projects/hello-world/google-apps-script"
 
-def test_documentation_url_multiword_lang():
+def test_documentation_url_symbol_lang():
     language: LanguageCollection = TEST_REPO.language_collections()["C#"]
     program: SampleProgram = language.sample_programs()["Hello World"]
     assert program.documentation_url() == "https://sample-programs.therenegadecoder.com/projects/hello-world/c-sharp"
