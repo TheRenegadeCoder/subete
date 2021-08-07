@@ -347,16 +347,17 @@ class LanguageCollection:
         if self._read_me_path:
             return Path(self._read_me_path).read_text()
 
-    def sample_programs(self) -> List[SampleProgram]:
+    def sample_programs(self) -> Dict[str, SampleProgram]:
         """
-        Retrieves the list of sample programs associated with this language.
+        Retrieves the dictionary of sample programs associated with this language.
+        Each sample program can be looked up by name (e.g., Hello World)
 
         Assuming you have a LanguageCollection object called language, 
         here's how you would use this method::
 
-            programs: List[SampleProgram] = language.sample_programs()
+            programs: Dict[SampleProgram] = language.sample_programs()
 
-        :return: the list of sample programs
+        :return: the dictionary of sample programs
         """
         return self._sample_programs
 
