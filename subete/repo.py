@@ -585,7 +585,7 @@ class Repo:
         Assuming you have a Repo object called repo, here’s how you would use 
         this method::
 
-            langs: List[LanguageCollection] = repo.get_languages_by_letter("p")
+            langs: List[LanguageCollection] = repo.languages_by_letter("p")
 
         :param letter: a character to search by
         :return: a list of language collections where the language starts with the provided letter
@@ -606,7 +606,7 @@ class Repo:
         Assuming you have a Repo object called repo, here’s how you would use 
         this method::
 
-            letters: List[str] = repo.get_sorted_language_letters()
+            letters: List[str] = repo.sorted_language_letters()
 
         :return: a sorted list of letters
         """
