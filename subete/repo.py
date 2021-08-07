@@ -78,11 +78,22 @@ class SampleProgram:
 
             name: str = program.language()
 
-        :return: the language of the sample program as a string
+        :return: the programming language as a titlecase string
         """
         return self._language
 
     def project(self) -> str:
+        """
+        Retrieves the project name of this sample program. Project name is
+        generated from the file name.
+
+        Assuming you have a SampleProgram object called program, 
+        here's how you would use this method::
+
+            name: str = program.project()
+
+        :return: the project name as a titlecase string
+        """
         return self._normalized_name.replace("-", " ").title()
 
     def code(self) -> str:
