@@ -3,7 +3,7 @@ import os
 import re
 import tempfile
 from pathlib import Path
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 import git
 import yaml
@@ -466,20 +466,21 @@ class Repo:
     def __init__(self, source_dir: Optional[str] = None) -> None:
         self._temp_dir = tempfile.TemporaryDirectory()
         self._source_dir: str = self._generate_source_dir(source_dir)
-        self._languages: List[LanguageCollection] = self._collect_languages()
-        self._total_snippets: int = sum(x.total_programs() for x in self._languages)
-        self._total_tests: int = sum(1 for x in self._languages if x.has_testinfo())
+        self._languages: Dict[str: LanguageCollection] = self._collect_languages()
+        self._total_snippets: int = sum(x.total_programs() for _, x in self._languages.items())
+        self._total_tests: int = sum(1 for _, x in self._languages.items() if x.has_testinfo())
 
-    def language_collections(self) -> List[LanguageCollection]:
+    def language_collections(self) -> Dict[str, LanguageCollection]:
         """
-        Retrieves the list of language collections in the Sample Programs repo.
+        Retrieves the list of language names mapped to their language collections in 
+        the Sample Programs repo.
 
         Assuming you have a Repo object called repo, here’s how you would use 
         this method::
 
-            languages: List[LanguageCollection] = repo.language_collections()
+            languages: Dict[str, LanguageCollection] = repo.language_collections()
 
-        :return: the list of the language collections
+        :return: the dictionary of language names mapped to language collections
         """
         return self._languages
 
@@ -526,7 +527,10 @@ class Repo:
         :return: a list of language collections where the language starts with the provided letter
         """
         language_list = [
-            language for language in self._languages if language._name.startswith(letter)]
+            language 
+            for name, language in self._languages.items() 
+            if name.lower().startswith(letter)
+        ]
         return sorted(language_list, key=lambda s: s._name.casefold())
 
     def get_sorted_language_letters(self) -> List[str]:
@@ -545,19 +549,18 @@ class Repo:
         unsorted_letters = os.listdir(self._source_dir)
         return sorted(unsorted_letters, key=lambda s: s.casefold())
 
-    def _collect_languages(self) -> List[LanguageCollection]:
+    def _collect_languages(self) -> Dict[str, LanguageCollection]:
         """
         Builds a list of language collections.
 
         :return: the list of language collections
         """
-        languages = []
+        languages = {}
         for root, directories, files in os.walk(self._source_dir):
             if not directories:
-                language = LanguageCollection(
-                    os.path.basename(root), root, files)
-                languages.append(language)
-        languages.sort(key=lambda lang: lang._name.casefold())
+                language = LanguageCollection(os.path.basename(root), root, files)
+                languages[str(language)] = language
+        languages = dict(sorted(languages.items()))
         return languages
 
     def _generate_source_dir(self, source_dir: Optional[str]) -> str:
