@@ -21,8 +21,7 @@ def test_language_collection_sample_programs():
     test = LanguageCollection(TEST_LANG, TEST_PATH, TEST_FILES)
     sample_programs = test.sample_programs()
     assert sample_programs != None
-    assert SampleProgram(
-        TEST_PATH, TEST_FILES[0], TEST_LANG.title()) in sample_programs
+    assert SampleProgram(TEST_PATH, TEST_FILES[0], TEST_LANG.title()) in sample_programs.values()
 
 
 def test_language_collection_total_programs():

@@ -246,14 +246,14 @@ class LanguageCollection:
         self._path: str = path
         self._file_list: List[str] = file_list
         self._first_letter: str = name[0]
-        self._sample_programs: List[SampleProgram] = self._collect_sample_programs()
+        self._sample_programs: Dict[str, SampleProgram] = self._collect_sample_programs()
         self._test_file_path: Optional[str] = self._collect_test_file()
         self._read_me_path: Optional[str] = self._collect_readme()
         self._lang_docs_url: str = f"https://sample-programs.therenegadecoder.com/languages/{self._name}"
         self._testinfo_url: str = f"https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/{self._name[0]}/{self._name}/testinfo.yml"
         self._total_snippets: int = len(self._sample_programs)
-        self._total_dir_size: int = sum(x.size() for x in self._sample_programs)
-        self._total_line_count: int = sum(x.line_count() for x in self._sample_programs)
+        self._total_dir_size: int = sum(x.size() for _, x in self._sample_programs.items())
+        self._total_line_count: int = sum(x.line_count() for _, x in self._sample_programs.items())
 
     def __str__(self) -> str:
         """
@@ -420,19 +420,20 @@ class LanguageCollection:
         """
         return self._testinfo_url
 
-    def _collect_sample_programs(self) -> List[SampleProgram]:
+    def _collect_sample_programs(self) -> Dict[str, SampleProgram]:
         """
         Generates a list of sample program objects from all of the files in this language collection.
 
         :return: a collection of sample programs
         """
-        sample_programs = []
+        sample_programs = {}
         for file in self._file_list:
             _, file_ext = os.path.splitext(file)
             file_ext = file_ext.lower()
             if file_ext not in (".md", "", ".yml"):
-                sample_programs.append(SampleProgram(self._path, file, str(self)))
-        sample_programs.sort(key=lambda program: str(program).casefold())
+                program = SampleProgram(self._path, file, str(self))
+                sample_programs[str(program)] = program
+        sample_programs = dict(sorted(sample_programs.items()))
         return sample_programs
 
     def _collect_test_file(self) -> Optional[str]:
