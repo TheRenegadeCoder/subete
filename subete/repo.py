@@ -577,7 +577,7 @@ class Repo:
         program = random.choice(list(language.sample_programs().values()))
         return program
 
-    def get_languages_by_letter(self, letter: str) -> List[LanguageCollection]:
+    def languages_by_letter(self, letter: str) -> List[LanguageCollection]:
         """
         A convenience method for retrieving all language collections that start with a 
         particular letter.
@@ -597,7 +597,7 @@ class Repo:
         ]
         return sorted(language_list, key=lambda s: s._name.casefold())
 
-    def get_sorted_language_letters(self) -> List[str]:
+    def sorted_language_letters(self) -> List[str]:
         """
         A convenience method which generates a list of sorted letters from the sample 
         programs archive. This will return a list of letters that match the directory
