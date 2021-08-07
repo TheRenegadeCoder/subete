@@ -36,7 +36,7 @@ class SampleProgram:
 
         :return: the sample program as a string
         """
-        return f'{self._normalized_name.replace("-", " ").title()} in {self._language.title()}'
+        return f'{self.project()} in {self.language()}'
 
     def __eq__(self, o: object) -> bool:
         """
@@ -81,6 +81,9 @@ class SampleProgram:
         :return: the language of the sample program as a string
         """
         return self._language
+
+    def project(self) -> str:
+        return self._normalized_name.replace("-", " ").title()
 
     def code(self) -> str:
         """
@@ -270,8 +273,7 @@ class LanguageCollection:
             "sharp": "#",
             "star": r"\*"
         }
-        tokens = [text_to_symbol.get(token, token)
-                  for token in self._name.split("-")]
+        tokens = [text_to_symbol.get(token, token) for token in self._name.split("-")]
         if any(token in text_to_symbol.values() for token in tokens):
             return "".join(tokens).title()
         else:
@@ -432,7 +434,8 @@ class LanguageCollection:
             file_ext = file_ext.lower()
             if file_ext not in (".md", "", ".yml"):
                 program = SampleProgram(self._path, file, str(self))
-                sample_programs[str(program)] = program
+                print(program)
+                sample_programs[program.project()] = program
         sample_programs = dict(sorted(sample_programs.items()))
         return sample_programs
 
