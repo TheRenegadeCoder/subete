@@ -2,6 +2,7 @@ import logging
 import os
 import re
 import tempfile
+import random
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -365,7 +366,7 @@ class LanguageCollection:
         Assuming you have a LanguageCollection object called language, 
         here's how you would use this method::
 
-            programs: Dict[SampleProgram] = language.sample_programs()
+            programs: Dict[str, SampleProgram] = language.sample_programs()
 
         :return: the dictionary of sample programs
         """
@@ -560,6 +561,21 @@ class Repo:
         :return: the total number of tested languages as an int
         """
         return self._total_tests
+
+    def random_program(self) -> SampleProgram:
+        """
+        A convenience method for retrieving a random program from the repository.
+
+        Assuming you have a Repo object called repo, here’s how you would use 
+        this method::
+
+            program: SampleProgram = repo.random_program()
+
+        :return: a random sample program from the Sample Programs repository
+        """
+        language = random.choice(list(self.language_collections().values()))
+        program = random.choice(list(language.sample_programs().values()))
+        return program
 
     def get_languages_by_letter(self, letter: str) -> List[LanguageCollection]:
         """
