@@ -300,6 +300,16 @@ class LanguageCollection:
         """
         return self._sample_programs[program]
 
+    def pathlike_name(self):
+        """
+        Retrieves a pathlike name for this language. For example,
+        instead of returning C# it would return c-sharp. Names
+        are based on the folder names in the Sample Programs repo.
+
+        :return: the pathlike name of this programming language
+        """
+        return self._name
+
     def testinfo(self) -> Optional[dict]:
         """
         Retrieves the test data from the testinfo file. The YAML data
