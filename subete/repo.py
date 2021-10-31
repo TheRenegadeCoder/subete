@@ -271,6 +271,7 @@ class LanguageCollection:
         self._total_snippets: int = len(self._sample_programs)
         self._total_dir_size: int = sum(x.size() for _, x in self._sample_programs.items())
         self._total_line_count: int = sum(x.line_count() for _, x in self._sample_programs.items())
+        self._missing_programs: List[str] = self._collect_missing_programs()
 
     def __str__(self) -> str:
         """
@@ -457,6 +458,46 @@ class LanguageCollection:
         """
         return self._testinfo_url
 
+
+    def missing_programs(self) -> List[str]:
+        """
+        Retrieves the list of missing sample programs for this language.
+
+        Assuming you have a LanguageCollection object called language, 
+        here's how you would use this method::
+
+            missing_programs: List[str] = language.missing_programs()
+
+        return: a list of missing sample programs
+        """
+        return self._missing_programs
+
+
+    def missing_programs_count(self) -> int:
+        """
+        Retrieves the number of missing sample programs for this language.
+
+        Assuming you have a LanguageCollection object called language, 
+        here's how you would use this method::
+
+            missing_programs_count: int = language.missing_programs_count()
+
+        return: the number of missing sample programs
+        """
+        return len(self._missing_programs)
+
+
+    def _collect_missing_programs(self) -> List[str]:
+        """
+        Generates a list of sample programs that are missing from the language collection.
+
+        :return: a list of missing sample programs
+        """
+        programs = set(program._normalize_program_name() for program in self._sample_programs.values())
+        projects = set(self._projects)
+        return list(projects - programs)
+
+
     def _collect_sample_programs(self) -> Dict[str, SampleProgram]:
         """
         Generates a list of sample program objects from all of the files in this language collection.
@@ -495,21 +536,6 @@ class LanguageCollection:
         if "README.md" in self._file_list:
             logger.debug(f"New README collected for {self}")
             return os.path.join(self._path, "README.md")
-
-    def missing_programs(self) -> List[str]:
-        """
-        Generates a list of sample programs that are missing from the language collection.
-
-        Assuming you have a LanguageCollection object called language, 
-        here's how you would use this method::
-
-            missing_programs: List[str] = language.missing_programs()
-
-        :return: a list of missing sample programs
-        """
-        programs = set(program._normalize_program_name() for program in self._sample_programs.values())
-        projects = set(self._projects)
-        return list(projects - programs)
 
 
 class Repo:
