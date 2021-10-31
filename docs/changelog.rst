@@ -1,6 +1,13 @@
 Changelog
 =========
 
+* v0.7.1
+  * Fixed a bug where the missing programs feature failed for provided repos 
+
+* v0.7.0
+  * Added Plausible support for analytics
+  * Added feature which allows us to retrieve list of missing programs for a language
+
 * v0.6.0
     * Added random program functionality
     * Fixed several documentation issues
