@@ -4,7 +4,7 @@ import re
 import tempfile
 import random
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, Iterator, List, Optional
 
 import git
 import yaml
@@ -505,6 +505,8 @@ class Repo:
     def __init__(self, source_dir: Optional[str] = None) -> None:
         self._temp_dir = tempfile.TemporaryDirectory()
         self._source_dir: str = self._generate_source_dir(source_dir)
+        self._projects: list[str] = self._collect_projects()
+        self._docs_dir: str = os.path.join(self._source, "docs")
         self._languages: Dict[str: LanguageCollection] = self._collect_languages()
         self._total_snippets: int = sum(x.total_programs() for _, x in self._languages.items())
         self._total_tests: int = sum(1 for _, x in self._languages.items() if x.has_testinfo())
@@ -629,6 +631,19 @@ class Repo:
         languages = dict(sorted(languages.items()))
         return languages
 
+    def _collect_projects(self) -> List[str]:
+        """
+        A helper method for collecting the projects from the 
+        sample-programs-website repository. 
+
+        :return: a list of string objects representing the projects
+        """
+        projects = []
+        for project_dir in Path(self._docs_path).iterdir():
+            if project_dir.is_dir():
+                projects.append(project_dir)
+        return projects
+        
     def _generate_source_dir(self, source_dir: Optional[str]) -> str:
         """
         A helper method which generates the Sample Programs repo
@@ -638,7 +653,7 @@ class Repo:
         """
         if not source_dir:
             logger.info(f"Source directory is not provided. Cloning the Sample Programs repo to a temporary directory: {self._temp_dir.name}.")
-            git.Repo.clone_from("https://github.com/TheRenegadeCoder/sample-programs.git", self._temp_dir.name)
+            repo = git.Repo.clone_from("https://github.com/TheRenegadeCoder/sample-programs.git", self._temp_dir.name, multi_options=["--recursive"])
             return os.path.join(self._temp_dir.name, "archive")
         logger.info(f"Source directory provided: {source_dir}")
         return source_dir
