@@ -506,8 +506,8 @@ class Repo:
     def __init__(self, source_dir: Optional[str] = None) -> None:
         self._temp_dir = tempfile.TemporaryDirectory()
         self._source_dir: str = self._generate_source_dir(source_dir)
+        self._docs_dir: str = os.path.join(self._temp_dir.name, "docs")
         self._projects: list[str] = self._collect_projects()
-        self._docs_dir: str = os.path.join(self._source, "docs")
         self._languages: Dict[str: LanguageCollection] = self._collect_languages()
         self._total_snippets: int = sum(x.total_programs() for _, x in self._languages.items())
         self._total_tests: int = sum(1 for _, x in self._languages.items() if x.has_testinfo())
@@ -655,7 +655,7 @@ class Repo:
         :return: a list of string objects representing the projects
         """
         projects = []
-        for project_dir in Path(self._docs_path, "projects").iterdir():
+        for project_dir in Path(self._docs_dir, "projects").iterdir():
             if project_dir.is_dir():
                 projects.append(project_dir)
         return projects
