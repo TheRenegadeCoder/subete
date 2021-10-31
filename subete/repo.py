@@ -256,10 +256,11 @@ class LanguageCollection:
     :param file_list: the list of files in language collection
     """
 
-    def __init__(self, name: str, path: str, file_list: List[str]) -> None:
+    def __init__(self, name: str, path: str, file_list: List[str], projects: List[str]) -> None:
         self._name: str = name
         self._path: str = path
         self._file_list: List[str] = file_list
+        self._projects: List[str] = projects
         self._first_letter: str = name[0]
         self._sample_programs: Dict[str, SampleProgram] = self._collect_sample_programs()
         self._test_file_path: Optional[str] = self._collect_test_file()
@@ -564,6 +565,21 @@ class Repo:
         """
         return self._total_tests
 
+    def total_approved_projects(self) -> int:
+        """
+        Retrieves the total number of approved projects in the repo. This value is
+        derived from the number of projects listed in the projects directory of
+        the website repo.
+
+        Assuming you have a Repo object called repo, here’s how you would use
+        this method::
+
+            count: int = repo.total_approved_projects()
+
+        :return: the total number of approved projects as an int
+        """
+        return len(self._projects)
+
     def random_program(self) -> SampleProgram:
         """
         A convenience method for retrieving a random program from the repository.
@@ -625,7 +641,7 @@ class Repo:
         languages = {}
         for root, directories, files in os.walk(self._source_dir):
             if not directories:
-                language = LanguageCollection(os.path.basename(root), root, files)
+                language = LanguageCollection(os.path.basename(root), root, files, self._projects)
                 languages[str(language)] = language
                 logger.debug(f"New language collected: {language}")
         languages = dict(sorted(languages.items()))
@@ -639,11 +655,11 @@ class Repo:
         :return: a list of string objects representing the projects
         """
         projects = []
-        for project_dir in Path(self._docs_path).iterdir():
+        for project_dir in Path(self._docs_path, "projects").iterdir():
             if project_dir.is_dir():
                 projects.append(project_dir)
         return projects
-        
+
     def _generate_source_dir(self, source_dir: Optional[str]) -> str:
         """
         A helper method which generates the Sample Programs repo
