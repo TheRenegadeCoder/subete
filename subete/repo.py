@@ -548,7 +548,7 @@ class Repo:
     def __init__(self, source_dir: Optional[str] = None) -> None:
         self._temp_dir = tempfile.TemporaryDirectory()
         self._source_dir: str = self._generate_source_dir(source_dir)
-        self._docs_dir: str = os.path.join(self._temp_dir.name, "docs")
+        self._docs_dir: str = self._generate_docs_dir(source_dir)
         self._projects: list[str] = self._collect_projects()
         self._languages: Dict[str: LanguageCollection] = self._collect_languages()
         self._total_snippets: int = sum(x.total_programs() for _, x in self._languages.items())
@@ -715,3 +715,17 @@ class Repo:
             return os.path.join(self._temp_dir.name, "archive")
         logger.info(f"Source directory provided: {source_dir}")
         return source_dir
+
+    def _generate_docs_dir(self, source_dir: Optional[str]) -> str:
+        """
+        A helper methods which generates the path to the documentation.
+        This method is needed because the provided source directory is meant
+        to point at archive (for historical purposes). This is normally
+        a non-issue if the directory is generated using Git, but can be more
+        annoying if the user provides a source. 
+
+        :return: a path to the documentation directory
+        """
+        if not source_dir:
+            return os.path.join(self._temp_dir.name, "docs")
+        return os.path.join(source_dir, os.pardir, "docs")
