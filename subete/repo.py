@@ -4,7 +4,7 @@ import re
 import tempfile
 import random
 from pathlib import Path
-from typing import Dict, Iterator, List, Optional
+from typing import Dict, List, Optional
 
 import git
 import yaml
