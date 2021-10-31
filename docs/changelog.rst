@@ -1,6 +1,9 @@
 Changelog
 =========
 
+* v0.7.2
+    * Fixed a bug where the missing programs list shared the entire path 
+
 * v0.7.1
     * Fixed a bug where the missing programs feature failed for provided repos 
 
