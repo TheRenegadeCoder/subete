@@ -21,3 +21,7 @@ def test_repo_languages_by_letter():
 
 def test_random_program():
     assert TEST_REPO.random_program() != TEST_REPO.random_program()
+
+
+def test_total_approved_projects():
+    assert TEST_REPO.total_approved_projects() > 0

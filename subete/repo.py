@@ -254,12 +254,14 @@ class LanguageCollection:
     :param name: the name of the language (e.g., python)
     :param path: the path of the language (e.g., .../archive/p/python/)
     :param file_list: the list of files in language collection
+    :param projects: the list of approved projects according to the Sample Programs docs
     """
 
-    def __init__(self, name: str, path: str, file_list: List[str]) -> None:
+    def __init__(self, name: str, path: str, file_list: List[str], projects: List[str]) -> None:
         self._name: str = name
         self._path: str = path
         self._file_list: List[str] = file_list
+        self._projects: List[str] = projects
         self._first_letter: str = name[0]
         self._sample_programs: Dict[str, SampleProgram] = self._collect_sample_programs()
         self._test_file_path: Optional[str] = self._collect_test_file()
@@ -269,6 +271,7 @@ class LanguageCollection:
         self._total_snippets: int = len(self._sample_programs)
         self._total_dir_size: int = sum(x.size() for _, x in self._sample_programs.items())
         self._total_line_count: int = sum(x.line_count() for _, x in self._sample_programs.items())
+        self._missing_programs: List[str] = self._collect_missing_programs()
 
     def __str__(self) -> str:
         """
@@ -455,6 +458,46 @@ class LanguageCollection:
         """
         return self._testinfo_url
 
+
+    def missing_programs(self) -> List[str]:
+        """
+        Retrieves the list of missing sample programs for this language.
+
+        Assuming you have a LanguageCollection object called language, 
+        here's how you would use this method::
+
+            missing_programs: List[str] = language.missing_programs()
+
+        return: a list of missing sample programs
+        """
+        return self._missing_programs
+
+
+    def missing_programs_count(self) -> int:
+        """
+        Retrieves the number of missing sample programs for this language.
+
+        Assuming you have a LanguageCollection object called language, 
+        here's how you would use this method::
+
+            missing_programs_count: int = language.missing_programs_count()
+
+        return: the number of missing sample programs
+        """
+        return len(self._missing_programs)
+
+
+    def _collect_missing_programs(self) -> List[str]:
+        """
+        Generates a list of sample programs that are missing from the language collection.
+
+        :return: a list of missing sample programs
+        """
+        programs = set(program._normalize_program_name() for program in self._sample_programs.values())
+        projects = set(self._projects)
+        return list(projects - programs)
+
+
     def _collect_sample_programs(self) -> Dict[str, SampleProgram]:
         """
         Generates a list of sample program objects from all of the files in this language collection.
@@ -505,6 +548,8 @@ class Repo:
     def __init__(self, source_dir: Optional[str] = None) -> None:
         self._temp_dir = tempfile.TemporaryDirectory()
         self._source_dir: str = self._generate_source_dir(source_dir)
+        self._docs_dir: str = os.path.join(self._temp_dir.name, "docs")
+        self._projects: list[str] = self._collect_projects()
         self._languages: Dict[str: LanguageCollection] = self._collect_languages()
         self._total_snippets: int = sum(x.total_programs() for _, x in self._languages.items())
         self._total_tests: int = sum(1 for _, x in self._languages.items() if x.has_testinfo())
@@ -561,6 +606,21 @@ class Repo:
         :return: the total number of tested languages as an int
         """
         return self._total_tests
+
+    def total_approved_projects(self) -> int:
+        """
+        Retrieves the total number of approved projects in the repo. This value is
+        derived from the number of projects listed in the projects directory of
+        the website repo.
+
+        Assuming you have a Repo object called repo, here’s how you would use
+        this method::
+
+            count: int = repo.total_approved_projects()
+
+        :return: the total number of approved projects as an int
+        """
+        return len(self._projects)
 
     def random_program(self) -> SampleProgram:
         """
@@ -623,11 +683,24 @@ class Repo:
         languages = {}
         for root, directories, files in os.walk(self._source_dir):
             if not directories:
-                language = LanguageCollection(os.path.basename(root), root, files)
+                language = LanguageCollection(os.path.basename(root), root, files, self._projects)
                 languages[str(language)] = language
                 logger.debug(f"New language collected: {language}")
         languages = dict(sorted(languages.items()))
         return languages
+
+    def _collect_projects(self) -> List[str]:
+        """
+        A helper method for collecting the projects from the 
+        sample-programs-website repository. 
+
+        :return: a list of string objects representing the projects
+        """
+        projects = []
+        for project_dir in Path(self._docs_dir, "projects").iterdir():
+            if project_dir.is_dir():
+                projects.append(project_dir)
+        return projects
 
     def _generate_source_dir(self, source_dir: Optional[str]) -> str:
         """
@@ -638,7 +711,7 @@ class Repo:
         """
         if not source_dir:
             logger.info(f"Source directory is not provided. Cloning the Sample Programs repo to a temporary directory: {self._temp_dir.name}.")
-            git.Repo.clone_from("https://github.com/TheRenegadeCoder/sample-programs.git", self._temp_dir.name)
+            repo = git.Repo.clone_from("https://github.com/TheRenegadeCoder/sample-programs.git", self._temp_dir.name, multi_options=["--recursive"])
             return os.path.join(self._temp_dir.name, "archive")
         logger.info(f"Source directory provided: {source_dir}")
         return source_dir
