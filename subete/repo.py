@@ -468,7 +468,7 @@ class LanguageCollection:
 
             missing_programs: List[str] = language.missing_programs()
 
-        return: a list of missing sample programs
+        :return: a list of missing sample programs
         """
         return self._missing_programs
 
@@ -482,7 +482,7 @@ class LanguageCollection:
 
             missing_programs_count: int = language.missing_programs_count()
 
-        return: the number of missing sample programs
+        :return: the number of missing sample programs
         """
         return len(self._missing_programs)
 
