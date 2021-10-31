@@ -5,7 +5,7 @@ from subete import LanguageCollection
 TEST_PATH = "tests/python/"
 TEST_LANG = "python"
 TEST_FILES = ["hello_world.py", "testinfo.yml", "README.md"]
-TEST_PROJECTS = ["hello-world"]
+TEST_PROJECTS = ["hello-world", "reverse-string"]
 
 
 def test_language_collection_str():
@@ -48,3 +48,7 @@ def test_language_collection_total_line_count():
 def test_language_collection_language_url():
     test = LanguageCollection(TEST_LANG, TEST_PATH, TEST_FILES, TEST_PROJECTS)
     assert test.lang_docs_url() == "https://sample-programs.therenegadecoder.com/languages/python"
+
+def test_missing_programs():
+    test = LanguageCollection(TEST_LANG, TEST_PATH, TEST_FILES, TEST_PROJECTS)
+    assert test.missing_programs() == ["reverse-string"]

@@ -254,6 +254,7 @@ class LanguageCollection:
     :param name: the name of the language (e.g., python)
     :param path: the path of the language (e.g., .../archive/p/python/)
     :param file_list: the list of files in language collection
+    :param projects: the list of approved projects according to the Sample Programs docs
     """
 
     def __init__(self, name: str, path: str, file_list: List[str], projects: List[str]) -> None:
@@ -494,6 +495,21 @@ class LanguageCollection:
         if "README.md" in self._file_list:
             logger.debug(f"New README collected for {self}")
             return os.path.join(self._path, "README.md")
+
+    def missing_programs(self) -> List[str]:
+        """
+        Generates a list of sample programs that are missing from the language collection.
+
+        Assuming you have a LanguageCollection object called language, 
+        here's how you would use this method::
+
+            missing_programs: List[str] = language.missing_programs()
+
+        :return: a list of missing sample programs
+        """
+        programs = set(program._normalize_program_name() for program in self._sample_programs.values())
+        projects = set(self._projects)
+        return list(projects - programs)
 
 
 class Repo:
