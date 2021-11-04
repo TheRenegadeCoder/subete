@@ -68,6 +68,22 @@ class SampleProgram:
         relative_path = os.path.join(self._path, self._file_name)
         return os.path.getsize(relative_path)
 
+    def date_created(self):
+        """
+        Retrieves the date the sample program was created. Note:
+        due to operating system difference, this value may not
+        be the actual creation time but rather the last metadata
+        change date (e.g., on Linux).
+
+        Assuming you have a SampleProgram object called program, 
+        here's how you would use this method::
+
+            date: str = program.date_created()
+
+        :return: the date the sample program was created in seconds
+        """
+        return Path(self._path, self._file_name).stat().st_ctime
+
     def language(self) -> str:
         """
         Retrieves the language name for this sample program. Language
