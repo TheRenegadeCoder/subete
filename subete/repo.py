@@ -135,10 +135,10 @@ class SampleProgram:
         and therefore not validated. The requirements documentation 
         URL is in the following form:
 
-        ``https://sample-programs.therenegadecoder.com/projects/{project}/``
+        ``https://sampleprograms.io/projects/{project}/``
 
         For example, here is a link to the
-        `Hello World documentation <https://sample-programs.therenegadecoder.com/projects/hello-world/>`_. 
+        `Hello World documentation <https://sampleprograms.io/projects/hello-world/>`_. 
 
         Assuming you have a SampleProgram object called program, 
         here's how you would use this method::
@@ -156,10 +156,10 @@ class SampleProgram:
         and therefore not validated. The documentation 
         URL is in the following form:
 
-        ``https://sample-programs.therenegadecoder.com/projects/{project}/{lang}/``
+        ``https://sampleprograms.io/projects/{project}/{lang}/``
 
         For example, here is a link to the
-        `Hello World in Python documentation <https://sample-programs.therenegadecoder.com/projects/hello-world/python/>`_. 
+        `Hello World in Python documentation <https://sampleprograms.io/projects/hello-world/python/>`_. 
 
         Assuming you have a SampleProgram object called program, 
         here's how you would use this method::
@@ -216,7 +216,7 @@ class SampleProgram:
 
         :return: the expected requirements URL 
         """
-        doc_url_base = "https://sample-programs.therenegadecoder.com/projects"
+        doc_url_base = "https://sampleprograms.io/projects"
         if "export" in self._normalized_name or "import" in self._normalized_name:
             return f"{doc_url_base}/import-export"
         else:
@@ -266,7 +266,7 @@ class LanguageCollection:
         self._sample_programs: Dict[str, SampleProgram] = self._collect_sample_programs()
         self._test_file_path: Optional[str] = self._collect_test_file()
         self._read_me_path: Optional[str] = self._collect_readme()
-        self._lang_docs_url: str = f"https://sample-programs.therenegadecoder.com/languages/{self._name}"
+        self._lang_docs_url: str = f"https://sampleprograms.io/languages/{self._name}"
         self._testinfo_url: str = f"https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/{self._name[0]}/{self._name}/testinfo.yml"
         self._total_snippets: int = len(self._sample_programs)
         self._total_dir_size: int = sum(x.size() for _, x in self._sample_programs.items())
@@ -424,10 +424,10 @@ class LanguageCollection:
         to exist and therefore not validated. The language documentation URL is
         in the following form:
 
-        ``https://sample-programs.therenegadecoder.com/languages/{lang}/``
+        ``https://sampleprograms.io/languages/{lang}/``
 
         For example, here is a link to the
-        `Python documentation <https://sample-programs.therenegadecoder.com/languages/python/>`_. 
+        `Python documentation <https://sampleprograms.io/languages/python/>`_. 
 
         Assuming you have a LanguageCollection object called language, 
         here's how you would use this method::
