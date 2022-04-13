@@ -626,7 +626,7 @@ class Repo:
         """
         A convenience method for retrieving a random program from the repository.
 
-        Assuming you have a Repo object called repo, here’s how you would use 
+        Assuming you have a Repo object called repo, here's how you would use 
         this method::
 
             program: SampleProgram = repo.random_program()
