@@ -47,7 +47,7 @@ def test_language_collection_total_line_count():
 
 def test_language_collection_language_url():
     test = LanguageCollection(TEST_LANG, TEST_PATH, TEST_FILES, TEST_PROJECTS)
-    assert test.lang_docs_url() == "https://sample-programs.therenegadecoder.com/languages/python"
+    assert test.lang_docs_url() == "https://sampleprograms.io/languages/python"
 
 
 def test_missing_programs():

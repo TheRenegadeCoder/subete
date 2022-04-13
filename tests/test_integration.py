@@ -6,12 +6,12 @@ TEST_REPO = subete.load()
 
 def test_doc_url_multiword_lang():
     language: LanguageCollection = TEST_REPO["Google Apps Script"]
-    assert language.lang_docs_url() == "https://sample-programs.therenegadecoder.com/languages/google-apps-script"
+    assert language.lang_docs_url() == "https://sampleprograms.io/languages/google-apps-script"
 
 
 def test_doc_url_symbol_lang():
     language: LanguageCollection = TEST_REPO["C#"]
-    assert language.lang_docs_url() == "https://sample-programs.therenegadecoder.com/languages/c-sharp"
+    assert language.lang_docs_url() == "https://sampleprograms.io/languages/c-sharp"
 
 
 def test_testinfo_url_multiword_lang():
@@ -26,22 +26,22 @@ def test_testinfo_url_symbol_lang():
 
 def test_requirements_url_multiword_lang():
     program: SampleProgram = TEST_REPO["Google Apps Script"]["Hello World"]
-    assert program.requirements_url() == "https://sample-programs.therenegadecoder.com/projects/hello-world"
+    assert program.requirements_url() == "https://sampleprograms.io/projects/hello-world"
 
 
 def test_requirements_url_symbol_lang():
     program: SampleProgram = TEST_REPO["C#"]["Hello World"]
-    assert program.requirements_url() == "https://sample-programs.therenegadecoder.com/projects/hello-world"
+    assert program.requirements_url() == "https://sampleprograms.io/projects/hello-world"
 
 
 def test_documentation_url_multiword_lang():
     program: SampleProgram = TEST_REPO["Google Apps Script"]["Hello World"]
-    assert program.documentation_url() == "https://sample-programs.therenegadecoder.com/projects/hello-world/google-apps-script"
+    assert program.documentation_url() == "https://sampleprograms.io/projects/hello-world/google-apps-script"
 
 
 def test_documentation_url_symbol_lang():
     program: SampleProgram = TEST_REPO["C#"]["Hello World"]
-    assert program.documentation_url() == "https://sample-programs.therenegadecoder.com/projects/hello-world/c-sharp"
+    assert program.documentation_url() == "https://sampleprograms.io/projects/hello-world/c-sharp"
 
 
 def test_article_issue_url_multiword_lang():
