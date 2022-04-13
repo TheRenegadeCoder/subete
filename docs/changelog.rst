@@ -1,6 +1,9 @@
 Changelog
 =========
 
+* v0.8.0
+    * Updated URL from sample-programs.therenegadecoder.com to sampleprograms.io
+
 * v0.7.2
     * Fixed a bug where the missing programs list shared the entire path 
 
