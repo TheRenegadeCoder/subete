@@ -569,7 +569,7 @@ class Repo:
         Retrieves the list of language names mapped to their language collections in 
         the Sample Programs repo.
 
-        Assuming you have a Repo object called repo, here’s how you would use 
+        Assuming you have a Repo object called repo, here's how you would use 
         this method::
 
             languages: Dict[str, LanguageCollection] = repo.language_collections()
@@ -584,7 +584,7 @@ class Repo:
         This total does not include any additional files such as README
         or testinfo files. 
 
-        Assuming you have a Repo object called repo, here’s how you would use 
+        Assuming you have a Repo object called repo, here's how you would use 
         this method::
 
             count: int = repo.total_programs()
@@ -598,7 +598,7 @@ class Repo:
         Retrieves the total number of tested languages in the repo. This value
         is based on the number of testinfo files in the repo.
 
-        Assuming you have a Repo object called repo, here’s how you would use 
+        Assuming you have a Repo object called repo, here's how you would use 
         this method::
 
             count: int = repo.total_tests()
@@ -607,13 +607,28 @@ class Repo:
         """
         return self._total_tests
 
+    def approved_projects(self) -> List[str]:
+        """
+        Retrieves the list of approved projects in the repo. Projects are
+        returned as a list of strings where the strings represent the full
+        project name (e.g., Hello World).
+
+        Assuming you have a Repo object called repo, here's how you would use 
+        this method::
+
+            approved_projects: List[str] = repo.approved_projects()
+
+        :return: the list of approved projects
+        """
+        return self._projects
+
     def total_approved_projects(self) -> int:
         """
         Retrieves the total number of approved projects in the repo. This value is
         derived from the number of projects listed in the projects directory of
         the website repo.
 
-        Assuming you have a Repo object called repo, here’s how you would use
+        Assuming you have a Repo object called repo, here's how you would use
         this method::
 
             count: int = repo.total_approved_projects()
