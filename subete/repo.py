@@ -823,6 +823,7 @@ class Project:
         self._requirements_url: str = self._generate_requirements_url()
 
     def __str__(self) -> str:
+        logger.info(f"Generating name from {_name}")
         return (
             self._name.replace("-", " ").title() 
             if len(self._name) <= 3 
