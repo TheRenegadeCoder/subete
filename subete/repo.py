@@ -556,9 +556,9 @@ class SampleProgram:
     """
 
     def __init__(self, path: str, file_name: str, language: LanguageCollection) -> None:
-        self._path = path
-        self._file_name = file_name
-        self._language = language
+        self._path: str = path
+        self._file_name: str = file_name
+        self._language: LanguageCollection = language
         self._project: Project = self._generate_project()
         self._sample_program_doc_url: str = self._generate_doc_url()
         self._sample_program_issue_url: str = self._generate_issue_url()
@@ -677,7 +677,6 @@ class SampleProgram:
 
         :return: the project name as a titlecase string (e.g., Hello World, MST)
         """
-        logger.info(f'Retrieving project name for {self}: {self._project}')
         return self._project.name()
 
     def project_pathlike_name(self) -> str:
