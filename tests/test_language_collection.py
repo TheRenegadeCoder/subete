@@ -1,9 +1,10 @@
+from typing import List
 import subete
 
 TEST_PATH: str = "tests/python/"
 TEST_LANG: str = "python"
-TEST_FILES: list[str] = ["hello_world.py", "testinfo.yml", "README.md"]
-TEST_PROJECTS: list[subete.Project] = [subete.Project("hello-world"), subete.Project("reverse-string")]
+TEST_FILES: List[str] = ["hello_world.py", "testinfo.yml", "README.md"]
+TEST_PROJECTS: List[subete.Project] = [subete.Project("hello-world"), subete.Project("reverse-string")]
 
 
 def test_language_collection_str():

@@ -253,7 +253,8 @@ class LanguageCollection:
             x.size() for _, x in self._sample_programs.items()
         )
         self._total_line_count: int = sum(
-            x.line_count() for _, x in self._sample_programs.items())
+            x.line_count() for _, x in self._sample_programs.items()
+        )
         self._missing_programs: List[str] = self._collect_missing_programs()
 
     def __str__(self) -> str:
