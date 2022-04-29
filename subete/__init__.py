@@ -1,7 +1,7 @@
-from .language_collection import *
 from .project import *
-from .repo import *
 from .sample_program import *
+from .language_collection import *
+from .repo import *
 
 
 def load(source_dir: str = None) -> Repo:
