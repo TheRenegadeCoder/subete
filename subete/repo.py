@@ -227,13 +227,17 @@ class LanguageCollection:
     """
     An object representing a collection of sample programs files for a particular programming language.
 
-    :param name: the name of the language (e.g., python)
-    :param path: the path of the language (e.g., .../archive/p/python/)
-    :param file_list: the list of files in language collection
-    :param projects: the list of approved projects according to the Sample Programs docs
+    :param str name: the name of the language (e.g., python)
+    :param str path: the path of the language (e.g., .../archive/p/python/)
+    :param list[str] file_list: the list of files in language collection
+    :param list[Project] projects: the list of approved projects according to the Sample Programs docs
     """
 
     def __init__(self, name: str, path: str, file_list: List[str], projects: List[Project]) -> None:
+        assert isinstance(name, str)
+        assert isinstance(path, str)
+        assert isinstance(file_list, list)
+        assert isinstance(projects, list)
         self._name: str = name
         self._path: str = path
         self._file_list: List[str] = file_list
