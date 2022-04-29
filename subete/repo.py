@@ -18,7 +18,7 @@ class Repo:
     """
     An object representing the Sample Programs repository.
 
-    :param source_dir: the location of the repo archive (e.g., C://.../sample-programs/archive)
+    :param str source_dir: the location of the repo archive (e.g., C://.../sample-programs/archive)
     """
 
     def __init__(self, source_dir: Optional[str] = None) -> None:
@@ -35,7 +35,7 @@ class Repo:
         Makes a repo subscriptable. In this case, the subscript retrieves a 
         language collection. 
 
-        :param language: the name of the language to lookup
+        :param str language: the name of the language to lookup
         :return: the language collection by name
         """
         return self._languages[language]
@@ -824,7 +824,7 @@ class Project:
     """
     An object representing a Project in the Sample Programs repo.
 
-    :param name: the name of the project in its pathlike form (e.g., hello-world) 
+    :param str name: the name of the project in its pathlike form (e.g., hello-world) 
     """
 
     def __init__(self, name: str):
@@ -841,6 +841,9 @@ class Project:
 
     def __eq__(self, __o: object) -> bool:
         return isinstance(__o, Project) and self._name == __o._name
+
+    def __hash__(self) -> int:
+        return hash(self._name)
 
     def name(self) -> str:
         """
