@@ -1,6 +1,13 @@
 Changelog
 =========
 
+* v0.9.1
+    * Updated official documentation
+    * Fixed an issue where one of the type hints was wrong
+
+* v0.9.0
+    * Reworked several of the methods to use the new docs location for website
+
 * v0.8.0
     * Updated URL from sample-programs.therenegadecoder.com to sampleprograms.io
 
