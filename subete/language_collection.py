@@ -26,14 +26,17 @@ class LanguageCollection:
         self._file_list: List[str] = file_list
         self._projects: List[str] = projects
         self._first_letter: str = name[0]
-        self._sample_programs: Dict[str, SampleProgram] = self._collect_sample_programs()
+        self._sample_programs: Dict[str,
+                                    SampleProgram] = self._collect_sample_programs()
         self._test_file_path: Optional[str] = self._collect_test_file()
         self._read_me_path: Optional[str] = self._collect_readme()
         self._lang_docs_url: str = f"https://sampleprograms.io/languages/{self._name}"
         self._testinfo_url: str = f"https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/{self._name[0]}/{self._name}/testinfo.yml"
         self._total_snippets: int = len(self._sample_programs)
-        self._total_dir_size: int = sum(x.size() for _, x in self._sample_programs.items())
-        self._total_line_count: int = sum(x.line_count() for _, x in self._sample_programs.items())
+        self._total_dir_size: int = sum(x.size()
+                                        for _, x in self._sample_programs.items())
+        self._total_line_count: int = sum(
+            x.line_count() for _, x in self._sample_programs.items())
         self._missing_programs: List[str] = self._collect_missing_programs()
 
     def __str__(self) -> str:
@@ -51,7 +54,8 @@ class LanguageCollection:
             "sharp": "#",
             "star": r"\*"
         }
-        tokens = [text_to_symbol.get(token, token) for token in self._name.split("-")]
+        tokens = [text_to_symbol.get(token, token)
+                  for token in self._name.split("-")]
         if any(token in text_to_symbol.values() for token in tokens):
             return "".join(tokens).title()
         else:
@@ -67,14 +71,44 @@ class LanguageCollection:
         """
         return self._sample_programs[program]
 
+    def __iter__(self):
+        """
+        Iterates over all sample programs in the language collection.
+
+        Assuming you have a LanguageCollection object called language, 
+        here's how you would use this method::
+
+            for program in language:
+                print(program)
+
+        :return: an iterator over all sample programs in the language collection
+        """
+        return iter(self._sample_programs.values())
+
+    def name(self) -> str:
+        """
+        Retrieves the name of the language in a human-readable format.
+
+        Assuming you have a LanguageCollection object called language, 
+        here's how you would use this method::
+
+            name: str = language.name()
+
+        :return: the name of the programming language (e.g., Python, Google Apps Script, C#)
+        """
+        return str(self)
+
     def pathlike_name(self):
         """
         Retrieves a pathlike name for this language. For example,
         instead of returning C# it would return c-sharp. Names
         are based on the folder names in the Sample Programs repo.
+        These names are generated from the file names directly.
+        Use `name()` to get the human-readable name or `str(self)`.
 
-        :return: the pathlike name of this programming language
+        :return: the pathlike name of this programming language (e.g., c-plus-plus)
         """
+        logger.info(f"Retrieving pathlike name for {self}: {self._name}")
         return self._name
 
     def testinfo(self) -> Optional[dict]:
@@ -89,6 +123,7 @@ class LanguageCollection:
 
         :return: the test info data as a dictionary
         """
+        logger.info(f"Retrieving testinfo for {self}: {self._name}")
         test_data = None
         if self._test_file_path:
             with open(self._test_file_path) as test_file:
@@ -107,6 +142,7 @@ class LanguageCollection:
 
         :return: True if a test info file exists; False otherwise
         """
+        logger.info(f"Retrieving testinfo state for {self}: {self._name}")
         return bool(self._test_file_path)
 
     def readme(self) -> Optional[str]:
@@ -121,22 +157,9 @@ class LanguageCollection:
 
         :return: the README contents as a string
         """
+        logger.info(f"Retrieving README for {self}: {self._read_me_path}")
         if self._read_me_path:
             return Path(self._read_me_path).read_text()
-
-    def sample_programs(self) -> Dict[str, SampleProgram]:
-        """
-        Retrieves the dictionary of sample programs associated with this language.
-        Each sample program can be looked up by name (e.g., Hello World)
-
-        Assuming you have a LanguageCollection object called language, 
-        here's how you would use this method::
-
-            programs: Dict[str, SampleProgram] = language.sample_programs()
-
-        :return: the dictionary of sample programs
-        """
-        return self._sample_programs
 
     def total_programs(self) -> int:
         """
@@ -149,6 +172,8 @@ class LanguageCollection:
 
         :return: the number of sample programs as an int
         """
+        logger.info(
+            f"Retrieving total programs for {self}: {self._total_snippets}")
         return self._total_snippets
 
     def total_size(self) -> int:
@@ -164,6 +189,8 @@ class LanguageCollection:
 
         :return: the total byte size of the language collection as an int
         """
+        logger.info(
+            f"Retrieving total size for {self}: {self._total_dir_size}")
         return self._total_dir_size
 
     def total_line_count(self) -> int:
@@ -179,6 +206,8 @@ class LanguageCollection:
 
         :return: the total line count of the language collection as an int
         """
+        logger.info(
+            f"Retrieving total line count for {self}: {self._total_line_count}")
         return self._total_line_count
 
     def lang_docs_url(self) -> str:
@@ -199,6 +228,8 @@ class LanguageCollection:
 
         :return: the language documentation URL as a string
         """
+        logger.info(
+            f"Retrieving language documentation URL for {self}: {self._lang_docs_url}")
         return self._lang_docs_url
 
     def testinfo_url(self) -> str:
@@ -219,8 +250,9 @@ class LanguageCollection:
 
         :return: the testinfo URL as a string
         """
+        logger.info(
+            f"Retrieving testinfo URL for {self}: {self._test_info_url}")
         return self._testinfo_url
-
 
     def missing_programs(self) -> List[str]:
         """
@@ -235,7 +267,6 @@ class LanguageCollection:
         """
         return self._missing_programs
 
-
     def missing_programs_count(self) -> int:
         """
         Retrieves the number of missing sample programs for this language.
@@ -249,17 +280,16 @@ class LanguageCollection:
         """
         return len(self._missing_programs)
 
-
     def _collect_missing_programs(self) -> List[str]:
         """
         Generates a list of sample programs that are missing from the language collection.
 
         :return: a list of missing sample programs
         """
-        programs = set(program._normalize_program_name() for program in self._sample_programs.values())
+        programs = set(program._normalize_program_name()
+                       for program in self._sample_programs.values())
         projects = set(self._projects)
         return list(projects - programs)
-
 
     def _collect_sample_programs(self) -> Dict[str, SampleProgram]:
         """
