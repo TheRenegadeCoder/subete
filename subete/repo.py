@@ -826,7 +826,7 @@ class Project:
         logger.info(f"Generating name from {_name}")
         return (
             self._name.replace("-", " ").title() 
-            if len(self._name) <= 3 
+            if len(self._name) > 3 
             else self._name.upper()
         )
 
