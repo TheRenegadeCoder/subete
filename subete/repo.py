@@ -187,7 +187,7 @@ class Repo:
 
         :return: a list of string objects representing the projects
         """
-        logger.info(f"Collecting projects along path: {self._docs_dir}; {os.getcwd()}")
+        logger.info(f"Collecting projects along path: {self._docs_dir}")
         projects = []
         for project_dir in Path(self._docs_dir, "projects").iterdir():
             if project_dir.is_dir():
