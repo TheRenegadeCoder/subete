@@ -234,7 +234,7 @@ class SampleProgram:
         logger.info(f'Retrieving article issue query URL for {self}: {self._sample_program_issue_url}')
         return self._sample_program_issue_url
 
-    def _generate_project(self) -> str:
+    def _generate_project(self) -> Project:
         """
         A helper function which converts the program name into
         a standard representation (i.e. hello_world -> hello-world).
