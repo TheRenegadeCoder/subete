@@ -4,9 +4,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 import yaml
-from subete.project import Project
-
-from subete.sample_program import SampleProgram
+from subete import Project, SampleProgram
 
 logger = logging.getLogger(__name__)
 

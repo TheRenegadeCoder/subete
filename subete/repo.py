@@ -7,9 +7,7 @@ from typing import Dict, List, Optional
 
 import git
 
-from subete.language_collection import LanguageCollection
-from subete.project import Project
-from subete.sample_program import SampleProgram
+from subete import LanguageCollection, Project, SampleProgram
 
 logger = logging.getLogger(__name__)
 

@@ -1,9 +1,9 @@
 import logging
 import os
-from pathlib import Path
 import re
-from subete.project import Project
-from subete.repo import LanguageCollection
+from pathlib import Path
+
+from subete import LanguageCollection, Project
 
 logger = logging.getLogger(__name__)
 
