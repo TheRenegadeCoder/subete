@@ -255,7 +255,7 @@ class LanguageCollection:
         self._total_line_count: int = sum(
             x.line_count() for _, x in self._sample_programs.items()
         )
-        self._missing_programs: List[str] = self._collect_missing_programs()
+        self._missing_programs: List[Project] = self._collect_missing_programs()
 
     def __str__(self) -> str:
         """
@@ -471,7 +471,7 @@ class LanguageCollection:
         logger.info(f"Retrieving testinfo URL for {self}: {self._testinfo_url}")
         return self._testinfo_url
 
-    def missing_programs(self) -> List[str]:
+    def missing_programs(self) -> List[Project]:
         """
         Retrieves the list of missing sample programs for this language.
 
@@ -497,7 +497,7 @@ class LanguageCollection:
         """
         return len(self._missing_programs)
 
-    def _collect_missing_programs(self) -> List[str]:
+    def _collect_missing_programs(self) -> List[Project]:
         """
         Generates a list of sample programs that are missing from the language collection.
 
