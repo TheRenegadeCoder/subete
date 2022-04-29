@@ -555,6 +555,9 @@ class SampleProgram:
     """
 
     def __init__(self, path: str, file_name: str, language: LanguageCollection) -> None:
+        assert isinstance(path, str)
+        assert isinstance(file_name, str)
+        assert isinstance(language, LanguageCollection)
         self._path: str = path
         self._file_name: str = file_name
         self._language: LanguageCollection = language
