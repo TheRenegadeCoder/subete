@@ -462,8 +462,7 @@ class LanguageCollection:
 
         :return: the testinfo URL as a string
         """
-        logger.info(
-            f"Retrieving testinfo URL for {self}: {self._test_info_url}")
+        logger.info(f"Retrieving testinfo URL for {self}: {self._testinfo_url}")
         return self._testinfo_url
 
     def missing_programs(self) -> List[str]:
@@ -824,7 +823,11 @@ class Project:
         self._requirements_url: str = self._generate_requirements_url()
 
     def __str__(self) -> str:
-        return self.name()
+        return (
+            self._name.replace("-", " ").title() 
+            if len(self._name) <= 3 
+            else self._name.upper()
+        )
 
     def name(self) -> str:
         """
@@ -837,12 +840,8 @@ class Project:
 
         :return: the name of the project as a string
         """
-        _project_name = (
-            self._name.replace("-", " ").title() 
-            if len(self._name) <= 3 
-            else self._name.upper()
-        )
-        return _project_name
+        logger.info(f'Retrieving project name for {self}')
+        return str(self)
 
     def pathlike_name(self) -> str:
         """
