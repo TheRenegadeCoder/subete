@@ -3,7 +3,7 @@ import os
 import re
 from pathlib import Path
 
-from subete import LanguageCollection, Project
+import subete
 
 logger = logging.getLogger(__name__)
 
@@ -18,11 +18,11 @@ class SampleProgram:
         collection of this sample program
     """
 
-    def __init__(self, path: str, file_name: str, language: LanguageCollection) -> None:
+    def __init__(self, path: str, file_name: str, language: subete.LanguageCollection) -> None:
         self._path = path
         self._file_name = file_name
         self._language = language
-        self._project: Project = self._generate_project()
+        self._project: subete.Project = self._generate_project()
         self._sample_program_doc_url: str = self._generate_doc_url()
         self._sample_program_issue_url: str = self._generate_issue_url()
         self._line_count: int = len(self.code().splitlines())
@@ -64,7 +64,7 @@ class SampleProgram:
         relative_path = os.path.join(self._path, self._file_name)
         return os.path.getsize(relative_path)
 
-    def language_collection(self) -> LanguageCollection:
+    def language_collection(self) -> subete.LanguageCollection:
         """
         Retrieves the language collection object that this sample 
         program is a part of.  
@@ -111,7 +111,7 @@ class SampleProgram:
         logger.info(f'Retrieving language pathlike name for {self}: {self._language.pathlike_name()}')
         return self._language.pathlike_name()
 
-    def project(self) -> Project:
+    def project(self) -> subete.Project:
         """
         Retrieves the project object for this sample program.
 
@@ -234,7 +234,7 @@ class SampleProgram:
         logger.info(f'Retrieving article issue query URL for {self}: {self._sample_program_issue_url}')
         return self._sample_program_issue_url
 
-    def _generate_project(self) -> Project:
+    def _generate_project(self) -> subete.Project:
         """
         A helper function which converts the program name into
         a standard representation (i.e. hello_world -> hello-world).
@@ -250,7 +250,7 @@ class SampleProgram:
             # TODO: this is brutal. At some point, we should loop in the glotter test file.
             url = re.sub('((?<=[a-z])[A-Z0-9]|(?!^)[A-Z](?=[a-z]))', r'-\1', stem).lower()
         logger.info(f"Constructed a normalized form of the program {url}")
-        return Project(url)
+        return subete.Project(url)
 
     def _generate_doc_url(self) -> str:
         """

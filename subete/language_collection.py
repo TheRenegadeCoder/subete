@@ -4,7 +4,8 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 import yaml
-from subete import Project, SampleProgram
+
+import subete
 
 logger = logging.getLogger(__name__)
 
@@ -19,13 +20,13 @@ class LanguageCollection:
     :param projects: the list of approved projects according to the Sample Programs docs
     """
 
-    def __init__(self, name: str, path: str, file_list: List[str], projects: List[Project]) -> None:
+    def __init__(self, name: str, path: str, file_list: List[str], projects: List[subete.Project]) -> None:
         self._name: str = name
         self._path: str = path
         self._file_list: List[str] = file_list
-        self._projects: List[Project] = projects
+        self._projects: List[subete.Project] = projects
         self._first_letter: str = name[0]
-        self._sample_programs: Dict[str, SampleProgram] = self._collect_sample_programs()
+        self._sample_programs: Dict[str, subete.SampleProgram] = self._collect_sample_programs()
         self._test_file_path: Optional[str] = self._collect_test_file()
         self._read_me_path: Optional[str] = self._collect_readme()
         self._lang_docs_url: str = f"https://sampleprograms.io/languages/{self._name}"
@@ -291,7 +292,7 @@ class LanguageCollection:
         projects = set(self._projects)
         return list(projects - programs)
 
-    def _collect_sample_programs(self) -> Dict[str, SampleProgram]:
+    def _collect_sample_programs(self) -> Dict[str, subete.SampleProgram]:
         """
         Generates a list of sample program objects from all of the files in this language collection.
 
@@ -302,7 +303,7 @@ class LanguageCollection:
             _, file_ext = os.path.splitext(file)
             file_ext = file_ext.lower()
             if file_ext not in (".md", "", ".yml"):
-                program = SampleProgram(self._path, file, str(self))
+                program = subete.SampleProgram(self._path, file, str(self))
                 sample_programs[program.project_name()] = program
                 logger.debug(f"New sample program collected: {program}")
         sample_programs = dict(sorted(sample_programs.items()))

@@ -7,7 +7,7 @@ from typing import Dict, List, Optional
 
 import git
 
-from subete import LanguageCollection, Project, SampleProgram
+import subete
 
 logger = logging.getLogger(__name__)
 
@@ -23,12 +23,12 @@ class Repo:
         self._temp_dir = tempfile.TemporaryDirectory()
         self._source_dir: str = self._generate_source_dir(source_dir)
         self._docs_dir: str = self._generate_docs_dir(source_dir)
-        self._projects: list[Project] = self._collect_projects()
-        self._languages: Dict[str: LanguageCollection] = self._collect_languages()
+        self._projects: List[subete.Project] = self._collect_projects()
+        self._languages: Dict[str: subete.LanguageCollection] = self._collect_languages()
         self._total_snippets: int = sum(x.total_programs() for _, x in self._languages.items())
         self._total_tests: int = sum(1 for _, x in self._languages.items() if x.has_testinfo())
 
-    def __getitem__(self, language) -> LanguageCollection:
+    def __getitem__(self, language) -> subete.LanguageCollection:
         """
         Makes a repo subscriptable. In this case, the subscript retrieves a 
         language collection. 
@@ -111,7 +111,7 @@ class Repo:
         """
         return len(self._projects)
 
-    def random_program(self) -> SampleProgram:
+    def random_program(self) -> subete.SampleProgram:
         """
         A convenience method for retrieving a random program from the repository.
 
@@ -127,12 +127,12 @@ class Repo:
         logger.debug(f"Generated random program: {program}")
         return program
 
-    def languages_by_letter(self, letter: str) -> List[LanguageCollection]:
+    def languages_by_letter(self, letter: str) -> List[subete.LanguageCollection]:
         """
         A convenience method for retrieving all language collections that start with a 
         particular letter.
 
-        Assuming you have a Repo object called repo, here’s how you would use 
+        Assuming you have a Repo object called repo, here's how you would use 
         this method::
 
             langs: List[LanguageCollection] = repo.languages_by_letter("p")
@@ -163,7 +163,7 @@ class Repo:
         unsorted_letters = os.listdir(self._source_dir)
         return sorted(unsorted_letters, key=lambda s: s.casefold())
 
-    def _collect_languages(self) -> Dict[str, LanguageCollection]:
+    def _collect_languages(self) -> Dict[str, subete.LanguageCollection]:
         """
         Builds a list of language collections.
 
@@ -172,13 +172,13 @@ class Repo:
         languages = {}
         for root, directories, files in os.walk(self._source_dir):
             if not directories:
-                language = LanguageCollection(os.path.basename(root), root, files, self._projects)
+                language = subete.LanguageCollection(os.path.basename(root), root, files, self._projects)
                 languages[str(language)] = language
                 logger.debug(f"New language collected: {language}")
         languages = dict(sorted(languages.items()))
         return languages
 
-    def _collect_projects(self) -> List[Project]:
+    def _collect_projects(self) -> List[subete.Project]:
         """
         A helper method for collecting the projects from the 
         sample-programs-website repository. 
@@ -188,7 +188,7 @@ class Repo:
         projects = []
         for project_dir in Path(self._docs_dir, "projects").iterdir():
             if project_dir.is_dir():
-                projects.append(Project(project_dir.name))
+                projects.append(subete.Project(project_dir.name))
         return projects
 
     def _generate_source_dir(self, source_dir: Optional[str]) -> str:
