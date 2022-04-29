@@ -18,7 +18,7 @@ class Repo:
     """
     An object representing the Sample Programs repository.
 
-    :param source_dir: the location of the repo archive (e.g., C://.../sample-programs/archive)
+    :param str source_dir: the location of the repo archive (e.g., C://.../sample-programs/archive)
     """
 
     def __init__(self, source_dir: Optional[str] = None) -> None:
@@ -35,7 +35,7 @@ class Repo:
         Makes a repo subscriptable. In this case, the subscript retrieves a 
         language collection. 
 
-        :param language: the name of the language to lookup
+        :param str language: the name of the language to lookup
         :return: the language collection by name
         """
         return self._languages[language]
@@ -227,13 +227,17 @@ class LanguageCollection:
     """
     An object representing a collection of sample programs files for a particular programming language.
 
-    :param name: the name of the language (e.g., python)
-    :param path: the path of the language (e.g., .../archive/p/python/)
-    :param file_list: the list of files in language collection
-    :param projects: the list of approved projects according to the Sample Programs docs
+    :param str name: the name of the language (e.g., python)
+    :param str path: the path of the language (e.g., .../archive/p/python/)
+    :param list[str] file_list: the list of files in language collection
+    :param list[Project] projects: the list of approved projects according to the Sample Programs docs
     """
 
     def __init__(self, name: str, path: str, file_list: List[str], projects: List[Project]) -> None:
+        assert isinstance(name, str), "name must be a string"
+        assert isinstance(path, str), "path must be a string"
+        assert isinstance(file_list, list), "file_list must be a list"
+        assert isinstance(projects, list), "projects must be a list"
         self._name: str = name
         self._path: str = path
         self._file_list: List[str] = file_list
@@ -245,11 +249,13 @@ class LanguageCollection:
         self._lang_docs_url: str = f"https://sampleprograms.io/languages/{self._name}"
         self._testinfo_url: str = f"https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/{self._name[0]}/{self._name}/testinfo.yml"
         self._total_snippets: int = len(self._sample_programs)
-        self._total_dir_size: int = sum(x.size()
-                                        for _, x in self._sample_programs.items())
+        self._total_dir_size: int = sum(
+            x.size() for _, x in self._sample_programs.items()
+        )
         self._total_line_count: int = sum(
-            x.line_count() for _, x in self._sample_programs.items())
-        self._missing_programs: List[str] = self._collect_missing_programs()
+            x.line_count() for _, x in self._sample_programs.items()
+        )
+        self._missing_programs: List[Project] = self._collect_missing_programs()
 
     def __str__(self) -> str:
         """
@@ -465,7 +471,7 @@ class LanguageCollection:
         logger.info(f"Retrieving testinfo URL for {self}: {self._testinfo_url}")
         return self._testinfo_url
 
-    def missing_programs(self) -> List[str]:
+    def missing_programs(self) -> List[Project]:
         """
         Retrieves the list of missing sample programs for this language.
 
@@ -491,16 +497,13 @@ class LanguageCollection:
         """
         return len(self._missing_programs)
 
-    def _collect_missing_programs(self) -> List[str]:
+    def _collect_missing_programs(self) -> List[Project]:
         """
         Generates a list of sample programs that are missing from the language collection.
 
         :return: a list of missing sample programs
         """
-        programs = set(
-            program.project_pathlike_name() 
-            for program in self._sample_programs.values()
-        )
+        programs = set(program.project() for program in self)
         projects = set(self._projects)
         return list(projects - programs)
 
@@ -515,7 +518,7 @@ class LanguageCollection:
             _, file_ext = os.path.splitext(file)
             file_ext = file_ext.lower()
             if file_ext not in (".md", "", ".yml"):
-                program = SampleProgram(self._path, file, str(self))
+                program = SampleProgram(self._path, file, self)
                 sample_programs[program.project_name()] = program
                 logger.debug(f"New sample program collected: {program}")
         sample_programs = dict(sorted(sample_programs.items()))
@@ -555,6 +558,9 @@ class SampleProgram:
     """
 
     def __init__(self, path: str, file_name: str, language: LanguageCollection) -> None:
+        assert isinstance(path, str), "path must be a string"
+        assert isinstance(file_name, str), "file_name must be a string"
+        assert isinstance(language, LanguageCollection), "language must be a LanguageCollection"
         self._path: str = path
         self._file_name: str = file_name
         self._language: LanguageCollection = language
@@ -815,7 +821,7 @@ class Project:
     """
     An object representing a Project in the Sample Programs repo.
 
-    :param name: the name of the project in its pathlike form (e.g., hello-world) 
+    :param str name: the name of the project in its pathlike form (e.g., hello-world) 
     """
 
     def __init__(self, name: str):
@@ -829,6 +835,12 @@ class Project:
             if len(self._name) > 3 
             else self._name.upper()
         )
+
+    def __eq__(self, __o: object) -> bool:
+        return isinstance(__o, Project) and self._name == __o._name
+
+    def __hash__(self) -> int:
+        return hash(self._name)
 
     def name(self) -> str:
         """

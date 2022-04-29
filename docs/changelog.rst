@@ -1,6 +1,10 @@
 Changelog
 =========
 
+* v0.9.2
+    * Fixed an issue with the use of the SampleProgram constructor
+    * Fixed an issue where the missing_programs() method did not work correctly
+
 * v0.9.1
     * Updated official documentation
     * Fixed an issue where one of the type hints was wrong
