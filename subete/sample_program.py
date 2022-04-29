@@ -33,7 +33,7 @@ class SampleProgram:
 
         :return: the sample program as a string
         """
-        return f'{self.project_name()} in {self.language_collection()}'
+        return f'{self.project_name()} in {self.language_name()}'
 
     def __eq__(self, o: object) -> bool:
         """
