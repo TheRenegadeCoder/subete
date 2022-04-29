@@ -503,10 +503,7 @@ class LanguageCollection:
 
         :return: a list of missing sample programs
         """
-        programs = set(
-            program.project_pathlike_name() 
-            for program in self._sample_programs.values()
-        )
+        programs = set(program.project() for program in self)
         projects = set(self._projects)
         return list(projects - programs)
 
