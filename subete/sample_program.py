@@ -21,7 +21,7 @@ class SampleProgram:
         self._path = path
         self._file_name = file_name
         self._language = language
-        self._normalized_name: str = self._normalize_program_name()
+        self._normalized_program_name: str = self._normalize_program_name()
         self._sample_program_req_url: str = self._generate_requirements_url()
         self._sample_program_doc_url: str = self._generate_doc_url()
         self._sample_program_issue_url: str = self._generate_issue_url()
@@ -33,7 +33,7 @@ class SampleProgram:
 
         :return: the sample program as a string
         """
-        return f'{self.project()} in {self.language()}'
+        return f'{self.project_name()} in {self.language_collection()}'
 
     def __eq__(self, o: object) -> bool:
         """
@@ -64,7 +64,21 @@ class SampleProgram:
         relative_path = os.path.join(self._path, self._file_name)
         return os.path.getsize(relative_path)
 
-    def language(self) -> LanguageCollection:
+    def language_collection(self) -> LanguageCollection:
+        """
+        Retrieves the language collection object that this sample 
+        program is a part of.  
+
+        Assuming you have a SampleProgram object called program, 
+        here's how you would use this method::
+
+            name: str = program.language_collection()
+
+        :return: the language collection that this program belongs to.
+        """
+        return self._language
+
+    def language_name(self) -> str:
         """
         Retrieves the language name for this sample program. Language
         name is generated from a call to str() for the source
@@ -73,25 +87,59 @@ class SampleProgram:
         Assuming you have a SampleProgram object called program, 
         here's how you would use this method::
 
-            name: str = program.language()
+            name: str = program.language_name()
 
         :return: the programming language as a titlecase string (e.g., Python)
         """
-        return self._language
+        return str(self._language)
 
-    def project(self) -> str:
+    def language_pathlike_name(self) -> str:
         """
-        Retrieves the project name of this sample program. Project name is
-        generated from the file name.
+        Retrieves the language name in the form of a path for URL purposes.
+        This is a convenience method that pulls directly from language
+        collection's `pathlike_name()` method.
 
         Assuming you have a SampleProgram object called program, 
         here's how you would use this method::
 
-            name: str = program.project()
+            name: str = program.language_pathlike_name()
 
-        :return: the project name as a titlecase string (e.g., Hello World)
+        :return: the language name as a path name (e.g., google-apps-script, python)
         """
-        return self._normalized_name.replace("-", " ").title()
+        return self._language.pathlike_name()
+    
+    def project_name(self) -> str:
+        """
+        Retrieves the project name of this sample program. Project name is
+        generated from the file name. Specifically, multiword project names
+        are converted to titlecase (e.g., Convex Hull) while acronyms of 
+        three or less characters are uppercased (e.g., LPS).
+
+        Assuming you have a SampleProgram object called program, 
+        here's how you would use this method::
+
+            name: str = program.project_name()
+
+        :return: the project name as a titlecase string (e.g., Hello World, MST)
+        """
+        return (
+            self._normalized_program_name.replace("-", " ").title() 
+            if len(self._normalized_program_name) <= 3 
+            else self._normalized_program_name.upper()
+        )
+
+    def project_pathlike_name(self) -> str:
+        """
+        Retrieves the project name in the form of a path for URL purposes.
+
+        Assuming you have a SampleProgram object called program, 
+        here's how you would use this method::
+
+            name: str = program.project_pathlike_name()
+
+        :return: the project name as a path name (e.g., hello-world, convex-hull)
+        """
+        return self._normalized_program_name
 
     def code(self) -> str:
         """
@@ -103,12 +151,13 @@ class SampleProgram:
 
         Assuming you have a SampleProgram object called program, 
         here's how you would use this method::
-        
+
             code: str = program.code()
 
         :return: the code for the sample program as a string
         """
-        logger.debug(f"Attempting to retrieve code from {self._path}/{self._file_name}")
+        logger.debug(
+            f"Attempting to retrieve code from {self._path}/{self._file_name}")
         return Path(self._path, self._file_name).read_text(errors="replace")
 
     def line_count(self) -> int:
@@ -159,7 +208,7 @@ class SampleProgram:
 
         Assuming you have a SampleProgram object called program, 
         here's how you would use this method::
-        
+
             url: str = program.documentation_url()
 
         :return: the documentation URL as a string
@@ -201,7 +250,8 @@ class SampleProgram:
             url = stem.replace("_", "-").lower()
         else:
             # TODO: this is brutal. At some point, we should loop in the glotter test file.
-            url = re.sub('((?<=[a-z])[A-Z0-9]|(?!^)[A-Z](?=[a-z]))', r'-\1', stem).lower()
+            url = re.sub(
+                '((?<=[a-z])[A-Z0-9]|(?!^)[A-Z](?=[a-z]))', r'-\1', stem).lower()
         logger.info(f"Constructed a normalized form of the program {url}")
         return url
 
@@ -213,10 +263,10 @@ class SampleProgram:
         :return: the expected requirements URL 
         """
         doc_url_base = "https://sampleprograms.io/projects"
-        if "export" in self._normalized_name or "import" in self._normalized_name:
+        if "export" in self._normalized_program_name or "import" in self._normalized_program_name:
             return f"{doc_url_base}/import-export"
         else:
-            return f"{doc_url_base}/{self._normalized_name}"
+            return f"{doc_url_base}/{self._normalized_program_name}"
 
     def _generate_doc_url(self) -> str:
         """
@@ -239,5 +289,5 @@ class SampleProgram:
         """
         issue_url_base = "https://github.com//TheRenegadeCoder/" \
                          "sample-programs-website/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+"
-        program = self._normalized_name.replace("-", "+")
+        program = self._normalized_program_name.replace("-", "+")
         return f"{issue_url_base}{program}+{self._language.replace(' ', '+').lower()}"

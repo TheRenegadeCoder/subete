@@ -273,7 +273,7 @@ class LanguageCollection:
             file_ext = file_ext.lower()
             if file_ext not in (".md", "", ".yml"):
                 program = SampleProgram(self._path, file, str(self))
-                sample_programs[program.project()] = program
+                sample_programs[program.project_name()] = program
                 logger.debug(f"New sample program collected: {program}")
         sample_programs = dict(sorted(sample_programs.items()))
         return sample_programs
