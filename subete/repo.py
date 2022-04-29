@@ -124,8 +124,8 @@ class Repo:
 
         :return: a random sample program from the Sample Programs repository
         """
-        language = random.choice(list(self.language_collections().values()))
-        program = random.choice(list(language.sample_programs().values()))
+        language = random.choice(list(self))
+        program = random.choice(list(language))
         logger.debug(f"Generated random program: {program}")
         return program
 
