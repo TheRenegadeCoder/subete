@@ -629,7 +629,6 @@ class SampleProgram:
 
         :return: the programming language as a titlecase string (e.g., Python)
         """
-        logger.info(f'Retrieving language name for {self}: {self._language}')
         return str(self._language)
 
     def language_pathlike_name(self) -> str:
