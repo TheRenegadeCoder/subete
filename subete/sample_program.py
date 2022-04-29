@@ -110,6 +110,20 @@ class SampleProgram:
         """
         logger.info(f'Retrieving language pathlike name for {self}: {self._language.pathlike_name()}')
         return self._language.pathlike_name()
+
+    def project(self) -> Project:
+        """
+        Retrieves the project object for this sample program.
+
+        Assuming you have a SampleProgram object called program, 
+        here's how you would use this method::
+
+            project: Project = program.project()
+
+        :return: the project object for this sample program
+        """
+        logger.info(f'Retrieving project for {self}: {self._project}')
+        return self._project
     
     def project_name(self) -> str:
         """

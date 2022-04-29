@@ -4,7 +4,7 @@ TEST_REPO = subete.load()
 
 
 def test_repo_languages():
-    assert len(TEST_REPO.language_collections()) > 0
+    assert len(TEST_REPO) > 0
 
 
 def test_repo_total_programs():

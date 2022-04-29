@@ -26,12 +26,12 @@ def test_testinfo_url_symbol_lang():
 
 def test_requirements_url_multiword_lang():
     program: SampleProgram = TEST_REPO["Google Apps Script"]["Hello World"]
-    assert program.requirements_url() == "https://sampleprograms.io/projects/hello-world"
+    assert program.project().requirements_url() == "https://sampleprograms.io/projects/hello-world"
 
 
 def test_requirements_url_symbol_lang():
     program: SampleProgram = TEST_REPO["C#"]["Hello World"]
-    assert program.requirements_url() == "https://sampleprograms.io/projects/hello-world"
+    assert program.project().requirements_url() == "https://sampleprograms.io/projects/hello-world"
 
 
 def test_documentation_url_multiword_lang():
