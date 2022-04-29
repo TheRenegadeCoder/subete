@@ -876,8 +876,8 @@ class Project:
 
         :return: the requirments URL as a string 
         """
-        logger.info(f'Retrieving requirements URL for {self}: {self._sample_program_req_url}')
-        return self._sample_program_req_url
+        logger.info(f'Retrieving requirements URL for {self}: {self._requirements_url}')
+        return self._requirements_url
 
     def _generate_requirements_url(self) -> str:
         """
