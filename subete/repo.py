@@ -219,8 +219,8 @@ class Repo:
         :return: a path to the documentation directory
         """
         if not source_dir:
-            return os.path.join(self._temp_dir.name, "docs", "docs")
-        return os.path.join(source_dir, os.pardir, "docs", "docs")
+            return os.path.join(self._temp_dir.name, "docs", "sources")
+        return os.path.join(source_dir, os.pardir, "docs", "sources")
 
 
 class LanguageCollection:
