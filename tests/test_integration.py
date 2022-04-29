@@ -1,5 +1,5 @@
-from subete.repo import LanguageCollection, SampleProgram
 import subete
+from subete import LanguageCollection, SampleProgram
 
 TEST_REPO = subete.load()
 

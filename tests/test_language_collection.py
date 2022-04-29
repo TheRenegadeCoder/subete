@@ -1,6 +1,4 @@
-from typing import List
-from subete.repo import SampleProgram
-from subete import LanguageCollection
+from subete import SampleProgram, LanguageCollection
 
 TEST_PATH = "tests/python/"
 TEST_LANG = "python"
