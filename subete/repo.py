@@ -839,6 +839,9 @@ class Project:
             else self._name.upper()
         )
 
+    def __eq__(self, __o: object) -> bool:
+        return isinstance(__o, Project) and self._name == __o._name
+
     def name(self) -> str:
         """
         Retrieves the name of the project in its human-readable form.
