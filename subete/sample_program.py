@@ -76,6 +76,7 @@ class SampleProgram:
 
         :return: the language collection that this program belongs to.
         """
+        logger.info(f'Retrieving language collection for {self}: {self._language}')
         return self._language
 
     def language_name(self) -> str:
@@ -91,6 +92,7 @@ class SampleProgram:
 
         :return: the programming language as a titlecase string (e.g., Python)
         """
+        logger.info(f'Retrieving language name for {self}: {self._language}')
         return str(self._language)
 
     def language_pathlike_name(self) -> str:
@@ -106,6 +108,7 @@ class SampleProgram:
 
         :return: the language name as a path name (e.g., google-apps-script, python)
         """
+        logger.info(f'Retrieving language pathlike name for {self}: {self._language.pathlike_name()}')
         return self._language.pathlike_name()
     
     def project_name(self) -> str:
@@ -122,11 +125,13 @@ class SampleProgram:
 
         :return: the project name as a titlecase string (e.g., Hello World, MST)
         """
-        return (
+        _project_name = (
             self._normalized_program_name.replace("-", " ").title() 
             if len(self._normalized_program_name) <= 3 
             else self._normalized_program_name.upper()
         )
+        logger.info(f'Retrieving project name for {self}: {_project_name}')
+        return _project_name
 
     def project_pathlike_name(self) -> str:
         """
@@ -139,6 +144,7 @@ class SampleProgram:
 
         :return: the project name as a path name (e.g., hello-world, convex-hull)
         """
+        logger.info(f'Retrieving project pathlike name for {self}: {self._normalized_program_name}')
         return self._normalized_program_name
 
     def code(self) -> str:
@@ -156,8 +162,7 @@ class SampleProgram:
 
         :return: the code for the sample program as a string
         """
-        logger.debug(
-            f"Attempting to retrieve code from {self._path}/{self._file_name}")
+        logger.info(f"Retrieving code from {self._path}/{self._file_name}")
         return Path(self._path, self._file_name).read_text(errors="replace")
 
     def line_count(self) -> int:
@@ -171,6 +176,7 @@ class SampleProgram:
 
         :return: the number of lines for the sample program as an integer
         """
+        logger.info(f'Retrieving line count for {self}: {self._line_count}')
         return self._line_count
 
     def requirements_url(self) -> str:
@@ -192,6 +198,7 @@ class SampleProgram:
 
         :return: the requirments URL as a string 
         """
+        logger.info(f'Retrieving requirements URL for {self}: {self._sample_program_req_url}')
         return self._sample_program_req_url
 
     def documentation_url(self) -> str:
@@ -213,6 +220,7 @@ class SampleProgram:
 
         :return: the documentation URL as a string
         """
+        logger.info(f'Retrieving documentation URL for {self}: {self._sample_program_doc_url}')
         return self._sample_program_doc_url
 
     def article_issue_query_url(self) -> str:
@@ -234,6 +242,7 @@ class SampleProgram:
 
         :return: the issue query URL as a string
         """
+        logger.info(f'Retrieving article issue query URL for {self}: {self._sample_program_issue_url}')
         return self._sample_program_issue_url
 
     def _normalize_program_name(self) -> str:
@@ -250,8 +259,7 @@ class SampleProgram:
             url = stem.replace("_", "-").lower()
         else:
             # TODO: this is brutal. At some point, we should loop in the glotter test file.
-            url = re.sub(
-                '((?<=[a-z])[A-Z0-9]|(?!^)[A-Z](?=[a-z]))', r'-\1', stem).lower()
+            url = re.sub('((?<=[a-z])[A-Z0-9]|(?!^)[A-Z](?=[a-z]))', r'-\1', stem).lower()
         logger.info(f"Constructed a normalized form of the program {url}")
         return url
 
