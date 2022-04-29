@@ -83,7 +83,7 @@ class Repo:
         """
         return self._total_tests
 
-    def approved_pathlike_projects(self) -> List[str]:
+    def approved_projects(self) -> List[Project]:
         """
         Retrieves the list of approved projects in the repo. Projects are
         returned as a list of strings where the strings represent the pathlike 
