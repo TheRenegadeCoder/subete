@@ -234,10 +234,10 @@ class LanguageCollection:
     """
 
     def __init__(self, name: str, path: str, file_list: List[str], projects: List[Project]) -> None:
-        assert isinstance(name, str)
-        assert isinstance(path, str)
-        assert isinstance(file_list, list)
-        assert isinstance(projects, list)
+        assert isinstance(name, str), "name must be a string"
+        assert isinstance(path, str), "path must be a string"
+        assert isinstance(file_list, list), "file_list must be a list"
+        assert isinstance(projects, list), "projects must be a list"
         self._name: str = name
         self._path: str = path
         self._file_list: List[str] = file_list
@@ -249,8 +249,9 @@ class LanguageCollection:
         self._lang_docs_url: str = f"https://sampleprograms.io/languages/{self._name}"
         self._testinfo_url: str = f"https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/{self._name[0]}/{self._name}/testinfo.yml"
         self._total_snippets: int = len(self._sample_programs)
-        self._total_dir_size: int = sum(x.size()
-                                        for _, x in self._sample_programs.items())
+        self._total_dir_size: int = sum(
+            x.size() for _, x in self._sample_programs.items()
+        )
         self._total_line_count: int = sum(
             x.line_count() for _, x in self._sample_programs.items())
         self._missing_programs: List[str] = self._collect_missing_programs()
@@ -559,9 +560,9 @@ class SampleProgram:
     """
 
     def __init__(self, path: str, file_name: str, language: LanguageCollection) -> None:
-        assert isinstance(path, str)
-        assert isinstance(file_name, str)
-        assert isinstance(language, LanguageCollection)
+        assert isinstance(path, str), "path must be a string"
+        assert isinstance(file_name, str), "file_name must be a string"
+        assert isinstance(language, LanguageCollection), "language must be a LanguageCollection"
         self._path: str = path
         self._file_name: str = file_name
         self._language: LanguageCollection = language
