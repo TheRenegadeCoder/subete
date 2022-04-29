@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 import yaml
+from subete.project import Project
 
 from subete.sample_program import SampleProgram
 
@@ -20,14 +21,13 @@ class LanguageCollection:
     :param projects: the list of approved projects according to the Sample Programs docs
     """
 
-    def __init__(self, name: str, path: str, file_list: List[str], projects: List[str]) -> None:
+    def __init__(self, name: str, path: str, file_list: List[str], projects: List[Project]) -> None:
         self._name: str = name
         self._path: str = path
         self._file_list: List[str] = file_list
-        self._projects: List[str] = projects
+        self._projects: List[Project] = projects
         self._first_letter: str = name[0]
-        self._sample_programs: Dict[str,
-                                    SampleProgram] = self._collect_sample_programs()
+        self._sample_programs: Dict[str, SampleProgram] = self._collect_sample_programs()
         self._test_file_path: Optional[str] = self._collect_test_file()
         self._read_me_path: Optional[str] = self._collect_readme()
         self._lang_docs_url: str = f"https://sampleprograms.io/languages/{self._name}"
@@ -286,8 +286,10 @@ class LanguageCollection:
 
         :return: a list of missing sample programs
         """
-        programs = set(program._normalize_program_name()
-                       for program in self._sample_programs.values())
+        programs = set(
+            program.project_pathlike_name() 
+            for program in self._sample_programs.values()
+        )
         projects = set(self._projects)
         return list(projects - programs)
 

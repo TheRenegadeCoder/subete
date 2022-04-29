@@ -2,6 +2,7 @@ import logging
 import os
 from pathlib import Path
 import re
+from subete.project import Project
 from subete.repo import LanguageCollection
 
 logger = logging.getLogger(__name__)
@@ -21,8 +22,7 @@ class SampleProgram:
         self._path = path
         self._file_name = file_name
         self._language = language
-        self._normalized_program_name: str = self._normalize_program_name()
-        self._sample_program_req_url: str = self._generate_requirements_url()
+        self._project: Project = self._generate_project()
         self._sample_program_doc_url: str = self._generate_doc_url()
         self._sample_program_issue_url: str = self._generate_issue_url()
         self._line_count: int = len(self.code().splitlines())
@@ -116,7 +116,8 @@ class SampleProgram:
         Retrieves the project name of this sample program. Project name is
         generated from the file name. Specifically, multiword project names
         are converted to titlecase (e.g., Convex Hull) while acronyms of 
-        three or less characters are uppercased (e.g., LPS).
+        three or less characters are uppercased (e.g., LPS). This
+        method is an alias for `project.name()`. 
 
         Assuming you have a SampleProgram object called program, 
         here's how you would use this method::
@@ -125,17 +126,13 @@ class SampleProgram:
 
         :return: the project name as a titlecase string (e.g., Hello World, MST)
         """
-        _project_name = (
-            self._normalized_program_name.replace("-", " ").title() 
-            if len(self._normalized_program_name) <= 3 
-            else self._normalized_program_name.upper()
-        )
-        logger.info(f'Retrieving project name for {self}: {_project_name}')
-        return _project_name
+        logger.info(f'Retrieving project name for {self}: {self._project}')
+        return self._project.name()
 
     def project_pathlike_name(self) -> str:
         """
         Retrieves the project name in the form of a path for URL purposes.
+        This method is an alias for `project.pathlike_name()`.
 
         Assuming you have a SampleProgram object called program, 
         here's how you would use this method::
@@ -144,8 +141,8 @@ class SampleProgram:
 
         :return: the project name as a path name (e.g., hello-world, convex-hull)
         """
-        logger.info(f'Retrieving project pathlike name for {self}: {self._normalized_program_name}')
-        return self._normalized_program_name
+        logger.info(f'Retrieving project pathlike name for {self}: {self._project}')
+        return self._project.pathlike_name()
 
     def code(self) -> str:
         """
@@ -178,28 +175,6 @@ class SampleProgram:
         """
         logger.info(f'Retrieving line count for {self}: {self._line_count}')
         return self._line_count
-
-    def requirements_url(self) -> str:
-        """
-        Retrieves the URL to the requirements documentation for
-        this sample program. Requirements URL is assumed to exist
-        and therefore not validated. The requirements documentation 
-        URL is in the following form:
-
-        ``https://sampleprograms.io/projects/{project}/``
-
-        For example, here is a link to the
-        `Hello World documentation <https://sampleprograms.io/projects/hello-world/>`_. 
-
-        Assuming you have a SampleProgram object called program, 
-        here's how you would use this method::
-
-            url: str = program.requirements_url()
-
-        :return: the requirments URL as a string 
-        """
-        logger.info(f'Retrieving requirements URL for {self}: {self._sample_program_req_url}')
-        return self._sample_program_req_url
 
     def documentation_url(self) -> str:
         """
@@ -245,7 +220,7 @@ class SampleProgram:
         logger.info(f'Retrieving article issue query URL for {self}: {self._sample_program_issue_url}')
         return self._sample_program_issue_url
 
-    def _normalize_program_name(self) -> str:
+    def _generate_project(self) -> str:
         """
         A helper function which converts the program name into
         a standard representation (i.e. hello_world -> hello-world).
@@ -261,20 +236,7 @@ class SampleProgram:
             # TODO: this is brutal. At some point, we should loop in the glotter test file.
             url = re.sub('((?<=[a-z])[A-Z0-9]|(?!^)[A-Z](?=[a-z]))', r'-\1', stem).lower()
         logger.info(f"Constructed a normalized form of the program {url}")
-        return url
-
-    def _generate_requirements_url(self) -> str:
-        """
-        A helper method for generating the expected requirements URL 
-        for this sample program.
-
-        :return: the expected requirements URL 
-        """
-        doc_url_base = "https://sampleprograms.io/projects"
-        if "export" in self._normalized_program_name or "import" in self._normalized_program_name:
-            return f"{doc_url_base}/import-export"
-        else:
-            return f"{doc_url_base}/{self._normalized_program_name}"
+        return Project(url)
 
     def _generate_doc_url(self) -> str:
         """
@@ -297,5 +259,5 @@ class SampleProgram:
         """
         issue_url_base = "https://github.com//TheRenegadeCoder/" \
                          "sample-programs-website/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+"
-        program = self._normalized_program_name.replace("-", "+")
+        program = self._project.pathlike_name().replace("-", "+")
         return f"{issue_url_base}{program}+{str(self._language).replace(' ', '+').lower()}"

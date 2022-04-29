@@ -8,6 +8,7 @@ from typing import Dict, List, Optional
 import git
 
 from subete.language_collection import LanguageCollection
+from subete.project import Project
 from subete.sample_program import SampleProgram
 
 logger = logging.getLogger(__name__)
@@ -24,7 +25,7 @@ class Repo:
         self._temp_dir = tempfile.TemporaryDirectory()
         self._source_dir: str = self._generate_source_dir(source_dir)
         self._docs_dir: str = self._generate_docs_dir(source_dir)
-        self._projects: list[str] = self._collect_projects()
+        self._projects: list[Project] = self._collect_projects()
         self._languages: Dict[str: LanguageCollection] = self._collect_languages()
         self._total_snippets: int = sum(x.total_programs() for _, x in self._languages.items())
         self._total_tests: int = sum(1 for _, x in self._languages.items() if x.has_testinfo())
@@ -39,19 +40,19 @@ class Repo:
         """
         return self._languages[language]
 
-    def language_collections(self) -> Dict[str, LanguageCollection]:
+    def __iter__(self):
         """
-        Retrieves the list of language names mapped to their language collections in 
-        the Sample Programs repo.
+        A convenience method for iterating over all language collections in the repo.
 
         Assuming you have a Repo object called repo, here's how you would use 
         this method::
 
-            languages: Dict[str, LanguageCollection] = repo.language_collections()
+            for language in repo:
+                print(language)
 
-        :return: the dictionary of language names mapped to language collections
+        :return: an iterator over all language collections
         """
-        return self._languages
+        return iter(self._languages.values())
 
     def total_programs(self) -> int:
         """
@@ -82,18 +83,18 @@ class Repo:
         """
         return self._total_tests
 
-    def approved_projects(self) -> List[str]:
+    def approved_pathlike_projects(self) -> List[str]:
         """
         Retrieves the list of approved projects in the repo. Projects are
-        returned as a list of strings where the strings represent the full
-        project name (e.g., Hello World).
+        returned as a list of strings where the strings represent the pathlike 
+        project names (e.g., hello-world).
 
         Assuming you have a Repo object called repo, here's how you would use 
         this method::
 
             approved_projects: List[str] = repo.approved_projects()
 
-        :return: the list of approved projects
+        :return: the list of approved projects (e.g. [hello-world, mst])
         """
         return self._projects
 
@@ -179,7 +180,7 @@ class Repo:
         languages = dict(sorted(languages.items()))
         return languages
 
-    def _collect_projects(self) -> List[str]:
+    def _collect_projects(self) -> List[Project]:
         """
         A helper method for collecting the projects from the 
         sample-programs-website repository. 
@@ -189,7 +190,7 @@ class Repo:
         projects = []
         for project_dir in Path(self._docs_dir, "projects").iterdir():
             if project_dir.is_dir():
-                projects.append(project_dir.name)
+                projects.append(Project(project_dir.name))
         return projects
 
     def _generate_source_dir(self, source_dir: Optional[str]) -> str:
@@ -217,5 +218,5 @@ class Repo:
         :return: a path to the documentation directory
         """
         if not source_dir:
-            return os.path.join(self._temp_dir.name, "docs")
-        return os.path.join(source_dir, os.pardir, "docs")
+            return os.path.join(self._temp_dir.name, "docs", "docs")
+        return os.path.join(source_dir, os.pardir, "docs", "docs")
