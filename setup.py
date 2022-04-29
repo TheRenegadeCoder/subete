@@ -13,7 +13,7 @@ with open("README.md", "r") as fh:
 
 MAJOR = 0
 MINOR = 9
-PATCH = 2
+PATCH = 3
 
 name = "subete"
 version = f"{MAJOR}.{MINOR}"
@@ -28,7 +28,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/TheRenegadeCoder/subete",
     packages=setuptools.find_packages(),
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     install_requires=[
         "PyYAML>=5",
         "GitPython>=3"

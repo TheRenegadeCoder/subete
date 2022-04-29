@@ -1,6 +1,9 @@
 Changelog
 =========
 
+* v0.9.3
+    * Changed docs dir to sources
+
 * v0.9.2
     * Fixed an issue with the use of the SampleProgram constructor
     * Fixed an issue where the missing_programs() method did not work correctly

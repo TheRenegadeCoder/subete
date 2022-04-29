@@ -825,7 +825,7 @@ class Project:
     """
 
     def __init__(self, name: str):
-        self._name: str = name
+        self._name: str = Project._generate_name(name)
         self._requirements_url: str = self._generate_requirements_url()
 
     def __str__(self) -> str:
@@ -899,7 +899,16 @@ class Project:
         :return: the expected requirements URL 
         """
         doc_url_base = "https://sampleprograms.io/projects"
-        if "export" in self.pathlike_name() or "import" in self.pathlike_name():
-            return f"{doc_url_base}/import-export"
-        else:
-            return f"{doc_url_base}/{self.pathlike_name()}"
+        return f"{doc_url_base}/{self.pathlike_name()}"
+
+    @staticmethod
+    def _generate_name(name: str) -> str:
+        """
+        Creates the project name from some input string.
+
+        :param str name: the name of the project in its pathlike form (e.g., hello-world)
+        :return: the name of the project in its pathlike form (e.g., hello-world)
+        """
+        if "export" in name or "import" in name:
+            return "import-export"
+        return name
