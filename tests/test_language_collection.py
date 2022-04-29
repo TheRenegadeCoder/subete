@@ -50,4 +50,4 @@ def test_language_collection_language_url():
 
 def test_missing_programs():
     test = subete.LanguageCollection(TEST_LANG, TEST_PATH, TEST_FILES, TEST_PROJECTS)
-    assert test.missing_programs() == ["reverse-string"]
+    assert test.missing_programs() == [TEST_PROJECTS[1]]

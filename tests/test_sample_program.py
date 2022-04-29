@@ -23,7 +23,7 @@ def test_sample_program_str():
 
 def test_sample_program_language():
     test = subete.SampleProgram(TEST_PATH, TEST_FILES[0], TEST_LANG_COLLECTION)
-    assert test.language_collection() == TEST_LANG
+    assert test.language_collection() == TEST_LANG_COLLECTION
 
 
 def test_sample_program_code():
