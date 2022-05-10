@@ -51,3 +51,7 @@ def test_article_issue_url_multiword_lang():
 def test_article_issue_url_symbol_lang():
     program: subete.SampleProgram = TEST_REPO["C#"]["Hello World"]
     assert program.article_issue_query_url() == "https://github.com//TheRenegadeCoder/sample-programs-website/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+hello+world+c#"
+
+def test_project_has_test():
+    program: subete.SampleProgram = TEST_REPO["Google Apps Script"]["Hello World"]
+    assert program.project().has_testing()

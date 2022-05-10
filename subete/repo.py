@@ -25,6 +25,7 @@ class Repo:
         self._temp_dir = tempfile.TemporaryDirectory()
         self._source_dir: str = self._generate_source_dir(source_dir)
         self._docs_dir: str = self._generate_docs_dir(source_dir)
+        self._tested_projects: Dict = self._collect_tested_projects()
         self._projects: List[Project] = self._collect_projects()
         self._languages: Dict[str: LanguageCollection] = self._collect_languages()
         self._total_snippets: int = sum(x.total_programs() for _, x in self._languages.items())
@@ -191,7 +192,9 @@ class Repo:
         projects = []
         for project_dir in Path(self._docs_dir, "projects").iterdir():
             if project_dir.is_dir():
-                projects.append(Project(project_dir.name))
+                project_test = self._tested_projects.get("".join(project_dir.name.split("-")))
+                logger.info(f"Generating project from: {project_dir.name}, {project_test}")
+                projects.append(Project(project_dir.name, project_test))
         return projects
 
     def _generate_source_dir(self, source_dir: Optional[str]) -> str:
@@ -221,6 +224,20 @@ class Repo:
         if not source_dir:
             return os.path.join(self._temp_dir.name, "docs", "sources")
         return os.path.join(source_dir, os.pardir, "docs", "sources")
+
+    def _collect_tested_projects(self) -> str:
+        """
+        Generates the dictionary of tested projects from the
+        Glotter YAML file. 
+        """
+        p = Path(self._source_dir).parents[0] / ".glotter.yml"
+        if p.exists():
+            with open(p, "r") as f:
+                data = yaml.safe_load(f)["projects"]
+            logger.info(f"Collected tested projects: {data}")
+            return data
+        else:
+            return None
 
 
 class LanguageCollection:
@@ -774,13 +791,14 @@ class SampleProgram:
         logger.info(f'Retrieving article issue query URL for {self}: {self._sample_program_issue_url}')
         return self._sample_program_issue_url
 
-    def _generate_project(self) -> Project:
+    def _generate_project(self) -> Optional[Project]:
         """
         A helper function which converts the program name into
         a standard representation (i.e. hello_world -> hello-world).
 
-        :return: the sample program as a lowercase string separated by hyphens
+        :return: the sample program as a Project object or None if the project is not approved
         """
+        projects = self._language._projects
         stem = os.path.splitext(self._file_name)[0]
         if len(stem.split("-")) > 1:
             url = stem.lower()
@@ -790,7 +808,11 @@ class SampleProgram:
             # TODO: this is brutal. At some point, we should loop in the glotter test file.
             url = re.sub('((?<=[a-z])[A-Z0-9]|(?!^)[A-Z](?=[a-z]))', r'-\1', stem).lower()
         logger.info(f"Constructed a normalized form of the program {url}")
-        return Project(url)
+        for project in projects:
+            if url in project.pathlike_name():
+                return project
+        logger.error(f"Could not find a project for {self._file_name} with name {url} in {projects}.")
+        return None
 
     def _generate_doc_url(self) -> str:
         """
@@ -824,7 +846,8 @@ class Project:
     :param str name: the name of the project in its pathlike form (e.g., hello-world) 
     """
 
-    def __init__(self, name: str):
+    def __init__(self, name: str, project_tests: Optional[Dict]):
+        self._project_tests = project_tests
         self._name: str = Project._generate_name(name)
         self._requirements_url: str = self._generate_requirements_url()
 
@@ -841,6 +864,14 @@ class Project:
 
     def __hash__(self) -> int:
         return hash(self._name)
+
+    def has_testing(self) -> bool:
+        """
+        Responds true if the project has tests. 
+
+        :return: True if the project is tested, False otherwise
+        """
+        return self._project_tests is not None
 
     def name(self) -> str:
         """
