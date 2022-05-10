@@ -248,7 +248,7 @@ class LanguageCollection:
     :param list[Project] projects: the list of approved projects according to the Sample Programs docs
     """
 
-    def __init__(self, name: str, path: str, file_list: List[str], projects: List[Project], repo: Repo) -> None:
+    def __init__(self, name: str, path: str, file_list: List[str], projects: List[Project]) -> None:
         assert isinstance(name, str), "name must be a string"
         assert isinstance(path, str), "path must be a string"
         assert isinstance(file_list, list), "file_list must be a list"
@@ -257,7 +257,6 @@ class LanguageCollection:
         self._path: str = path
         self._file_list: List[str] = file_list
         self._projects: List[Project] = projects
-        self._repo: Repo = repo
         self._first_letter: str = name[0]
         self._sample_programs: Dict[str, SampleProgram] = self._collect_sample_programs()
         self._test_file_path: Optional[str] = self._collect_test_file()
@@ -318,13 +317,6 @@ class LanguageCollection:
         :return: an iterator over all sample programs in the language collection
         """
         return iter(self._sample_programs.values())
-
-    def repo(self) -> Repo:
-        """
-        Returns the repository object from which the language collection
-        was generated.
-        """
-        return self._repo
 
     def name(self) -> str:
         """
@@ -804,7 +796,7 @@ class SampleProgram:
 
         :return: the sample program as a Project object or None if the project is not approved
         """
-        projects = self.language_collection().repo().approved_projects()
+        projects = self.language_collection()._projects
         stem = os.path.splitext(self._file_name)[0]
         if len(stem.split("-")) > 1:
             url = stem.lower()
