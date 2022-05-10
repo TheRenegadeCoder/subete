@@ -25,6 +25,7 @@ class Repo:
         self._temp_dir = tempfile.TemporaryDirectory()
         self._source_dir: str = self._generate_source_dir(source_dir)
         self._docs_dir: str = self._generate_docs_dir(source_dir)
+        self._tested_projects: Dict = self._collect_tested_projects()
         self._projects: List[Project] = self._collect_projects()
         self._languages: Dict[str: LanguageCollection] = self._collect_languages()
         self._total_snippets: int = sum(x.total_programs() for _, x in self._languages.items())
@@ -191,7 +192,8 @@ class Repo:
         projects = []
         for project_dir in Path(self._docs_dir, "projects").iterdir():
             if project_dir.is_dir():
-                projects.append(Project(project_dir.name))
+                project_test = self._tested_projects.get("".join(project_dir.name.lower().split()))
+                projects.append(Project(project_dir.name, project_test))
         return projects
 
     def _generate_source_dir(self, source_dir: Optional[str]) -> str:
@@ -221,6 +223,19 @@ class Repo:
         if not source_dir:
             return os.path.join(self._temp_dir.name, "docs", "sources")
         return os.path.join(source_dir, os.pardir, "docs", "sources")
+
+    def _collect_tested_projects(self) -> str:
+        """
+        Generates the dictionary of tested projects from the
+        Glotter YAML file. 
+        """
+        p = Path(self._source_dir).parents[0] / ".glotter.yml"
+        if p.exists():
+            with open(p, "r") as f:
+                data = yaml.safe_load(f)
+            return data
+        else:
+            return None
 
 
 class LanguageCollection:
@@ -824,9 +839,11 @@ class Project:
     :param str name: the name of the project in its pathlike form (e.g., hello-world) 
     """
 
-    def __init__(self, name: str):
+    def __init__(self, name: str, project_tests: Optional[Dict]):
+        self._project_tests = project_tests
         self._name: str = Project._generate_name(name)
         self._requirements_url: str = self._generate_requirements_url()
+        self._testing_path: str = self._generate_testing_path()
 
     def __str__(self) -> str:
         logger.info(f"Generating name from {self._name}")
@@ -841,6 +858,14 @@ class Project:
 
     def __hash__(self) -> int:
         return hash(self._name)
+
+    def has_testing(self) -> bool:
+        """
+        Responds true if the project has tests. 
+
+        :return: True if the project is tested, False otherwise
+        """
+        return self._project_tests is not None
 
     def name(self) -> str:
         """
