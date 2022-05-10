@@ -233,7 +233,7 @@ class Repo:
         p = Path(self._source_dir).parents[0] / ".glotter.yml"
         if p.exists():
             with open(p, "r") as f:
-                data = yaml.safe_load(f)
+                data = yaml.safe_load(f)["projects"]
             logger.info(f"Collected tested projects: {data}")
             return data
         else:
