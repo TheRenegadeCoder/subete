@@ -24,6 +24,7 @@ class Repo:
     def __init__(self, source_dir: Optional[str] = None) -> None:
         self._temp_dir = tempfile.TemporaryDirectory()
         self._source_dir: str = self._generate_source_dir(source_dir)
+        self._git_repo: git.Repo = self._generate_git_repo()
         self._docs_dir: str = self._generate_docs_dir(source_dir)
         self._tested_projects: Dict = self._collect_tested_projects()
         self._projects: List[Project] = self._collect_projects()
@@ -205,11 +206,21 @@ class Repo:
         :return: a path to the source directory of the archive directory
         """
         if not source_dir:
-            logger.info(f"Source directory is not provided. Cloning the Sample Programs repo to a temporary directory: {self._temp_dir.name}.")
-            git.Repo.clone_from("https://github.com/TheRenegadeCoder/sample-programs.git", self._temp_dir.name, multi_options=["--recursive"])
+            logger.info(f"Source directory is not provided. Using temp directory {self._temp_dir.name}.")
             return os.path.join(self._temp_dir.name, "archive")
         logger.info(f"Source directory provided: {source_dir}")
         return source_dir
+
+    def _generate_git_repo(self) -> git.Repo:
+        """
+        Generates the Git repository from the Sample Programs repo.
+
+        :return: a Git repository object
+        """
+        if self._temp_dir.name in self._source_dir:
+            return git.Repo.clone_from("https://github.com/TheRenegadeCoder/sample-programs.git", self._temp_dir.name, multi_options=["--recursive"])
+        else:
+            return git.Repo(self._source_dir)
 
     def _generate_docs_dir(self, source_dir: Optional[str]) -> str:
         """
