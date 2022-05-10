@@ -192,7 +192,7 @@ class Repo:
         projects = []
         for project_dir in Path(self._docs_dir, "projects").iterdir():
             if project_dir.is_dir():
-                project_test = self._tested_projects.get("".join(project_dir.name.lower().split()))
+                project_test = self._tested_projects.get("".join(project_dir.name().lower().split()))
                 projects.append(Project(project_dir.name, project_test))
         return projects
 
