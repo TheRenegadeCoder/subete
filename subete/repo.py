@@ -192,7 +192,7 @@ class Repo:
         projects = []
         for project_dir in Path(self._docs_dir, "projects").iterdir():
             if project_dir.is_dir():
-                project_test = self._tested_projects.get("".join(project_dir.name().lower().split()))
+                project_test = self._tested_projects.get("".join(project_dir.name.split("-")))
                 projects.append(Project(project_dir.name, project_test))
         return projects
 
@@ -248,7 +248,7 @@ class LanguageCollection:
     :param list[Project] projects: the list of approved projects according to the Sample Programs docs
     """
 
-    def __init__(self, name: str, path: str, file_list: List[str], projects: List[Project]) -> None:
+    def __init__(self, name: str, path: str, file_list: List[str], projects: List[Project], repo: Repo) -> None:
         assert isinstance(name, str), "name must be a string"
         assert isinstance(path, str), "path must be a string"
         assert isinstance(file_list, list), "file_list must be a list"
@@ -257,6 +257,7 @@ class LanguageCollection:
         self._path: str = path
         self._file_list: List[str] = file_list
         self._projects: List[Project] = projects
+        self._repo: Repo = repo
         self._first_letter: str = name[0]
         self._sample_programs: Dict[str, SampleProgram] = self._collect_sample_programs()
         self._test_file_path: Optional[str] = self._collect_test_file()
@@ -317,6 +318,13 @@ class LanguageCollection:
         :return: an iterator over all sample programs in the language collection
         """
         return iter(self._sample_programs.values())
+
+    def repo(self) -> Repo:
+        """
+        Returns the repository object from which the language collection
+        was generated.
+        """
+        return self._repo
 
     def name(self) -> str:
         """
@@ -789,13 +797,14 @@ class SampleProgram:
         logger.info(f'Retrieving article issue query URL for {self}: {self._sample_program_issue_url}')
         return self._sample_program_issue_url
 
-    def _generate_project(self) -> Project:
+    def _generate_project(self) -> Optional[Project]:
         """
         A helper function which converts the program name into
         a standard representation (i.e. hello_world -> hello-world).
 
-        :return: the sample program as a lowercase string separated by hyphens
+        :return: the sample program as a Project object or None if the project is not approved
         """
+        projects = self.language_collection().repo().approved_projects()
         stem = os.path.splitext(self._file_name)[0]
         if len(stem.split("-")) > 1:
             url = stem.lower()
@@ -805,7 +814,10 @@ class SampleProgram:
             # TODO: this is brutal. At some point, we should loop in the glotter test file.
             url = re.sub('((?<=[a-z])[A-Z0-9]|(?!^)[A-Z](?=[a-z]))', r'-\1', stem).lower()
         logger.info(f"Constructed a normalized form of the program {url}")
-        return Project(url)
+        for project in projects:
+            if project.pathlike_name() == url:
+                return project
+        return None
 
     def _generate_doc_url(self) -> str:
         """
@@ -843,7 +855,6 @@ class Project:
         self._project_tests = project_tests
         self._name: str = Project._generate_name(name)
         self._requirements_url: str = self._generate_requirements_url()
-        self._testing_path: str = self._generate_testing_path()
 
     def __str__(self) -> str:
         logger.info(f"Generating name from {self._name}")
