@@ -234,6 +234,7 @@ class Repo:
         if p.exists():
             with open(p, "r") as f:
                 data = yaml.safe_load(f)
+            logger.info(f"Collected tested projects: {data}")
             return data
         else:
             return None
