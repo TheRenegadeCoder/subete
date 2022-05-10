@@ -635,7 +635,7 @@ class SampleProgram:
 
         :return: the language collection that this program belongs to.
         """
-        logger.info(f'Retrieving language collection: {self._language}')
+        logger.info(f'Retrieving language collection for {self}: {self._language}')
         return self._language
 
     def language_name(self) -> str:
@@ -798,7 +798,7 @@ class SampleProgram:
 
         :return: the sample program as a Project object or None if the project is not approved
         """
-        projects = self.language_collection()._projects
+        projects = self._language._projects
         stem = os.path.splitext(self._file_name)[0]
         if len(stem.split("-")) > 1:
             url = stem.lower()
