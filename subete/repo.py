@@ -193,6 +193,7 @@ class Repo:
         for project_dir in Path(self._docs_dir, "projects").iterdir():
             if project_dir.is_dir():
                 project_test = self._tested_projects.get("".join(project_dir.name.split("-")))
+                logger.info(f"Generating project from: {project_dir.name}, {project_test}")
                 projects.append(Project(project_dir.name, project_test))
         return projects
 
