@@ -811,8 +811,8 @@ class SampleProgram:
         for project in projects:
             if project.pathlike_name() == url:
                 return project
-        logger.error(f"Could not find a project for {self._file_name} with name {url} in {projects}")
-        return None
+        logger.error(f"Could not find a project for {self._file_name} with name {url} in {projects}. Creating a generic project from {url}.")
+        return Project(url, None)
 
     def _generate_doc_url(self) -> str:
         """
