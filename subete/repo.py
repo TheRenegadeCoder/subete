@@ -635,7 +635,7 @@ class SampleProgram:
 
         :return: the language collection that this program belongs to.
         """
-        logger.info(f'Retrieving language collection for {self}: {self._language}')
+        logger.info(f'Retrieving language collection: {self._language}')
         return self._language
 
     def language_name(self) -> str:
@@ -811,8 +811,8 @@ class SampleProgram:
         for project in projects:
             if project.pathlike_name() == url:
                 return project
-        logger.error(f"Could not find a project for {self._file_name} with name {url} in {projects}. Creating a generic project from {url}.")
-        return Project(url, None)
+        logger.error(f"Could not find a project for {self._file_name} with name {url} in {projects}.")
+        return None
 
     def _generate_doc_url(self) -> str:
         """
