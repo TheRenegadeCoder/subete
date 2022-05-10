@@ -1,6 +1,9 @@
 Changelog
 =========
 
+* v0.10.0
+    * Added support for the Glotter testing file: users can now check if a project is tested by Glotter 
+
 * v0.9.3
     * Changed docs dir to sources
 
