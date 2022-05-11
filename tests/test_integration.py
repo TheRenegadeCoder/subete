@@ -76,6 +76,11 @@ def test_modified_not_none():
     assert program.modified() is not None
 
 
+def test_code():
+    program: subete.SampleProgram = TEST_REPO["Python"]["Hello World"]
+    assert program.code() == 'print("Hello, World!")\n'
+
+
 def test_project_has_test():
     program: subete.SampleProgram = TEST_REPO["Google Apps Script"]["Hello World"]
     assert program.project().has_testing()
