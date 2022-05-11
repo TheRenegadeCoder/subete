@@ -7,6 +7,9 @@ newest changes first.
 0.11.x
 -------
 
+* v0.11.2
+    * Fixed a bug where code could not be loaded because the repo was deleted
+
 * v0.11.1
     * Fixed an issue where local repo could cause stack overflow 
     * Added sections to the changelog
