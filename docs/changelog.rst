@@ -1,12 +1,28 @@
 Changelog
 =========
 
+Below you'll find all the changes that have been made to the code with
+newest changes first.
+
+0.11.x
+-------
+
+* v0.11.1
+    * Fixed an issue where local repo could cause stack overflow 
+    * Added sections to the changelog
+
 * v0.11.0
     * Added support for git data: SampleProgram objects now include authors, created dates, and modified dates 
     * Reorganized documentation, so objects have their own sections in the table of contents
 
+0.10.x
+-------
+
 * v0.10.0
     * Added support for the Glotter testing file: users can now check if a project is tested by Glotter 
+
+0.9.x
+------
 
 * v0.9.3
     * Changed docs dir to sources
@@ -22,8 +38,14 @@ Changelog
 * v0.9.0
     * Reworked several of the methods to use the new docs location for website
 
+0.8.x
+------
+
 * v0.8.0
     * Updated URL from sample-programs.therenegadecoder.com to sampleprograms.io
+
+0.7.x
+------
 
 * v0.7.2
     * Fixed a bug where the missing programs list shared the entire path 
@@ -35,11 +57,17 @@ Changelog
     * Added Plausible support for analytics
     * Added feature which allows us to retrieve list of missing programs for a language
 
+0.6.x
+------
+
 * v0.6.0
     * Added random program functionality
     * Fixed several documentation issues
     * Renamed some repo functions to match naming conventions
     * Expanded testing to include tests for random functions
+
+0.5.x
+------
 
 * v0.5.0
     * Updated README to indicate alpha stage of project
@@ -49,6 +77,9 @@ Changelog
     * Removed extraneous print statement
     * Made Repo and LanguageCollection subscriptable
 
+0.4.x
+------
+
 * v0.4.1
     * Fixed an issue where generated links were broken
 
@@ -57,6 +88,9 @@ Changelog
     * Added test URL functionality to LanguageCollection
     * Created usage docs
 
+0.3.x
+------
+
 * v0.3.1
     * Fixed an issue where provided source directories would not run correctly
 
@@ -64,11 +98,17 @@ Changelog
     * Refactored the majority of the underlying library
     * Added testing for Python 3.6 to 3.9
 
+0.2.x
+------
+
 * v0.2.1
     * Fixed an issue where documentation wouldn't build due to sphinx_issues dependency
 
 * v0.2.0
     * Added support for Sphinx documentation
+
+0.1.x
+------
 
 * v0.1.0
     * Launches the library under the exact conditions it was in when it was removed from sample-programs-docs-generator
