@@ -317,8 +317,13 @@ class LanguageCollection:
         Generates as close to the proper language name as possible given a language
         name in plain text separated by hyphens.
 
-        | Example: google-apps-script -> Google Apps Script
-        | Example: c-sharp -> C#
+        - Example: google-apps-script -> Google Apps Script
+        - Example: c-sharp -> C#
+
+        Assuming you have a LanguageCollection object called language,
+        you can use the following code to get the language name::
+
+            name: str = str(language)
 
         :return: a readable representation of the language name
         """
@@ -334,12 +339,17 @@ class LanguageCollection:
         else:
             return " ".join(tokens).title()
 
-    def __getitem__(self, program) -> str:
+    def __getitem__(self, program: str) -> str:
         """
         Makes a language collection subscriptable. In this case, the subscript 
         retrieves a sample program. 
 
-        :param program: the name of the program to lookup
+        Assuming you have a LanguageCollection object called language,
+        you can access a sample program as follows::
+
+            program: SampleProgram = language["Hello World"]
+
+        :param str program: the name of the program to lookup
         :return: the sample program by name
         """
         return self._sample_programs[program]
@@ -631,6 +641,11 @@ class SampleProgram:
         """
         Renders the Sample Program in the following form: {name} in {language}.
 
+        Assuming you have a SampleProgram object called sample_program,
+        here's how you would use this method::
+
+            name: str = str(sample_program)
+
         :return: the sample program as a string
         """
         return f'{self.project_name()} in {self.language_name()}'
@@ -638,11 +653,16 @@ class SampleProgram:
     def __eq__(self, o: object) -> bool:
         """
         Compares an object to the sample program. Returns True if the object
-        is an instance of SampleProgram and has the following three fields:
+        is an instance of SampleProgram and matches the following three fields:
 
             - _file_name
             - _path
             - _language
+
+        Assuming you have a SampleProgram object called sample_program,
+        here's how you would use this method::
+
+            is_sample_program: bool = sample_program == other_sample_program
 
         :return: True if the object matches the Sample Program; False otherwise.
         """
@@ -666,7 +686,8 @@ class SampleProgram:
 
     def created(self) -> Optional[datetime.datetime]:
         """
-        Retrieves the date the sample program was created.
+        Retrieves the date the sample program was created. Created dates
+        are generated from git blame, specifically the author commits.
 
         Assuming you have a SampleProgram object called sample_program,
         here's how you would use this method::
@@ -679,7 +700,8 @@ class SampleProgram:
 
     def modified(self) -> Optional[datetime.datetime]:
         """
-        Retrieves the date the sample program was last modified.
+        Retrieves the date the sample program was last modified. Modified
+        dates are generated from git blame, specifically the author commits.
 
         Assuming you have a SampleProgram object called sample_program,
         here's how you would use this method::

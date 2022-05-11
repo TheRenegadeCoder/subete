@@ -33,6 +33,7 @@ subete.LanguageCollection
    :members:
    :undoc-members:
    :show-inheritance:
+   :special-members: __iter__, __getitem__, __str__
 
 subete.SampleProgram
 -------------------------
@@ -41,6 +42,7 @@ subete.SampleProgram
    :members:
    :undoc-members:
    :show-inheritance:
+   :special-members: __str__, __eq__
 
 subete.Project
 -------------------------
