@@ -222,7 +222,7 @@ class Repo:
         if self._temp_dir.name in self._source_dir:
             return git.Repo.clone_from("https://github.com/TheRenegadeCoder/sample-programs.git", self._temp_dir.name, multi_options=["--recursive"])
         else:
-            return git.Repo(Path(self._source_dir).parent[0])
+            return git.Repo(self._source_dir, search_parent_directories=True)
 
     def _generate_docs_dir(self, source_dir: Optional[str]) -> str:
         """
