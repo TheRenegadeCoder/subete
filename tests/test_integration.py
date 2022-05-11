@@ -61,6 +61,21 @@ def test_article_issue_url_symbol_lang():
     ) == "https://github.com//TheRenegadeCoder/sample-programs-website/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+hello+world+c#"
 
 
+def test_authors():
+    program: subete.SampleProgram = TEST_REPO["Python"]["Hello World"]
+    assert "Jeremy Grifski" in program.authors()
+
+
+def test_created_not_none():
+    program: subete.SampleProgram = TEST_REPO["Python"]["Hello World"]
+    assert program.created() is not None
+
+
+def test_modified_not_none():
+    program: subete.SampleProgram = TEST_REPO["Python"]["Hello World"]
+    assert program.modified() is not None
+
+
 def test_project_has_test():
     program: subete.SampleProgram = TEST_REPO["Google Apps Script"]["Hello World"]
     assert program.project().has_testing()
