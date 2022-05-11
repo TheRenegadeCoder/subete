@@ -270,6 +270,7 @@ class Repo:
                     times.append(commit.authored_datetime)
                 program._created = min(times)
                 program._modified = max(times)
+                logger.info(f"Loaded git data into existing program ({program}): {program._created} - {program._modified} by {program._authors}")
 
 
 class LanguageCollection:
