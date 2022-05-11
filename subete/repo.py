@@ -31,6 +31,11 @@ class Repo:
         self._languages: Dict[str: LanguageCollection] = self._collect_languages()
         self._total_snippets: int = sum(x.total_programs() for _, x in self._languages.items())
         self._total_tests: int = sum(1 for _, x in self._languages.items() if x.has_testinfo())
+        self._blame = self._generate_blame()
+        print(self._blame)
+
+    def _generate_blame(self):
+        return self._git_repo.blame("HEAD", "README.md")
 
     def __getitem__(self, language) -> LanguageCollection:
         """
