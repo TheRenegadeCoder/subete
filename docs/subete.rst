@@ -24,6 +24,7 @@ subete.Repo
    :members:
    :undoc-members:
    :show-inheritance:
+   :special-members: __iter__, __getitem__
 
 subete.LanguageCollection
 -------------------------

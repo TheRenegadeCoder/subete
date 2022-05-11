@@ -1,6 +1,6 @@
 from __future__ import annotations
-import datetime
 
+import datetime
 import logging
 import os
 import random
@@ -34,17 +34,22 @@ class Repo:
         self._total_tests: int = sum(1 for _, x in self._languages.items() if x.has_testinfo())
         self._load_git_data()
 
-    def __getitem__(self, language) -> LanguageCollection:
+    def __getitem__(self, language: str) -> LanguageCollection:
         """
         Makes a repo subscriptable. In this case, the subscript retrieves a 
         language collection. 
+
+        Assuming you have a Repo object called repo, here's how you would use
+        this method::
+
+            language: LanguageCollection = repo["Python"]
 
         :param str language: the name of the language to lookup
         :return: the language collection by name
         """
         return self._languages[language]
 
-    def __iter__(self):
+    def __iter__(self) -> iter:
         """
         A convenience method for iterating over all language collections in the repo.
 
