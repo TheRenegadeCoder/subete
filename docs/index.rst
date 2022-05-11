@@ -6,7 +6,7 @@ in the Sample Programs repository. Use the links below to
 navigate the docs.
 
 .. toctree::
-    :maxdepth: 1
+    :maxdepth: 2
 
     usage
     subete
