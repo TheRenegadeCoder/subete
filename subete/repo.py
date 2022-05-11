@@ -1,4 +1,5 @@
 from __future__ import annotations
+import datetime
 
 import logging
 import os
@@ -262,10 +263,13 @@ class Repo:
             for program in language:
                 program: SampleProgram
                 blame = self._git_repo.blame('HEAD', f"{program._path}/{program._file_name}")
+                times = []
                 for commit, _ in blame:
                     commit: git.Commit
                     program._authors.add(commit.author.name)
-                print(program._authors)
+                    times.append(commit.authored_datetime)
+                program._created = min(times)
+                program._modified = max(times)
 
 
 class LanguageCollection:
@@ -614,6 +618,8 @@ class SampleProgram:
         self._sample_program_issue_url: str = self._generate_issue_url()
         self._line_count: int = len(self.code().splitlines())
         self._authors: set = set()
+        self._created: Optional[datetime.datetime] = None
+        self._modified: Optional[datetime.datetime] = None
 
     def __str__(self) -> str:
         """
@@ -638,6 +644,46 @@ class SampleProgram:
             return self._file_name == o._file_name and self._path == self._path and self._language == o._language
         return False
 
+    def authors(self) -> set:
+        """
+        Retrieves the set of authors for this sample program. Author names
+        are generated from git blame. 
+
+        Assuming you have a SampleProgram object called sample_program,
+        here's how you would use this method::
+
+            authors: set = sample_program.authors()
+
+        :return: the set of authors
+        """
+        return self._authors
+
+    def created(self) -> Optional[datetime.datetime]:
+        """
+        Retrieves the date the sample program was created.
+
+        Assuming you have a SampleProgram object called sample_program,
+        here's how you would use this method::
+
+            created: datetime.datetime = sample_program.created()
+
+        :return: the date the sample program was created
+        """
+        return self._created
+
+    def modified(self) -> Optional[datetime.datetime]:
+        """
+        Retrieves the date the sample program was last modified.
+
+        Assuming you have a SampleProgram object called sample_program,
+        here's how you would use this method::
+
+            modified: datetime.datetime = sample_program.modified()
+        
+        :return: the date the sample program was last modified
+        """
+        return self._modified
+    
     def size(self) -> int:
         """
         Retrieves the size of the sample program in bytes. 
