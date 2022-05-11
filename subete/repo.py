@@ -31,11 +31,7 @@ class Repo:
         self._languages: Dict[str: LanguageCollection] = self._collect_languages()
         self._total_snippets: int = sum(x.total_programs() for _, x in self._languages.items())
         self._total_tests: int = sum(1 for _, x in self._languages.items() if x.has_testinfo())
-        self._blame = self._generate_blame()
-        print(self._blame)
-
-    def _generate_blame(self):
-        return self._git_repo.blame("HEAD", "README.md")
+        self._load_git_data()
 
     def __getitem__(self, language) -> LanguageCollection:
         """
@@ -225,7 +221,7 @@ class Repo:
         if self._temp_dir.name in self._source_dir:
             return git.Repo.clone_from("https://github.com/TheRenegadeCoder/sample-programs.git", self._temp_dir.name, multi_options=["--recursive"])
         else:
-            return git.Repo(self._source_dir)
+            return git.Repo(Path(self._source_dir).parent[0])
 
     def _generate_docs_dir(self, source_dir: Optional[str]) -> str:
         """
@@ -254,6 +250,22 @@ class Repo:
             return data
         else:
             return None
+
+    def _load_git_data(self) -> None:
+        """
+        One the repo is loaded, this method will load the git data from the repo
+        and inject that data into the repo object. This was done for simplicity.
+        It seems like way more of a pain to try to pass the git data around.
+        """
+        for language in self:
+            language: LanguageCollection
+            for program in language:
+                program: SampleProgram
+                blame = self._git_repo.blame('HEAD', f"{program._path}/{program._file_name}")
+                for commit, _ in blame:
+                    commit: git.Commit
+                    program._authors.add(commit.author.name)
+                print(program._authors)
 
 
 class LanguageCollection:
@@ -601,6 +613,7 @@ class SampleProgram:
         self._sample_program_doc_url: str = self._generate_doc_url()
         self._sample_program_issue_url: str = self._generate_issue_url()
         self._line_count: int = len(self.code().splitlines())
+        self._authors: set = set()
 
     def __str__(self) -> str:
         """
