@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 import logging
 import os
 import random
@@ -24,24 +25,31 @@ class Repo:
     def __init__(self, source_dir: Optional[str] = None) -> None:
         self._temp_dir = tempfile.TemporaryDirectory()
         self._source_dir: str = self._generate_source_dir(source_dir)
+        self._git_repo: git.Repo = self._generate_git_repo()
         self._docs_dir: str = self._generate_docs_dir(source_dir)
         self._tested_projects: Dict = self._collect_tested_projects()
         self._projects: List[Project] = self._collect_projects()
         self._languages: Dict[str: LanguageCollection] = self._collect_languages()
         self._total_snippets: int = sum(x.total_programs() for _, x in self._languages.items())
         self._total_tests: int = sum(1 for _, x in self._languages.items() if x.has_testinfo())
+        self._load_git_data()
 
-    def __getitem__(self, language) -> LanguageCollection:
+    def __getitem__(self, language: str) -> LanguageCollection:
         """
         Makes a repo subscriptable. In this case, the subscript retrieves a 
         language collection. 
+
+        Assuming you have a Repo object called repo, here's how you would use
+        this method::
+
+            language: LanguageCollection = repo["Python"]
 
         :param str language: the name of the language to lookup
         :return: the language collection by name
         """
         return self._languages[language]
 
-    def __iter__(self):
+    def __iter__(self) -> iter:
         """
         A convenience method for iterating over all language collections in the repo.
 
@@ -205,11 +213,21 @@ class Repo:
         :return: a path to the source directory of the archive directory
         """
         if not source_dir:
-            logger.info(f"Source directory is not provided. Cloning the Sample Programs repo to a temporary directory: {self._temp_dir.name}.")
-            git.Repo.clone_from("https://github.com/TheRenegadeCoder/sample-programs.git", self._temp_dir.name, multi_options=["--recursive"])
+            logger.info(f"Source directory is not provided. Using temp directory {self._temp_dir.name}.")
             return os.path.join(self._temp_dir.name, "archive")
         logger.info(f"Source directory provided: {source_dir}")
         return source_dir
+
+    def _generate_git_repo(self) -> git.Repo:
+        """
+        Generates the Git repository from the Sample Programs repo.
+
+        :return: a Git repository object
+        """
+        if self._temp_dir.name in self._source_dir:
+            return git.Repo.clone_from("https://github.com/TheRenegadeCoder/sample-programs.git", self._temp_dir.name, multi_options=["--recursive"])
+        else:
+            return git.Repo(self._source_dir, search_parent_directories=True)
 
     def _generate_docs_dir(self, source_dir: Optional[str]) -> str:
         """
@@ -238,6 +256,26 @@ class Repo:
             return data
         else:
             return None
+
+    def _load_git_data(self) -> None:
+        """
+        One the repo is loaded, this method will load the git data from the repo
+        and inject that data into the repo object. This was done for simplicity.
+        It seems like way more of a pain to try to pass the git data around.
+        """
+        for language in self:
+            language: LanguageCollection
+            for program in language:
+                program: SampleProgram
+                blame = self._git_repo.blame('HEAD', f"{program._path}/{program._file_name}")
+                times = []
+                for commit, _ in blame:
+                    commit: git.Commit
+                    program._authors.add(commit.author.name)
+                    times.append(commit.authored_datetime)
+                program._created = min(times)
+                program._modified = max(times)
+                logger.info(f"Loaded git data into existing program ({program}): {program._created} - {program._modified} by {program._authors}")
 
 
 class LanguageCollection:
@@ -279,8 +317,13 @@ class LanguageCollection:
         Generates as close to the proper language name as possible given a language
         name in plain text separated by hyphens.
 
-        | Example: google-apps-script -> Google Apps Script
-        | Example: c-sharp -> C#
+        - Example: google-apps-script -> Google Apps Script
+        - Example: c-sharp -> C#
+
+        Assuming you have a LanguageCollection object called language,
+        you can use the following code to get the language name::
+
+            name: str = str(language)
 
         :return: a readable representation of the language name
         """
@@ -296,12 +339,17 @@ class LanguageCollection:
         else:
             return " ".join(tokens).title()
 
-    def __getitem__(self, program) -> str:
+    def __getitem__(self, program: str) -> str:
         """
         Makes a language collection subscriptable. In this case, the subscript 
         retrieves a sample program. 
 
-        :param program: the name of the program to lookup
+        Assuming you have a LanguageCollection object called language,
+        you can access a sample program as follows::
+
+            program: SampleProgram = language["Hello World"]
+
+        :param str program: the name of the program to lookup
         :return: the sample program by name
         """
         return self._sample_programs[program]
@@ -585,10 +633,18 @@ class SampleProgram:
         self._sample_program_doc_url: str = self._generate_doc_url()
         self._sample_program_issue_url: str = self._generate_issue_url()
         self._line_count: int = len(self.code().splitlines())
+        self._authors: set = set()
+        self._created: Optional[datetime.datetime] = None
+        self._modified: Optional[datetime.datetime] = None
 
     def __str__(self) -> str:
         """
         Renders the Sample Program in the following form: {name} in {language}.
+
+        Assuming you have a SampleProgram object called sample_program,
+        here's how you would use this method::
+
+            name: str = str(sample_program)
 
         :return: the sample program as a string
         """
@@ -597,11 +653,16 @@ class SampleProgram:
     def __eq__(self, o: object) -> bool:
         """
         Compares an object to the sample program. Returns True if the object
-        is an instance of SampleProgram and has the following three fields:
+        is an instance of SampleProgram and matches the following three fields:
 
             - _file_name
             - _path
             - _language
+
+        Assuming you have a SampleProgram object called sample_program,
+        here's how you would use this method::
+
+            is_sample_program: bool = sample_program == other_sample_program
 
         :return: True if the object matches the Sample Program; False otherwise.
         """
@@ -609,6 +670,48 @@ class SampleProgram:
             return self._file_name == o._file_name and self._path == self._path and self._language == o._language
         return False
 
+    def authors(self) -> set:
+        """
+        Retrieves the set of authors for this sample program. Author names
+        are generated from git blame. 
+
+        Assuming you have a SampleProgram object called sample_program,
+        here's how you would use this method::
+
+            authors: set = sample_program.authors()
+
+        :return: the set of authors
+        """
+        return self._authors
+
+    def created(self) -> Optional[datetime.datetime]:
+        """
+        Retrieves the date the sample program was created. Created dates
+        are generated from git blame, specifically the author commits.
+
+        Assuming you have a SampleProgram object called sample_program,
+        here's how you would use this method::
+
+            created: datetime.datetime = sample_program.created()
+
+        :return: the date the sample program was created
+        """
+        return self._created
+
+    def modified(self) -> Optional[datetime.datetime]:
+        """
+        Retrieves the date the sample program was last modified. Modified
+        dates are generated from git blame, specifically the author commits.
+
+        Assuming you have a SampleProgram object called sample_program,
+        here's how you would use this method::
+
+            modified: datetime.datetime = sample_program.modified()
+        
+        :return: the date the sample program was last modified
+        """
+        return self._modified
+    
     def size(self) -> int:
         """
         Retrieves the size of the sample program in bytes. 

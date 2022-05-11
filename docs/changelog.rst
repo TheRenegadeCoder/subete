@@ -1,6 +1,10 @@
 Changelog
 =========
 
+* v0.11.0
+    * Added support for git data: SampleProgram objects now include authors, created dates, and modified dates 
+    * Reorganized documentation, so objects have their own sections in the table of contents
+
 * v0.10.0
     * Added support for the Glotter testing file: users can now check if a project is tested by Glotter 
 

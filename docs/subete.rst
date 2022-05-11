@@ -17,7 +17,37 @@ users should make use of the public methods only.
 .. automodule:: subete
    :members:
 
-.. automodule:: subete.repo
+subete.Repo
+-------------------------
+
+.. autoclass:: subete.repo.Repo
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :special-members: __iter__, __getitem__
+
+subete.LanguageCollection
+-------------------------
+
+.. autoclass:: subete.repo.LanguageCollection
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :special-members: __iter__, __getitem__, __str__
+
+subete.SampleProgram
+-------------------------
+
+.. autoclass:: subete.repo.SampleProgram
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :special-members: __str__, __eq__
+
+subete.Project
+-------------------------
+
+.. autoclass:: subete.repo.Project
    :members:
    :undoc-members:
    :show-inheritance:
