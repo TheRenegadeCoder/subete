@@ -9,6 +9,7 @@ newest changes first.
 
 * v0.11.1
     * Fixed an issue where local repo could cause stack overflow 
+    * Added sections to the changelog
 
 * v0.11.0
     * Added support for git data: SampleProgram objects now include authors, created dates, and modified dates 
