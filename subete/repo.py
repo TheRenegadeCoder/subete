@@ -33,6 +33,8 @@ class Repo:
         self._total_snippets: int = sum(x.total_programs() for _, x in self._languages.items())
         self._total_tests: int = sum(1 for _, x in self._languages.items() if x.has_testinfo())
         self._load_git_data()
+        self._git_repo.close()  # Closes the repo before cleaning up the temp dir
+        self._temp_dir.cleanup()
 
     def __getitem__(self, language: str) -> LanguageCollection:
         """
