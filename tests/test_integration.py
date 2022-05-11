@@ -63,7 +63,7 @@ def test_article_issue_url_symbol_lang():
 
 def test_authors():
     program: subete.SampleProgram = TEST_REPO["Python"]["Hello World"]
-    assert "Jeremy Grifski" in program.authors()
+    assert "Jeremy Griffith" in program.authors()
 
 
 def test_created_not_none():
