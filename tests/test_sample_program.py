@@ -1,5 +1,6 @@
 from typing import List
 import subete
+from subete.repo import LanguageCollection
 
 TEST_PATH: str = "tests/python/"
 TEST_LANG: str = "python"
@@ -7,6 +8,7 @@ TEST_FILES: List[str] = ["hello_world.py", "testinfo.yml", "README.md"]
 TEST_PROJECTS: List[subete.Project] = [
     subete.Project("hello-world", {"words": ["hello", "world"], "requires_parameters": False}), 
     subete.Project("reverse-string", {"words": ["reverse", "string"], "requires_parameters": True}),
+    subete.Project("rot13", {"words": ["rot13"], "requires_parameters": False}),
 ]
 TEST_LANG_COLLECTION: subete.LanguageCollection = subete.LanguageCollection(
     TEST_LANG, 
@@ -56,3 +58,16 @@ def test_sample_program_issue_query_url():
     test = subete.SampleProgram(TEST_PATH, TEST_FILES[0], TEST_LANG_COLLECTION)
     assert test.article_issue_query_url(
     ) == "https://github.com//TheRenegadeCoder/sample-programs-website/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+hello+world+python"
+
+def test_generate_project_hyphen_branch():
+    test = subete.SampleProgram(
+        "tests/c", 
+        "rot13.c", 
+        LanguageCollection(
+            "c",
+            "tests/c",
+            ["rot13.c", "testinfo.yml", "README.md"],
+            TEST_PROJECTS
+        )
+    )
+    assert test.project_pathlike_name() == "rot13"
