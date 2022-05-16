@@ -4,6 +4,13 @@ Changelog
 Below you'll find all the changes that have been made to the code with
 newest changes first.
 
+0.12.x
+------
+
+* v0.12.0
+    * Reworked the way project names are parsed to support new naming conventions
+    * Cleaned up error logs for readability
+
 0.11.x
 -------
 
