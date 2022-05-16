@@ -910,7 +910,7 @@ class SampleProgram:
             url = stem.replace("_", "-").lower()
         else:
             # TODO: this is brutal. At some point, we should loop in the glotter test file.
-            url = re.sub('((?<=[a-z])[A-Z0-9]|(?!^)[A-Z](?=[a-z]))', r'-\1', stem).lower()
+            url = "-".join(re.sub('([A-Z][a-z]+)', r' \1', re.sub('([A-Z]+)', r' \1', stem)).split()).lower()
         logger.info(f"Constructed a normalized form of the program {url}")
         for project in projects:
             if url in project.pathlike_name():
