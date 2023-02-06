@@ -303,6 +303,18 @@ class Repo:
                 language._docs_files = []
                 for file in language_docs_path.glob("*"):
                     language._docs_files.append(file.name)
+                    
+        # Loads sample programs docs
+        for language in self:
+            language: LanguageCollection
+            for program in language:
+                program: SampleProgram
+                program_docs_path = Path(self._docs_source_dir, "programs", program.language_pathlike_name())
+                if program_docs_path.exists():
+                    program._docs_path = program_docs_path
+                    program._docs_files = []
+                    for file in program_docs_path.glob("*"):
+                        program._docs_files.append(file.name)
         
 
 class LanguageCollection:
@@ -665,7 +677,8 @@ class SampleProgram:
         self._authors: set = set()
         self._created: Optional[datetime.datetime] = None
         self._modified: Optional[datetime.datetime] = None
-        self._docs: Optional[dict] = None
+        self._docs_path: str = None
+        self._docs_files: list[str] = None
 
     def __str__(self) -> str:
         """
