@@ -108,3 +108,8 @@ def test_random_program():
 
 def test_total_approved_projects():
     assert TEST_REPO.total_approved_projects() > 0
+
+
+def test_program_has_docs():
+    program: subete.SampleProgram = TEST_REPO["Python"]["Hello World"]
+    assert program.has_docs()

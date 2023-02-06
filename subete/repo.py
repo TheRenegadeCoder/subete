@@ -289,6 +289,7 @@ class Repo:
             project: Project
             project_docs_path = Path(self._docs_source_dir, "projects", project.pathlike_name())
             if project_docs_path.exists():
+                logger.info(f"Project has documentation at {project_docs_path}")
                 project._docs_path = project_docs_path
                 project._docs_files = []
                 for file in project_docs_path.glob("*"):
@@ -311,6 +312,7 @@ class Repo:
                 program: SampleProgram
                 program_docs_path = Path(self._docs_source_dir, "programs", program.language_pathlike_name())
                 if program_docs_path.exists():
+                    logger.info(f"Program has documentation at {program_docs_path}")
                     program._docs_path = program_docs_path
                     program._docs_files = []
                     for file in program_docs_path.glob("*"):
