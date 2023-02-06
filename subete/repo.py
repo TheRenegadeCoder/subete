@@ -43,7 +43,7 @@ class Repo:
             self._sample_programs_website_repo: git.Repo = git.Repo.clone_from("https://github.com/TheRenegadeCoder/sample-programs-website.git", self._sample_programs_website_repo_dir)
         
         # Sets up paths to relevant directories
-        self._docs_dir: str = os.path.join(self._sample_programs_website_repo_dir, "docs")
+        self._docs_dir: str = os.path.join(self._sample_programs_website_repo_dir, "sources")
         self._archive_dir: str = os.path.join(self._sample_programs_repo_dir, "archive")
         
         # Performs data collection from the repos
@@ -52,7 +52,10 @@ class Repo:
         self._languages: Dict[str: LanguageCollection] = self._collect_languages()
         self._total_snippets: int = sum(x.total_programs() for _, x in self._languages.items())
         self._total_tests: int = sum(1 for _, x in self._languages.items() if x.has_testinfo())
+        
+        # Post generation updates
         self._load_git_data()
+        self._load_docs_data()
         
         # Closes repositories
         self._sample_programs_repo.close()
@@ -273,6 +276,30 @@ class Repo:
         # Delete .git-blame-ignore-revs if it did not exist before
         if not blame_path_exists:
             blame_path.unlink()
+            
+            
+    def _load_docs_data(self) -> None:
+        """
+        Once the repo is loaded, this method will load the documentation data from
+        the website repo and inject that data into the repo object.
+        """
+        
+        # Loads project docs
+        for project in self._projects:
+            project: Project
+            project_docs_path = Path(self._docs_dir, project.pathlike_name())
+            if project_docs_path.exists():
+                project._docs = {}
+                for file in project_docs_path.glob("*"):
+                    project._docs[file.name] = file.read_text()
+                
+        
+        for language in self:
+            language: LanguageCollection
+            for program in language:
+                program: SampleProgram
+                #Path(self._docs_dir, )
+        
 
 class LanguageCollection:
     """
@@ -632,6 +659,7 @@ class SampleProgram:
         self._authors: set = set()
         self._created: Optional[datetime.datetime] = None
         self._modified: Optional[datetime.datetime] = None
+        self._docs: Optional[dict] = None
 
     def __str__(self) -> str:
         """
@@ -944,12 +972,14 @@ class Project:
     An object representing a Project in the Sample Programs repo.
 
     :param str name: the name of the project in its pathlike form (e.g., hello-world) 
+    :param project_tests: a dictionary containing the test rules for the project
     """
 
     def __init__(self, name: str, project_tests: Optional[Dict]):
         self._project_tests = project_tests
         self._name: str = Project._generate_name(name)
         self._requirements_url: str = self._generate_requirements_url()
+        self._docs: dict = None
 
     def __str__(self) -> str:
         logger.info(f"Generating name from {self._name}")
