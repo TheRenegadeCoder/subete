@@ -264,6 +264,13 @@ class Repo:
         and inject that data into the repo object. This was done for simplicity.
         It seems like way more of a pain to try to pass the git data around.
         """
+
+        # Make sure .git-blame-ignore-revs exists for older versions of git and
+        # keep track of whether it existed before
+        blame_path = Path(f"{self._temp_dir.name}/.git-blame-ignore-revs")
+        blame_path_exists = blame_path.exists()
+        blame_path.touch()
+
         for language in self:
             language: LanguageCollection
             for program in language:
@@ -278,6 +285,9 @@ class Repo:
                 program._modified = max(times)
                 logger.info(f"Loaded git data into existing program ({program}): {program._created} - {program._modified} by {program._authors}")
 
+        # Delete .git-blame-ignore-revs if it did not exist before
+        if not blame_path_exists:
+            blame_path.unlink()
 
 class LanguageCollection:
     """

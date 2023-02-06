@@ -13,7 +13,7 @@ with open("README.md", "r") as fh:
 
 MAJOR = 0
 MINOR = 12
-PATCH = 0
+PATCH = 1
 
 name = "subete"
 version = f"{MAJOR}.{MINOR}"
