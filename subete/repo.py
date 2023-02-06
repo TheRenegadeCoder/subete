@@ -43,7 +43,7 @@ class Repo:
             self._sample_programs_website_repo: git.Repo = git.Repo.clone_from("https://github.com/TheRenegadeCoder/sample-programs-website.git", self._sample_programs_website_repo_dir)
         
         # Sets up paths to relevant directories
-        self._docs_dir: str = os.path.join(self._sample_programs_website_repo_dir, "sources")
+        self._docs_source_dir: str = os.path.join(self._sample_programs_website_repo_dir, "sources")
         self._archive_dir: str = os.path.join(self._sample_programs_repo_dir, "archive")
         
         # Performs data collection from the repos
@@ -223,9 +223,9 @@ class Repo:
 
         :return: a list of string objects representing the projects
         """
-        logger.info(f"Collecting projects along path: {self._docs_dir}")
+        logger.info(f"Collecting projects along path: {self._docs_source_dir}")
         projects = []
-        for project_dir in Path(self._docs_dir, "projects").iterdir():
+        for project_dir in Path(self._docs_source_dir, "projects").iterdir():
             if project_dir.is_dir():
                 project_test = self._tested_projects.get("".join(project_dir.name.split("-")))
                 logger.info(f"Generating project from: {project_dir.name}, {project_test}")
@@ -287,19 +287,22 @@ class Repo:
         # Loads project docs
         for project in self._projects:
             project: Project
-            project_docs_path = Path(self._docs_dir, project.pathlike_name())
+            project_docs_path = Path(self._docs_source_dir, "projects", project.pathlike_name())
             if project_docs_path.exists():
                 project._docs_path = project_docs_path
                 project._docs_files = []
                 for file in project_docs_path.glob("*"):
                     project._docs_files.append(file.name)
                 
-        
+        # Loads language docs
         for language in self:
             language: LanguageCollection
-            for program in language:
-                program: SampleProgram
-                #Path(self._docs_dir, )
+            language_docs_path = Path(self._docs_source_dir, "languages", language.pathlike_name())
+            if language_docs_path.exists():
+                language._docs_path = language_docs_path
+                language._docs_files = []
+                for file in language_docs_path.glob("*"):
+                    language._docs_files.append(file.name)
         
 
 class LanguageCollection:
@@ -321,6 +324,8 @@ class LanguageCollection:
         self._path: str = path
         self._file_list: List[str] = file_list
         self._projects: List[Project] = projects
+        self._docs_path: str = None
+        self._docs_files: list[str] = None
         self._first_letter: str = name[0]
         self._sample_programs: Dict[str, SampleProgram] = self._collect_sample_programs()
         self._test_file_path: Optional[str] = self._collect_test_file()
