@@ -18,4 +18,4 @@ def load(source_dir: str = None) -> Repo:
 
     :return: the Sample Programs repo as a Repo object
     """
-    return Repo(source_dir=source_dir)
+    return Repo(sample_programs_repo_dir=source_dir)
