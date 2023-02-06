@@ -289,9 +289,10 @@ class Repo:
             project: Project
             project_docs_path = Path(self._docs_dir, project.pathlike_name())
             if project_docs_path.exists():
-                project._docs = {}
+                project._docs_path = project_docs_path
+                project._docs_files = []
                 for file in project_docs_path.glob("*"):
-                    project._docs[file.name] = file.read_text()
+                    project._docs_files.append(file.name)
                 
         
         for language in self:
@@ -979,7 +980,8 @@ class Project:
         self._project_tests = project_tests
         self._name: str = Project._generate_name(name)
         self._requirements_url: str = self._generate_requirements_url()
-        self._docs: dict = None
+        self._docs_path: str = None
+        self._docs_files: list[str] = None
 
     def __str__(self) -> str:
         logger.info(f"Generating name from {self._name}")
