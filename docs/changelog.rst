@@ -4,6 +4,12 @@ Changelog
 Below you'll find all the changes that have been made to the code with
 newest changes first.
 
+0.14.x
+------
+
+* v0.13.0
+    * Added a feature to lets you check if programs have sources for documentation
+
 0.13.x
 ------
 
