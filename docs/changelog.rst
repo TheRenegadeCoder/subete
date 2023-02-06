@@ -7,7 +7,7 @@ newest changes first.
 0.14.x
 ------
 
-* v0.13.0
+* v0.14.0
     * Added a feature to lets you check if programs have sources for documentation
 
 0.13.x
