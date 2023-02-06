@@ -25,7 +25,7 @@ class Repo:
     def __init__(self, source_dir: Optional[str] = None) -> None:
         self._temp_dir = tempfile.TemporaryDirectory()
         self._source_dir: str = self._generate_source_dir(source_dir)
-        self._git_repo: git.Repo = self._generate_git_repo()
+        self._sample_programs_repo: git.Repo = self._generate_git_repo()
         self._docs_dir: str = self._generate_docs_dir(source_dir)
         self._tested_projects: Dict = self._collect_tested_projects()
         self._projects: List[Project] = self._collect_projects()
@@ -33,7 +33,7 @@ class Repo:
         self._total_snippets: int = sum(x.total_programs() for _, x in self._languages.items())
         self._total_tests: int = sum(1 for _, x in self._languages.items() if x.has_testinfo())
         self._load_git_data()
-        self._git_repo.close()  # Closes the repo before cleaning up the temp dir
+        self._sample_programs_repo.close()  # Closes the repo before cleaning up the temp dir
 
     def __getitem__(self, language: str) -> LanguageCollection:
         """
@@ -275,7 +275,7 @@ class Repo:
             language: LanguageCollection
             for program in language:
                 program: SampleProgram
-                blame = self._git_repo.blame('HEAD', f"{program._path}/{program._file_name}")
+                blame = self._sample_programs_repo.blame('HEAD', f"{program._path}/{program._file_name}")
                 times = []
                 for commit, _ in blame:
                     commit: git.Commit
