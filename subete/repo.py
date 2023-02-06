@@ -25,20 +25,22 @@ class Repo:
     def __init__(self, sample_programs_repo_dir: Optional[str] = None, sample_programs_website_repo_dir: Optional[str] = None) -> None:
         
         # Sets up the sample programs repo variables
-        self._sample_programs_repo_dir = tempfile.TemporaryDirectory() 
+        self._sample_programs_temp_dir = tempfile.TemporaryDirectory()
+        self._sample_programs_repo_dir = self._sample_programs_temp_dir.name
         if sample_programs_repo_dir:
             self._sample_programs_repo_dir = sample_programs_repo_dir
             self._sample_programs_repo: git.Repo = git.Repo(self._sample_programs_repo_dir, search_parent_directories=True)          
         else:
-            self._sample_programs_repo: git.Repo = git.Repo.clone_from("https://github.com/TheRenegadeCoder/sample-programs.git", self._sample_programs_repo_dir, multi_options=["--recursive"])
+            self._sample_programs_repo: git.Repo = git.Repo.clone_from("https://github.com/TheRenegadeCoder/sample-programs.git", self._sample_programs_repo_dir)
         
         # Sets up the sample programs website repo variables
-        self._sample_programs_website_repo_dir = tempfile.TemporaryDirectory()
+        self._sample_programs_website_temp_dir = tempfile.TemporaryDirectory()
+        self._sample_programs_website_repo_dir = self._sample_programs_website_temp_dir.name
         if sample_programs_website_repo_dir:
             self._sample_programs_website_repo_dir = sample_programs_website_repo_dir
             self._sample_programs_website_repo: git.Repo = git.Repo(self._sample_programs_website_repo_dir, search_parent_directories=True) 
         else:
-            self._sample_programs_website_repo: git.Repo = git.Repo.clone_from("https://github.com/TheRenegadeCoder/sample-programs-website.git", self._sample_programs_website_repo_dir, multi_options=["--recursive"])
+            self._sample_programs_website_repo: git.Repo = git.Repo.clone_from("https://github.com/TheRenegadeCoder/sample-programs-website.git", self._sample_programs_website_repo_dir)
         
         # Sets up paths to relevant directories
         self._docs_dir: str = os.path.join(self._sample_programs_website_repo_dir, "docs")
