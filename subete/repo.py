@@ -533,6 +533,20 @@ class LanguageCollection:
         logger.info(
             f"Retrieving total line count for {self}: {self._total_line_count}")
         return self._total_line_count
+    
+    def has_docs(self) -> bool:
+        """
+        Retrieves the documentation state of this language. Note that documentation
+        may not be complete or up to date. 
+        
+        Assuming you have a LanguageCollection object called language, 
+        here's how you would use this method::
+
+            state: bool = language.has_docs() 
+
+        :return: returns true if the language has a documentation folder created for it; false otherwise
+        """
+        return bool(self._docs_path)
 
     def lang_docs_url(self) -> str:
         """
@@ -892,6 +906,20 @@ class SampleProgram:
         """
         logger.info(f'Retrieving line count for {self}: {self._line_count}')
         return self._line_count
+    
+    def has_docs(self) -> bool:
+        """
+        Retrieves the documentation state of this program. Note that documentation
+        may not be complete or up to date. 
+        
+        Assuming you have a SampleProgram object called program, 
+        here's how you would use this method::
+
+            state: bool = program.has_docs() 
+
+        :return: returns true if the program has a documentation folder created for it; false otherwise
+        """
+        return bool(self._docs_path)
 
     def documentation_url(self) -> str:
         """
