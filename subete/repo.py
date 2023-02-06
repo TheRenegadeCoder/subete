@@ -22,18 +22,41 @@ class Repo:
     :param str source_dir: the location of the repo archive (e.g., C://.../sample-programs/archive)
     """
 
-    def __init__(self, source_dir: Optional[str] = None) -> None:
-        self._temp_dir = tempfile.TemporaryDirectory()
-        self._source_dir: str = self._generate_source_dir(source_dir)
-        self._git_repo: git.Repo = self._generate_git_repo()
-        self._docs_dir: str = self._generate_docs_dir(source_dir)
+    def __init__(self, sample_programs_repo_dir: Optional[str] = None, sample_programs_website_repo_dir: Optional[str] = None) -> None:
+        
+        # Sets up the sample programs repo variables
+        self._sample_programs_temp_dir = tempfile.TemporaryDirectory()
+        self._sample_programs_repo_dir = self._sample_programs_temp_dir.name
+        if sample_programs_repo_dir:
+            self._sample_programs_repo_dir = sample_programs_repo_dir
+            self._sample_programs_repo: git.Repo = git.Repo(self._sample_programs_repo_dir, search_parent_directories=True)          
+        else:
+            self._sample_programs_repo: git.Repo = git.Repo.clone_from("https://github.com/TheRenegadeCoder/sample-programs.git", self._sample_programs_repo_dir)
+        
+        # Sets up the sample programs website repo variables
+        self._sample_programs_website_temp_dir = tempfile.TemporaryDirectory()
+        self._sample_programs_website_repo_dir = self._sample_programs_website_temp_dir.name
+        if sample_programs_website_repo_dir:
+            self._sample_programs_website_repo_dir = sample_programs_website_repo_dir
+            self._sample_programs_website_repo: git.Repo = git.Repo(self._sample_programs_website_repo_dir, search_parent_directories=True) 
+        else:
+            self._sample_programs_website_repo: git.Repo = git.Repo.clone_from("https://github.com/TheRenegadeCoder/sample-programs-website.git", self._sample_programs_website_repo_dir)
+        
+        # Sets up paths to relevant directories
+        self._docs_dir: str = os.path.join(self._sample_programs_website_repo_dir, "docs")
+        self._archive_dir: str = os.path.join(self._sample_programs_repo_dir, "archive")
+        
+        # Performs data collection from the repos
         self._tested_projects: Dict = self._collect_tested_projects()
         self._projects: List[Project] = self._collect_projects()
         self._languages: Dict[str: LanguageCollection] = self._collect_languages()
         self._total_snippets: int = sum(x.total_programs() for _, x in self._languages.items())
         self._total_tests: int = sum(1 for _, x in self._languages.items() if x.has_testinfo())
         self._load_git_data()
-        self._git_repo.close()  # Closes the repo before cleaning up the temp dir
+        
+        # Closes repositories
+        self._sample_programs_repo.close()
+        self._sample_programs_website_repo.close()
 
     def __getitem__(self, language: str) -> LanguageCollection:
         """
@@ -172,7 +195,7 @@ class Repo:
 
         :return: a sorted list of letters
         """
-        unsorted_letters = os.listdir(self._source_dir)
+        unsorted_letters = os.listdir(self._archive_dir)
         return sorted(unsorted_letters, key=lambda s: s.casefold())
 
     def _collect_languages(self) -> Dict[str, LanguageCollection]:
@@ -182,7 +205,7 @@ class Repo:
         :return: the list of language collections
         """
         languages = {}
-        for root, directories, files in os.walk(self._source_dir):
+        for root, directories, files in os.walk(self._archive_dir):
             if not directories:
                 language = LanguageCollection(os.path.basename(root), root, files, self._projects)
                 languages[str(language)] = language
@@ -206,50 +229,12 @@ class Repo:
                 projects.append(Project(project_dir.name, project_test))
         return projects
 
-    def _generate_source_dir(self, source_dir: Optional[str]) -> str:
-        """
-        A helper method which generates the Sample Programs repo
-        from Git if it's not provided on the source directory.
-
-        :return: a path to the source directory of the archive directory
-        """
-        if not source_dir:
-            logger.info(f"Source directory is not provided. Using temp directory {self._temp_dir.name}.")
-            return os.path.join(self._temp_dir.name, "archive")
-        logger.info(f"Source directory provided: {source_dir}")
-        return source_dir
-
-    def _generate_git_repo(self) -> git.Repo:
-        """
-        Generates the Git repository from the Sample Programs repo.
-
-        :return: a Git repository object
-        """
-        if self._temp_dir.name in self._source_dir:
-            return git.Repo.clone_from("https://github.com/TheRenegadeCoder/sample-programs.git", self._temp_dir.name, multi_options=["--recursive"])
-        else:
-            return git.Repo(self._source_dir, search_parent_directories=True)
-
-    def _generate_docs_dir(self, source_dir: Optional[str]) -> str:
-        """
-        A helper methods which generates the path to the documentation.
-        This method is needed because the provided source directory is meant
-        to point at archive (for historical purposes). This is normally
-        a non-issue if the directory is generated using Git, but can be more
-        annoying if the user provides a source. 
-
-        :return: a path to the documentation directory
-        """
-        if not source_dir:
-            return os.path.join(self._temp_dir.name, "docs", "sources")
-        return os.path.join(source_dir, os.pardir, "docs", "sources")
-
     def _collect_tested_projects(self) -> str:
         """
         Generates the dictionary of tested projects from the
         Glotter YAML file. 
         """
-        p = Path(self._source_dir).parents[0] / ".glotter.yml"
+        p = Path(self._sample_programs_repo_dir) / ".glotter.yml"
         if p.exists():
             with open(p, "r") as f:
                 data = yaml.safe_load(f)["projects"]
@@ -260,14 +245,14 @@ class Repo:
 
     def _load_git_data(self) -> None:
         """
-        One the repo is loaded, this method will load the git data from the repo
+        Once the repo is loaded, this method will load the git data from the repo
         and inject that data into the repo object. This was done for simplicity.
         It seems like way more of a pain to try to pass the git data around.
         """
 
         # Make sure .git-blame-ignore-revs exists for older versions of git and
         # keep track of whether it existed before
-        blame_path = Path(f"{self._temp_dir.name}/.git-blame-ignore-revs")
+        blame_path = Path(f"{self._sample_programs_temp_dir.name}/.git-blame-ignore-revs")
         blame_path_exists = blame_path.exists()
         blame_path.touch()
 
@@ -275,7 +260,7 @@ class Repo:
             language: LanguageCollection
             for program in language:
                 program: SampleProgram
-                blame = self._git_repo.blame('HEAD', f"{program._path}/{program._file_name}")
+                blame = self._sample_programs_repo.blame('HEAD', f"{program._path}/{program._file_name}")
                 times = []
                 for commit, _ in blame:
                     commit: git.Commit
