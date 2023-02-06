@@ -44,13 +44,17 @@ class Repo:
         self._docs_dir: str = os.path.join(self._sample_programs_website_repo_dir, "docs")
         self._archive_dir: str = os.path.join(self._sample_programs_repo_dir, "archive")
         
+        # Performs data collection from the repos
         self._tested_projects: Dict = self._collect_tested_projects()
         self._projects: List[Project] = self._collect_projects()
         self._languages: Dict[str: LanguageCollection] = self._collect_languages()
         self._total_snippets: int = sum(x.total_programs() for _, x in self._languages.items())
         self._total_tests: int = sum(1 for _, x in self._languages.items() if x.has_testinfo())
         self._load_git_data()
-        self._sample_programs_repo.close()  # Closes the repo before cleaning up the temp dir
+        
+        # Closes repositories
+        self._sample_programs_repo.close()
+        self._sample_programs_website_repo.close()
 
     def __getitem__(self, language: str) -> LanguageCollection:
         """
@@ -189,7 +193,7 @@ class Repo:
 
         :return: a sorted list of letters
         """
-        unsorted_letters = os.listdir(self._sample_programs_repo_dir)
+        unsorted_letters = os.listdir(self._archive_dir)
         return sorted(unsorted_letters, key=lambda s: s.casefold())
 
     def _collect_languages(self) -> Dict[str, LanguageCollection]:
@@ -199,7 +203,7 @@ class Repo:
         :return: the list of language collections
         """
         languages = {}
-        for root, directories, files in os.walk(self._sample_programs_repo_dir):
+        for root, directories, files in os.walk(self._archive_dir):
             if not directories:
                 language = LanguageCollection(os.path.basename(root), root, files, self._projects)
                 languages[str(language)] = language
@@ -228,7 +232,7 @@ class Repo:
         Generates the dictionary of tested projects from the
         Glotter YAML file. 
         """
-        p = Path(self._sample_programs_repo_dir).parents[0] / ".glotter.yml"
+        p = Path(self._sample_programs_repo_dir) / ".glotter.yml"
         if p.exists():
             with open(p, "r") as f:
                 data = yaml.safe_load(f)["projects"]
@@ -239,7 +243,7 @@ class Repo:
 
     def _load_git_data(self) -> None:
         """
-        One the repo is loaded, this method will load the git data from the repo
+        Once the repo is loaded, this method will load the git data from the repo
         and inject that data into the repo object. This was done for simplicity.
         It seems like way more of a pain to try to pass the git data around.
         """
