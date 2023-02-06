@@ -25,22 +25,20 @@ class Repo:
     def __init__(self, sample_programs_repo_dir: Optional[str] = None, sample_programs_website_repo_dir: Optional[str] = None) -> None:
         
         # Sets up the sample programs repo variables
-        self._sample_programs_temp_dir = tempfile.TemporaryDirectory()
-        self._sample_programs_repo_dir: str = self._generate_source_dir(
-            sample_programs_repo_dir, 
-            self._sample_programs_temp_dir, 
-            "archive"
-        )
-        self._sample_programs_repo: git.Repo = self._generate_git_repo()
+        self._sample_programs_repo_dir = tempfile.TemporaryDirectory() 
+        if sample_programs_repo_dir:
+            self._sample_programs_repo_dir = sample_programs_repo_dir
+            self._sample_programs_repo: git.Repo = git.Repo(self._sample_programs_repo_dir, search_parent_directories=True)          
+        else:
+            self._sample_programs_repo: git.Repo = git.Repo.clone_from("https://github.com/TheRenegadeCoder/sample-programs.git", self._sample_programs_repo_dir, multi_options=["--recursive"])
         
         # Sets up the sample programs website repo variables
-        self._sample_programs_website_temp_dir = tempfile.TemporaryDirectory()
-        self._sample_programs_website_repo_dir: str = self._generate_source_dir(
-            sample_programs_website_repo_dir, 
-            self._sample_programs_website_temp_dir, 
-            "docs"
-        )
-        self._sample_programs_website_repo: git.Repo = self._generate_git_repo()
+        self._sample_programs_website_repo_dir = tempfile.TemporaryDirectory()
+        if sample_programs_website_repo_dir:
+            self._sample_programs_website_repo_dir = sample_programs_website_repo_dir
+            self._sample_programs_repo: git.Repo = git.Repo(self._sample_programs_website_repo_dir, search_parent_directories=True) 
+        else:
+            self._sample_programs_repo: git.Repo = git.Repo.clone_from("https://github.com/TheRenegadeCoder/sample-programs-website.git", self._sample_programs_website_repo_dir, multi_options=["--recursive"])
         
         self._docs_dir: str = self._generate_docs_dir(sample_programs_repo_dir)
         self._tested_projects: Dict = self._collect_tested_projects()
@@ -221,30 +219,6 @@ class Repo:
                 logger.info(f"Generating project from: {project_dir.name}, {project_test}")
                 projects.append(Project(project_dir.name, project_test))
         return projects
-
-    def _generate_source_dir(self, source_dir: Optional[str], temp_dir: tempfile.TemporaryDirectory, data_dir: str) -> str:
-        """
-        A helper method which generates a repo
-        from Git if it's not provided on the source directory.
-
-        :return: a path to the source directory of the archive directory
-        """
-        if not source_dir:
-            logger.info(f"Source directory is not provided. Using temp directory {temp_dir.name}.")
-            return os.path.join(temp_dir.name, data_dir)
-        logger.info(f"Source directory provided: {source_dir}")
-        return source_dir
-
-    def _generate_git_repo(self) -> git.Repo:
-        """
-        Generates the Git repository from the Sample Programs repo.
-
-        :return: a Git repository object
-        """
-        if self._sample_programs_temp_dir.name in self._sample_programs_repo_dir:
-            return git.Repo.clone_from("https://github.com/TheRenegadeCoder/sample-programs.git", self._sample_programs_temp_dir.name, multi_options=["--recursive"])
-        else:
-            return git.Repo(self._sample_programs_repo_dir, search_parent_directories=True)
 
     def _generate_docs_dir(self, source_dir: Optional[str]) -> str:
         """
