@@ -36,11 +36,14 @@ class Repo:
         self._sample_programs_website_repo_dir = tempfile.TemporaryDirectory()
         if sample_programs_website_repo_dir:
             self._sample_programs_website_repo_dir = sample_programs_website_repo_dir
-            self._sample_programs_repo: git.Repo = git.Repo(self._sample_programs_website_repo_dir, search_parent_directories=True) 
+            self._sample_programs_website_repo: git.Repo = git.Repo(self._sample_programs_website_repo_dir, search_parent_directories=True) 
         else:
-            self._sample_programs_repo: git.Repo = git.Repo.clone_from("https://github.com/TheRenegadeCoder/sample-programs-website.git", self._sample_programs_website_repo_dir, multi_options=["--recursive"])
+            self._sample_programs_website_repo: git.Repo = git.Repo.clone_from("https://github.com/TheRenegadeCoder/sample-programs-website.git", self._sample_programs_website_repo_dir, multi_options=["--recursive"])
         
-        self._docs_dir: str = self._generate_docs_dir(sample_programs_repo_dir)
+        # Sets up paths to relevant directories
+        self._docs_dir: str = os.path.join(self._sample_programs_website_repo_dir, "docs")
+        self._archive_dir: str = os.path.join(self._sample_programs_repo_dir, "archive")
+        
         self._tested_projects: Dict = self._collect_tested_projects()
         self._projects: List[Project] = self._collect_projects()
         self._languages: Dict[str: LanguageCollection] = self._collect_languages()
@@ -219,20 +222,6 @@ class Repo:
                 logger.info(f"Generating project from: {project_dir.name}, {project_test}")
                 projects.append(Project(project_dir.name, project_test))
         return projects
-
-    def _generate_docs_dir(self, source_dir: Optional[str]) -> str:
-        """
-        A helper methods which generates the path to the documentation.
-        This method is needed because the provided source directory is meant
-        to point at archive (for historical purposes). This is normally
-        a non-issue if the directory is generated using Git, but can be more
-        annoying if the user provides a source. 
-
-        :return: a path to the documentation directory
-        """
-        if not source_dir:
-            return os.path.join(self._sample_programs_temp_dir.name, "docs", "sources")
-        return os.path.join(source_dir, os.pardir, "docs", "sources")
 
     def _collect_tested_projects(self) -> str:
         """
