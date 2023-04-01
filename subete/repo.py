@@ -90,6 +90,14 @@ class Repo:
         """
         return iter(self._languages.values())
 
+    def sample_programs_repo_dir(self) -> str:
+        """
+        Retreives the directory containing the sample programs repository
+
+        :return: the sample programs repository directory
+        """
+        return self._sample_programs_repo_dir
+
     def total_programs(self) -> int:
         """
         Retrieves the total number of programs in the sample programs repo.
