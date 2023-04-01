@@ -4,6 +4,12 @@ Changelog
 Below you'll find all the changes that have been made to the code with
 newest changes first.
 
+0.15.x
+------
+
+* v0.15.0
+    * Added ability to get sample program repository directory
+
 0.14.x
 ------
 
