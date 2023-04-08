@@ -263,7 +263,7 @@ class Repo:
 
         # Make sure .git-blame-ignore-revs exists for older versions of git and
         # keep track of whether it existed before
-        blame_path = Path(f"{self._sample_programs_temp_dir.name}/.git-blame-ignore-revs")
+        blame_path = Path(f"{self._sample_programs_repo_dir}/.git-blame-ignore-revs")
         blame_path_exists = blame_path.exists()
         blame_path.touch()
 
