@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import imghdr
 import logging
 import os
 import random
@@ -902,6 +903,19 @@ class SampleProgram:
         """
         logger.info(f"Retrieving code from {self._path}/{self._file_name}")
         return Path(self._path, self._file_name).read_text(errors="replace")
+
+    def is_image(self) -> bool:
+        """
+        Determine if sample program is actual an image.
+
+        Assuming you have a SampleProgram object called program, 
+        here's how you would use this method::
+
+            is_img: bool = program.is_image()
+
+        :return: True if sample program is an image, False otherwise
+        """
+        return imghdr.what(Path(self._path, self._file_name)) is not None
 
     def line_count(self) -> int:
         """

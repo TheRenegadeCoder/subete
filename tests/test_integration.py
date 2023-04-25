@@ -87,6 +87,18 @@ def test_code(test_repo):
     assert program.code() == "print('Hello, World!')\n"
 
 
+@pytest.mark.parametrize(
+    "language,expected_result",
+    [
+        ("Piet", True),
+        ("Python", False),
+    ]
+)
+def test_is_image(language, expected_result, test_repo):
+    program: subete.SampleProgram = test_repo[language]["Hello World"]
+    assert program.is_image() == expected_result
+
+
 def test_project_has_test(test_repo):
     program: subete.SampleProgram = test_repo["Google Apps Script"]["Hello World"]
     assert program.project().has_testing()

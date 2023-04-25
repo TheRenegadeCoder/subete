@@ -4,6 +4,12 @@ Changelog
 Below you'll find all the changes that have been made to the code with
 newest changes first.
 
+0.16.x
+------
+
+* v0.16.0
+    * Added ability to detect if sample program is an image
+
 0.15.x
 ------
 
