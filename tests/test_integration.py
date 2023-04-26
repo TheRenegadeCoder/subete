@@ -87,6 +87,23 @@ def test_code(test_repo):
     assert program.code() == "print('Hello, World!')\n"
 
 
+@pytest.mark.parametrize(
+    "language,expected_result",
+    [
+        ("Piet", "png"),
+        ("Python", ""),
+    ]
+)
+def test_image_type(language, expected_result, test_repo):
+    program: subete.SampleProgram = test_repo[language]["Hello World"]
+    assert program.image_type() == expected_result
+
+
+def test_project_path(test_repo):
+    program: subete.SampleProgram = test_repo["Python"]["Hello World"]
+    assert program.project_path().endswith("/archive/p/python/hello_world.py")
+
+
 def test_project_has_test(test_repo):
     program: subete.SampleProgram = test_repo["Google Apps Script"]["Hello World"]
     assert program.project().has_testing()

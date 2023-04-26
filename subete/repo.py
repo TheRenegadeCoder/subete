@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import imghdr
 import logging
 import os
 import random
@@ -885,6 +886,19 @@ class SampleProgram:
         logger.info(f'Retrieving project pathlike name for {self}: {self._project}')
         return self._project.pathlike_name()
 
+    def project_path(self) -> str:
+        """
+        Retrieves the path to the project file.
+
+        Assuming you have a SampleProgram object called program, 
+        here's how you would use this method::
+
+            project_path: str = program.project_path()
+
+        :return: the project path (e.g., .../archive/p/python/hello_world.py)
+        """
+        return os.path.join(self._path, self._file_name)
+
     def code(self) -> str:
         """
         Retrieves the code for this sample program. To save space
@@ -902,6 +916,20 @@ class SampleProgram:
         """
         logger.info(f"Retrieving code from {self._path}/{self._file_name}")
         return Path(self._path, self._file_name).read_text(errors="replace")
+
+    def image_type(self) -> str:
+        """
+        Determine if sample program is actual an image, and if so, what type.
+
+        Assuming you have a SampleProgram object called program, 
+        here's how you would use this method::
+
+            image_type: str = program.image_type()
+
+        :return: Image type if sample program is an image (e.g., "png"),
+            empty string otherwise
+        """
+        return imghdr.what(Path(self._path, self._file_name)) or ""
 
     def line_count(self) -> int:
         """
