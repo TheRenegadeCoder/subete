@@ -8,7 +8,8 @@ newest changes first.
 ------
 
 * v0.16.0
-    * Added ability to detect if sample program is an image
+    * Added ability to detect if sample program is an image and return image type
+    * Added ability to get path to sample program
 
 0.15.x
 ------

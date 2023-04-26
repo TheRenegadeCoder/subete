@@ -90,13 +90,18 @@ def test_code(test_repo):
 @pytest.mark.parametrize(
     "language,expected_result",
     [
-        ("Piet", True),
-        ("Python", False),
+        ("Piet", "png"),
+        ("Python", ""),
     ]
 )
-def test_is_image(language, expected_result, test_repo):
+def test_image_type(language, expected_result, test_repo):
     program: subete.SampleProgram = test_repo[language]["Hello World"]
-    assert program.is_image() == expected_result
+    assert program.image_type() == expected_result
+
+
+def test_project_path(test_repo):
+    program: subete.SampleProgram = test_repo["Python"]["Hello World"]
+    assert program.project_path().endswith("/archive/p/python/hello_world.py")
 
 
 def test_project_has_test(test_repo):
