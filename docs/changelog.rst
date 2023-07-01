@@ -4,6 +4,13 @@ Changelog
 Below you'll find all the changes that have been made to the code with
 newest changes first.
 
+0.17.x
+------
+
+* v0.17.0
+    * Added ability to get authors, date/time created, date/time modified for
+      language, sample program, and project articles.
+
 0.16.x
 ------
 

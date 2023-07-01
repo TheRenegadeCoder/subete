@@ -15,19 +15,24 @@ def test_language_collection_str():
     assert str(test) == "Python"
 
 
+def test_language_collection_name():
+    test = subete.LanguageCollection(TEST_LANG, TEST_PATH, TEST_FILES, TEST_PROJECTS)
+    assert test.name() == "Python"
+
+
 def test_language_collection_test_file():
     test = subete.LanguageCollection(TEST_LANG, TEST_PATH, TEST_FILES, TEST_PROJECTS)
-    assert test.testinfo() != None
+    assert test.testinfo() is not None
 
 
 def test_language_collection_readme():
     test = subete.LanguageCollection(TEST_LANG, TEST_PATH, TEST_FILES, TEST_PROJECTS)
-    assert test.readme() != None
+    assert test.readme() is not None
 
 
 def test_language_collection_sample_programs():
     test = subete.LanguageCollection(TEST_LANG, TEST_PATH, TEST_FILES, TEST_PROJECTS)
-    assert test != None
+    assert test is not None
     assert subete.SampleProgram(TEST_PATH, TEST_FILES[0], test) in test
 
 
@@ -54,3 +59,8 @@ def test_language_collection_language_url():
 def test_missing_programs():
     test = subete.LanguageCollection(TEST_LANG, TEST_PATH, TEST_FILES, TEST_PROJECTS)
     assert test.missing_programs() == [TEST_PROJECTS[1]]
+
+
+def test_missing_programs_count():
+    test = subete.LanguageCollection(TEST_LANG, TEST_PATH, TEST_FILES, TEST_PROJECTS)
+    assert test.missing_programs_count() == 1

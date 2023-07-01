@@ -12,7 +12,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 MAJOR = 0
-MINOR = 16
+MINOR = 17
 PATCH = 0
 
 name = "subete"
