@@ -296,24 +296,12 @@ class Repo:
                 if project_docs_path.exists():
                     logger.info(f"Project has documentation at {project_docs_path}")
                     project._docs_path = project_docs_path
-                    project._docs_files = []
-                    project._doc_authors = set()
-                    project._doc_created = None
-                    project._doc_modified = None
-                    doc_times: List[datetime.datetime] = []
-                    for file in project_docs_path.glob("*"):
-                        project._docs_files.append(file.name)
-                        if file.stem != "featured-image":
-                            doc_file_authors, doc_file_times = _get_git_blame_data(
-                                self._sample_programs_website_repo, str(file)
-                            )
-                            project._doc_authors |= doc_file_authors
-                            doc_times += doc_file_times
-
-                    if doc_times:
-                        project._doc_created = min(doc_times)
-                        project._doc_modified = max(doc_times)
-
+                    (
+                        project._doc_authors,
+                        project._doc_created,
+                        project._doc_modified,
+                        project._docs_files
+                    ) = _get_doc_common_info(self._sample_programs_website_repo, project_docs_path)
                     logger.info(
                         f"Loaded git data into existing project article ({project}): "
                         f"{_datetime_to_str(project._doc_created)} - "
@@ -327,24 +315,12 @@ class Repo:
                 language_docs_path = Path(self._docs_source_dir, "languages", language.pathlike_name())
                 if language_docs_path.exists():
                     language._docs_path = language_docs_path
-                    language._docs_files = []
-                    language._doc_authors = set()
-                    language._doc_created = None
-                    language._doc_modified = None
-                    doc_times: List[datetime.datetime] = []
-                    for file in language_docs_path.glob("*"):
-                        language._docs_files.append(file.name)
-                        if file.stem != "featured-image":
-                            doc_file_authors, doc_file_times = _get_git_blame_data(
-                                self._sample_programs_website_repo, str(file)
-                            )
-                            language._doc_authors |= doc_file_authors
-                            doc_times += doc_file_times
-
-                    if doc_times:
-                        language._doc_created = min(doc_times)
-                        language._doc_modified = max(doc_times)
-
+                    (
+                        language._doc_authors,
+                        language._doc_created,
+                        language._doc_modified,
+                        language._docs_files
+                    ) = _get_doc_common_info(self._sample_programs_website_repo, language_docs_path)
                     logger.info(
                         f"Loaded git data into existing language article ({language}): "
                         f"{_datetime_to_str(language._doc_created)} - "
@@ -365,24 +341,12 @@ class Repo:
                     if program_docs_path.exists():
                         logger.info(f"Program has documentation at {program_docs_path}")
                         program._docs_path = program_docs_path
-                        program._docs_files = []
-                        program._doc_authors = set()
-                        program._doc_created = None
-                        program._doc_modified = None
-                        doc_times: List[datetime.datetime] = []
-                        for file in program_docs_path.glob("*"):
-                            program._docs_files.append(file.name)
-                            if file.stem != "featured-image":
-                                doc_file_authors, doc_file_times = _get_git_blame_data(
-                                    self._sample_programs_website_repo, str(file)
-                                )
-                                program._doc_authors |= doc_file_authors
-                                doc_times += doc_file_times
-
-                        if doc_times:
-                            program._doc_created = min(doc_times)
-                            program._doc_modified = max(doc_times)
-
+                        (
+                            program._doc_authors,
+                            program._doc_created,
+                            program._doc_modified,
+                            program._docs_files
+                        ) = _get_doc_common_info(self._sample_programs_website_repo, program_docs_path)
                         logger.info(
                             f"Loaded git data into existing program article ({program}): "
                             f"{_datetime_to_str(program._doc_created)} - "
@@ -1383,7 +1347,7 @@ def _maybe_create_delete_git_blame_ignore_revs(root_dir: str) -> None:
 
 def _get_git_blame_data(
     repo: git.Repo, file_path: str
-) -> Tuple[Set[str], datetime.datetime, datetime.datetime]:
+) -> Tuple[Set[str], List[datetime.datetime]]:
     """
     Get the following git blame date:
 
@@ -1403,6 +1367,41 @@ def _get_git_blame_data(
         times.append(commit.authored_datetime)
 
     return (authors, times)
+
+
+def _get_doc_common_info(
+    repo: git.Repo, docs_path: Path
+) -> Tuple[Set[str], Optional[datetime.datetime], Optional[datetime.datetime], List[str]]:
+    """
+    Get the following common information about articles:
+
+    - Set of author names
+    - Date/time when article was created
+    - Date/time when article was last modified
+    - List of article files
+
+    :param git.Repo: git repository.
+    :param pathlib.Path docs_path: directory path where article files are located.
+    :return: tuple containing set of author names, creation date/time, last modified
+        date/time, and list of article files.
+    """
+    doc_authors: Set[str] = set()
+    doc_created: Optional[datetime.datetime] = None
+    doc_modified: Optional[datetime.datetime] = None
+    doc_times: List[datetime.datetime] = []
+    doc_files: List[str] = []
+    for file in docs_path.glob("*"):
+        doc_files.append(file.name)
+        if file.stem != "featured-image":
+            doc_file_authors, doc_file_times = _get_git_blame_data(repo, str(file))
+            doc_authors |= doc_file_authors
+            doc_times += doc_file_times
+
+    if doc_times:
+        doc_created = min(doc_times)
+        doc_modified = max(doc_times)
+
+    return (doc_authors, doc_created, doc_modified, doc_files)
 
 
 def _datetime_to_str(value: Optional[datetime.datetime]) -> str:
