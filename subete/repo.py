@@ -288,12 +288,14 @@ class Repo:
         Once the repo is loaded, this method will load the documentation data from
         the website repo and inject that data into the repo object.
         """
+        required_files: List[str]
         with _maybe_create_delete_git_blame_ignore_revs(self._sample_programs_website_repo_dir):
             # Loads project docs
+            required_files = ["description.md", "requirements.md"]
             for project in self._projects:
                 project: Project
                 project_docs_path = Path(self._docs_source_dir, "projects", project.pathlike_name())
-                if project_docs_path.exists():
+                if _has_any_required_files(project_docs_path, required_files):
                     logger.info(f"Project has documentation at {project_docs_path}")
                     project._docs_path = project_docs_path
                     (
@@ -301,7 +303,9 @@ class Repo:
                         project._doc_created,
                         project._doc_modified,
                         project._docs_files
-                    ) = _get_doc_common_info(self._sample_programs_website_repo, project_docs_path)
+                    ) = _get_doc_common_info(
+                        self._sample_programs_website_repo, project_docs_path, required_files
+                    )
                     logger.info(
                         f"Loaded git data into existing project article ({project}): "
                         f"{_datetime_to_str(project._doc_created)} - "
@@ -310,17 +314,20 @@ class Repo:
                     )
 
             # Loads language docs
+            required_files = ["description.md"]
             for language in self:
                 language: LanguageCollection
                 language_docs_path = Path(self._docs_source_dir, "languages", language.pathlike_name())
-                if language_docs_path.exists():
+                if _has_any_required_files(language_docs_path, required_files):
                     language._docs_path = language_docs_path
                     (
                         language._doc_authors,
                         language._doc_created,
                         language._doc_modified,
                         language._docs_files
-                    ) = _get_doc_common_info(self._sample_programs_website_repo, language_docs_path)
+                    ) = _get_doc_common_info(
+                        self._sample_programs_website_repo, language_docs_path, required_files
+                    )
                     logger.info(
                         f"Loaded git data into existing language article ({language}): "
                         f"{_datetime_to_str(language._doc_created)} - "
@@ -329,6 +336,7 @@ class Repo:
                     )
 
             # Loads sample programs docs
+            required_files = ["how-to-implement-the-solution.md", "how-to-run-the-solution.md"]
             for language in self:
                 language: LanguageCollection
                 for program in language:
@@ -338,7 +346,7 @@ class Repo:
                         program.project_pathlike_name(),
                         program.language_pathlike_name()
                     )
-                    if program_docs_path.exists():
+                    if _has_any_required_files(program_docs_path, required_files):
                         logger.info(f"Program has documentation at {program_docs_path}")
                         program._docs_path = program_docs_path
                         (
@@ -346,7 +354,9 @@ class Repo:
                             program._doc_created,
                             program._doc_modified,
                             program._docs_files
-                        ) = _get_doc_common_info(self._sample_programs_website_repo, program_docs_path)
+                        ) = _get_doc_common_info(
+                            self._sample_programs_website_repo, program_docs_path, required_files
+                        )
                         logger.info(
                             f"Loaded git data into existing program article ({program}): "
                             f"{_datetime_to_str(program._doc_created)} - "
@@ -1369,8 +1379,19 @@ def _get_git_blame_data(
     return (authors, times)
 
 
+def _has_any_required_files(path: Path, required_files: List[str]) -> bool:
+    """
+    Indicate if the specified path has the required files.
+
+    :param pathlib.Path path: path to check.
+    :param List[str] required_files: list of required file names.
+    :return: True if at least one required file is found, False otherwise.
+    """
+    return any((path / required_file).exists() for required_file in required_files)
+
+
 def _get_doc_common_info(
-    repo: git.Repo, docs_path: Path
+    repo: git.Repo, docs_path: Path, required_files: List[str]
 ) -> Tuple[Set[str], Optional[datetime.datetime], Optional[datetime.datetime], List[str]]:
     """
     Get the following common information about articles:
@@ -1382,6 +1403,7 @@ def _get_doc_common_info(
 
     :param git.Repo: git repository.
     :param pathlib.Path docs_path: directory path where article files are located.
+    :param List[str] required_files: list of required file names.
     :return: tuple containing set of author names, creation date/time, last modified
         date/time, and list of article files.
     """
@@ -1391,8 +1413,8 @@ def _get_doc_common_info(
     doc_times: List[datetime.datetime] = []
     doc_files: List[str] = []
     for file in docs_path.glob("*"):
-        doc_files.append(file.name)
-        if file.stem != "featured-image":
+        if file.name in required_files:
+            doc_files.append(file.name)
             doc_file_authors, doc_file_times = _get_git_blame_data(repo, str(file))
             doc_authors |= doc_file_authors
             doc_times += doc_file_times
