@@ -59,6 +59,7 @@ def test_sample_program_issue_query_url():
     assert test.article_issue_query_url(
     ) == "https://github.com//TheRenegadeCoder/sample-programs-website/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+hello+world+python"
 
+
 def test_generate_project_hyphen_branch():
     test = subete.SampleProgram(
         "tests/c", 
@@ -71,3 +72,30 @@ def test_generate_project_hyphen_branch():
         )
     )
     assert test.project_pathlike_name() == "rot13"
+
+
+def test_sample_program_equality():
+    test1 = subete.SampleProgram(TEST_PATH, TEST_FILES[0], TEST_LANG_COLLECTION)
+    test2 = subete.SampleProgram(TEST_PATH, TEST_FILES[0], TEST_LANG_COLLECTION)
+    assert test1 == test2
+
+
+def test_sample_program_inequality():
+    test1 = subete.SampleProgram(TEST_PATH, TEST_FILES[0], TEST_LANG_COLLECTION)
+    test2 = subete.SampleProgram(
+        "tests/c", 
+        "rot13.c", 
+        LanguageCollection(
+            "c",
+            "tests/c",
+            ["rot13.c", "testinfo.yml", "README.md"],
+            TEST_PROJECTS
+        )
+    )
+    assert test1 != test2
+
+
+def test_sample_program_diff_class():
+    test1 = subete.SampleProgram(TEST_PATH, TEST_FILES[0], TEST_LANG_COLLECTION)
+    test2 = "foo"
+    assert test1 != test2

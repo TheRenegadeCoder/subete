@@ -8,7 +8,8 @@ import random
 import re
 import tempfile
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple, Set
+from contextlib import contextmanager
 
 import git
 import yaml
@@ -48,16 +49,16 @@ class Repo:
         self._archive_dir: str = os.path.join(self._sample_programs_repo_dir, "archive")
         
         # Performs data collection from the repos
-        self._tested_projects: Dict = self._collect_tested_projects()
+        self._tested_projects: dict = self._collect_tested_projects()
         self._projects: List[Project] = self._collect_projects()
-        self._languages: Dict[str: LanguageCollection] = self._collect_languages()
+        self._languages: Dict[str, LanguageCollection] = self._collect_languages()
         self._total_snippets: int = sum(x.total_programs() for _, x in self._languages.items())
         self._total_tests: int = sum(1 for _, x in self._languages.items() if x.has_testinfo())
-        
+
         # Post generation updates
         self._load_git_data()
         self._load_docs_data()
-        
+
         # Closes repositories
         self._sample_programs_repo.close()
         self._sample_programs_website_repo.close()
@@ -241,10 +242,12 @@ class Repo:
                 projects.append(Project(project_dir.name, project_test))
         return projects
 
-    def _collect_tested_projects(self) -> str:
+    def _collect_tested_projects(self) -> dict:
         """
         Generates the dictionary of tested projects from the
         Glotter YAML file. 
+
+        :return: contents of Glotter YAML file or empty dictionary
         """
         p = Path(self._sample_programs_repo_dir) / ".glotter.yml"
         if p.exists():
@@ -253,7 +256,7 @@ class Repo:
             logger.info(f"Collected tested projects: {data}")
             return data
         else:
-            return None
+            return {}
 
     def _load_git_data(self) -> None:
         """
@@ -262,71 +265,105 @@ class Repo:
         It seems like way more of a pain to try to pass the git data around.
         """
 
-        # Make sure .git-blame-ignore-revs exists for older versions of git and
-        # keep track of whether it existed before
-        blame_path = Path(f"{self._sample_programs_repo_dir}/.git-blame-ignore-revs")
-        blame_path_exists = blame_path.exists()
-        blame_path.touch()
+        with _maybe_create_delete_git_blame_ignore_revs(self._sample_programs_repo_dir):
+            for language in self:
+                language: LanguageCollection
+                for program in language:
+                    program: SampleProgram
+                    authors, times = _get_git_blame_data(
+                        self._sample_programs_repo, f"{program._path}/{program._file_name}"
+                    )
+                    program._authors |= authors
+                    program._created = min(times)
+                    program._modified = max(times)
+                    logger.info(
+                        f"Loaded git data into existing program ({program}): "
+                        f"{_datetime_to_str(program._created)} - "
+                        f"{_datetime_to_str(program._modified)} "
+                        f"by {program._authors}"
+                    )
 
-        for language in self:
-            language: LanguageCollection
-            for program in language:
-                program: SampleProgram
-                blame = self._sample_programs_repo.blame('HEAD', f"{program._path}/{program._file_name}")
-                times = []
-                for commit, _ in blame:
-                    commit: git.Commit
-                    program._authors.add(commit.author.name)
-                    times.append(commit.authored_datetime)
-                program._created = min(times)
-                program._modified = max(times)
-                logger.info(f"Loaded git data into existing program ({program}): {program._created} - {program._modified} by {program._authors}")
-
-        # Delete .git-blame-ignore-revs if it did not exist before
-        if not blame_path_exists:
-            blame_path.unlink()
-            
-            
     def _load_docs_data(self) -> None:
         """
         Once the repo is loaded, this method will load the documentation data from
         the website repo and inject that data into the repo object.
         """
-        
-        # Loads project docs
-        for project in self._projects:
-            project: Project
-            project_docs_path = Path(self._docs_source_dir, "projects", project.pathlike_name())
-            if project_docs_path.exists():
-                logger.info(f"Project has documentation at {project_docs_path}")
-                project._docs_path = project_docs_path
-                project._docs_files = []
-                for file in project_docs_path.glob("*"):
-                    project._docs_files.append(file.name)
-                
-        # Loads language docs
-        for language in self:
-            language: LanguageCollection
-            language_docs_path = Path(self._docs_source_dir, "languages", language.pathlike_name())
-            if language_docs_path.exists():
-                language._docs_path = language_docs_path
-                language._docs_files = []
-                for file in language_docs_path.glob("*"):
-                    language._docs_files.append(file.name)
-                    
-        # Loads sample programs docs
-        for language in self:
-            language: LanguageCollection
-            for program in language:
-                program: SampleProgram
-                program_docs_path = Path(self._docs_source_dir, "programs", program.project_pathlike_name(), program.language_pathlike_name())
-                if program_docs_path.exists():
-                    logger.info(f"Program has documentation at {program_docs_path}")
-                    program._docs_path = program_docs_path
-                    program._docs_files = []
-                    for file in program_docs_path.glob("*"):
-                        program._docs_files.append(file.name)
-        
+        required_files: List[str]
+        with _maybe_create_delete_git_blame_ignore_revs(self._sample_programs_website_repo_dir):
+            # Loads project docs
+            required_files = ["description.md", "requirements.md"]
+            for project in self._projects:
+                project: Project
+                project_docs_path = Path(self._docs_source_dir, "projects", project.pathlike_name())
+                if _has_any_required_files(project_docs_path, required_files):
+                    logger.info(f"Project has documentation at {project_docs_path}")
+                    project._docs_path = project_docs_path
+                    (
+                        project._doc_authors,
+                        project._doc_created,
+                        project._doc_modified,
+                        project._docs_files
+                    ) = _get_doc_common_info(
+                        self._sample_programs_website_repo, project_docs_path, required_files
+                    )
+                    logger.info(
+                        f"Loaded git data into existing project article ({project}): "
+                        f"{_datetime_to_str(project._doc_created)} - "
+                        f"{_datetime_to_str(project._doc_modified)} "
+                        f"by {project._doc_authors}"
+                    )
+
+            # Loads language docs
+            required_files = ["description.md"]
+            for language in self:
+                language: LanguageCollection
+                language_docs_path = Path(self._docs_source_dir, "languages", language.pathlike_name())
+                if _has_any_required_files(language_docs_path, required_files):
+                    language._docs_path = language_docs_path
+                    (
+                        language._doc_authors,
+                        language._doc_created,
+                        language._doc_modified,
+                        language._docs_files
+                    ) = _get_doc_common_info(
+                        self._sample_programs_website_repo, language_docs_path, required_files
+                    )
+                    logger.info(
+                        f"Loaded git data into existing language article ({language}): "
+                        f"{_datetime_to_str(language._doc_created)} - "
+                        f"{_datetime_to_str(language._doc_modified)} "
+                        f"by {language._doc_authors}"
+                    )
+
+            # Loads sample programs docs
+            required_files = ["how-to-implement-the-solution.md", "how-to-run-the-solution.md"]
+            for language in self:
+                language: LanguageCollection
+                for program in language:
+                    program: SampleProgram
+                    program_docs_path = Path(
+                        self._docs_source_dir, "programs",
+                        program.project_pathlike_name(),
+                        program.language_pathlike_name()
+                    )
+                    if _has_any_required_files(program_docs_path, required_files):
+                        logger.info(f"Program has documentation at {program_docs_path}")
+                        program._docs_path = program_docs_path
+                        (
+                            program._doc_authors,
+                            program._doc_created,
+                            program._doc_modified,
+                            program._docs_files
+                        ) = _get_doc_common_info(
+                            self._sample_programs_website_repo, program_docs_path, required_files
+                        )
+                        logger.info(
+                            f"Loaded git data into existing program article ({program}): "
+                            f"{_datetime_to_str(program._doc_created)} - "
+                            f"{_datetime_to_str(program._doc_modified)} by "
+                            f"{program._doc_authors}"
+                        )
+
 
 class LanguageCollection:
     """
@@ -347,8 +384,11 @@ class LanguageCollection:
         self._path: str = path
         self._file_list: List[str] = file_list
         self._projects: List[Project] = projects
-        self._docs_path: str = None
-        self._docs_files: list[str] = None
+        self._docs_path: Optional[str] = None
+        self._docs_files: Optional[List[str]] = None
+        self._doc_authors: Set[str] = set()
+        self._doc_created: Optional[datetime.datetime] = None
+        self._doc_modified: Optional[datetime.datetime] = None
         self._first_letter: str = name[0]
         self._sample_programs: Dict[str, SampleProgram] = self._collect_sample_programs()
         self._test_file_path: Optional[str] = self._collect_test_file()
@@ -677,6 +717,48 @@ class LanguageCollection:
             logger.debug(f"New README collected for {self}")
             return os.path.join(self._path, "README.md")
 
+    def doc_authors(self) -> Set[str]:
+        """
+        Retrieves the set of authors for this language article. Author names
+        are generated from git blame. 
+
+        Assuming you have a LanguageCollection object called language,
+        here's how you would use this method::
+
+            doc_authors: Set[str] = language.doc_authors()
+
+        :return: the set of language article authors
+        """
+        return self._doc_authors
+
+    def doc_created(self) -> Optional[datetime.datetime]:
+        """
+        Retrieves the date the language article was created. Created dates
+        are generated from git blame, specifically the article author commits.
+
+        Assuming you have a LanguageCollection object called language,
+        here's how you would use this method::
+
+            doc_created: Optional[datetime.datetime] = language.doc_created()
+
+        :return: the date the language article was created
+        """
+        return self._doc_created
+
+    def doc_modified(self) -> Optional[datetime.datetime]:
+        """
+        Retrieves the date the language article was last modified. Modified
+        dates are generated from git blame, specifically the author commits.
+
+        Assuming you have a LanguageCollection object called language,
+        here's how you would use this method::
+
+            doc_modified: Optional[datetime.datetime] = language.doc_modified()
+        
+        :return: the date the language article was last modified
+        """
+        return self._doc_modified
+
 
 class SampleProgram:
     """
@@ -699,11 +781,14 @@ class SampleProgram:
         self._sample_program_doc_url: str = self._generate_doc_url()
         self._sample_program_issue_url: str = self._generate_issue_url()
         self._line_count: int = len(self.code().splitlines())
-        self._authors: set = set()
+        self._authors: Set[str] = set()
         self._created: Optional[datetime.datetime] = None
         self._modified: Optional[datetime.datetime] = None
-        self._docs_path: str = None
-        self._docs_files: list[str] = None
+        self._docs_path: Optional[str] = None
+        self._docs_files: List[str] = None
+        self._doc_authors: Set[str] = set()
+        self._doc_created: Optional[datetime.datetime] = None
+        self._doc_modified: Optional[datetime.datetime] = None
 
     def __str__(self) -> str:
         """
@@ -738,7 +823,7 @@ class SampleProgram:
             return self._file_name == o._file_name and self._path == self._path and self._language == o._language
         return False
 
-    def authors(self) -> set:
+    def authors(self) -> Set[str]:
         """
         Retrieves the set of authors for this sample program. Author names
         are generated from git blame. 
@@ -746,7 +831,7 @@ class SampleProgram:
         Assuming you have a SampleProgram object called sample_program,
         here's how you would use this method::
 
-            authors: set = sample_program.authors()
+            authors: Set[str] = sample_program.authors()
 
         :return: the set of authors
         """
@@ -760,7 +845,7 @@ class SampleProgram:
         Assuming you have a SampleProgram object called sample_program,
         here's how you would use this method::
 
-            created: datetime.datetime = sample_program.created()
+            created: Optional[datetime.datetime] = sample_program.created()
 
         :return: the date the sample program was created
         """
@@ -774,7 +859,7 @@ class SampleProgram:
         Assuming you have a SampleProgram object called sample_program,
         here's how you would use this method::
 
-            modified: datetime.datetime = sample_program.modified()
+            modified: Optional[datetime.datetime] = sample_program.modified()
         
         :return: the date the sample program was last modified
         """
@@ -869,7 +954,7 @@ class SampleProgram:
 
         :return: the project name as a titlecase string (e.g., Hello World, MST)
         """
-        return self._project.name()
+        return self._project.name() if self._project else ""
 
     def project_pathlike_name(self) -> str:
         """
@@ -884,7 +969,7 @@ class SampleProgram:
         :return: the project name as a path name (e.g., hello-world, convex-hull)
         """
         logger.info(f'Retrieving project pathlike name for {self}: {self._project}')
-        return self._project.pathlike_name()
+        return self._project.pathlike_name() if self._project else ""
 
     def project_path(self) -> str:
         """
@@ -1037,7 +1122,7 @@ class SampleProgram:
 
         :return: the expected docs URL
         """
-        return f"{self.project().requirements_url()}/{Path(self._path).name}"
+        return f"{self._project.requirements_url()}/{Path(self._path).name}" if self._project else ""
 
     def _generate_issue_url(self) -> str:
         """
@@ -1048,8 +1133,50 @@ class SampleProgram:
         """
         issue_url_base = "https://github.com//TheRenegadeCoder/" \
                          "sample-programs-website/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+"
-        program = self._project.pathlike_name().replace("-", "+")
+        program = self._project.pathlike_name().replace("-", "+") if self._project else None
         return f"{issue_url_base}{program}+{str(self._language).replace(' ', '+').lower()}"
+
+    def doc_authors(self) -> Set[str]:
+        """
+        Retrieves the set of authors for this sample program article. Author names
+        are generated from git blame. 
+
+        Assuming you have a SampleProgram object called sample_program,
+        here's how you would use this method::
+
+            doc_authors: Set[str] = sample_program.doc_authors()
+
+        :return: the set of article authors
+        """
+        return self._doc_authors
+
+    def doc_created(self) -> Optional[datetime.datetime]:
+        """
+        Retrieves the date the sample program article was created. Created dates
+        are generated from git blame, specifically the article author commits.
+
+        Assuming you have a SampleProgram object called sample_program,
+        here's how you would use this method::
+
+            doc_created: Optional[datetime.datetime] = sample_program.doc_created()
+
+        :return: the date the sample program article was created
+        """
+        return self._doc_created
+
+    def doc_modified(self) -> Optional[datetime.datetime]:
+        """
+        Retrieves the date the sample program article was last modified. Modified
+        dates are generated from git blame, specifically the author commits.
+
+        Assuming you have a SampleProgram object called sample_program,
+        here's how you would use this method::
+
+            doc_modified: Optional[datetime.datetime] = sample_program.doc_modified()
+        
+        :return: the date the sample program article was last modified
+        """
+        return self._doc_modified
 
 
 class Project:
@@ -1062,10 +1189,13 @@ class Project:
 
     def __init__(self, name: str, project_tests: Optional[Dict]):
         self._project_tests = project_tests
-        self._name: str = Project._generate_name(name)
+        self._name: str = name
         self._requirements_url: str = self._generate_requirements_url()
         self._docs_path: str = None
-        self._docs_files: list[str] = None
+        self._docs_files: List[str] = None
+        self._doc_authors: Set[str] = set()
+        self._doc_created: Optional[datetime.datetime] = None
+        self._doc_modified: Optional[datetime.datetime] = None
 
     def __str__(self) -> str:
         logger.info(f"Generating name from {self._name}")
@@ -1148,14 +1278,151 @@ class Project:
         doc_url_base = "https://sampleprograms.io/projects"
         return f"{doc_url_base}/{self.pathlike_name()}"
 
-    @staticmethod
-    def _generate_name(name: str) -> str:
+    def doc_authors(self) -> Set[str]:
         """
-        Creates the project name from some input string.
+        Retrieves the set of authors for this project article. Author names
+        are generated from git blame. 
 
-        :param str name: the name of the project in its pathlike form (e.g., hello-world)
-        :return: the name of the project in its pathlike form (e.g., hello-world)
+        Assuming you have a Project object called project,
+        here's how you would use this method::
+
+            doc_authors: Set[str] = project.doc_authors()
+
+        :return: the set of project article authors
         """
-        if "export" in name or "import" in name:
-            return "import-export"
-        return name
+        return self._doc_authors
+
+    def doc_created(self) -> Optional[datetime.datetime]:
+        """
+        Retrieves the date the project article was created. Created dates
+        are generated from git blame, specifically the article author commits.
+
+        Assuming you have a Project object called project,
+        here's how you would use this method::
+
+            doc_created: Optional[datetime.datetime] = project.doc_created()
+
+        :return: the date the project article was created
+        """
+        return self._doc_created
+
+    def doc_modified(self) -> Optional[datetime.datetime]:
+        """
+        Retrieves the date the project article was last modified. Modified
+        dates are generated from git blame, specifically the author commits.
+
+        Assuming you have a Project object called project,
+        here's how you would use this method::
+
+            doc_modified: Optional[datetime.datetime] = project.doc_modified()
+        
+        :return: the date the project article was last modified
+        """
+        return self._doc_modified
+
+
+@contextmanager
+def _maybe_create_delete_git_blame_ignore_revs(root_dir: str) -> None:
+    """
+    Create `.git-blame-ignore-revs` if it does not exist and delete it
+    it did not exist previously.
+
+    :param str root_dir: root directory of repository.
+    """
+
+    blame_path = Path(f"{root_dir}/.git-blame-ignore-revs")
+    blame_path_exists = blame_path.exists()
+    try:
+        # Make sure .git-blame-ignore-revs exists for older versions of git and
+        # keep track of whether it existed before
+        blame_path.touch()
+        yield
+    finally:
+        # Delete .git-blame-ignore-revs if it did not exist before
+        if not blame_path_exists:
+            blame_path.unlink()
+
+
+def _get_git_blame_data(
+    repo: git.Repo, file_path: str
+) -> Tuple[Set[str], List[datetime.datetime]]:
+    """
+    Get the following git blame date:
+
+    - Set of author names
+    - List of date/times when commits were done
+
+    :param git.Repo repo: git repository.
+    :param str file_path: path to file
+    :return: tuple containing set of author names and list of date/times
+    """
+    blame = repo.blame('HEAD', file_path)
+    authors: Set[str] = set()
+    times: List[datetime.datetime] = []
+    for commit, _ in blame:
+        commit: git.Commit
+        authors.add(commit.author.name)
+        times.append(commit.authored_datetime)
+
+    return (authors, times)
+
+
+def _has_any_required_files(path: Path, required_files: List[str]) -> bool:
+    """
+    Indicate if the specified path has the required files.
+
+    :param pathlib.Path path: path to check.
+    :param List[str] required_files: list of required file names.
+    :return: True if at least one required file is found, False otherwise.
+    """
+    return any((path / required_file).exists() for required_file in required_files)
+
+
+def _get_doc_common_info(
+    repo: git.Repo, docs_path: Path, required_files: List[str]
+) -> Tuple[Set[str], Optional[datetime.datetime], Optional[datetime.datetime], List[str]]:
+    """
+    Get the following common information about articles:
+
+    - Set of author names
+    - Date/time when article was created
+    - Date/time when article was last modified
+    - List of article files
+
+    :param git.Repo: git repository.
+    :param pathlib.Path docs_path: directory path where article files are located.
+    :param List[str] required_files: list of required file names.
+    :return: tuple containing set of author names, creation date/time, last modified
+        date/time, and list of article files.
+    """
+    doc_authors: Set[str] = set()
+    doc_created: Optional[datetime.datetime] = None
+    doc_modified: Optional[datetime.datetime] = None
+    doc_times: List[datetime.datetime] = []
+    doc_files: List[str] = []
+    for file in docs_path.glob("*"):
+        if file.name in required_files:
+            doc_files.append(file.name)
+            doc_file_authors, doc_file_times = _get_git_blame_data(repo, str(file))
+            doc_authors |= doc_file_authors
+            doc_times += doc_file_times
+
+    if doc_times:
+        doc_created = min(doc_times)
+        doc_modified = max(doc_times)
+
+    return (doc_authors, doc_created, doc_modified, doc_files)
+
+
+def _datetime_to_str(value: Optional[datetime.datetime]) -> str:
+    """
+    Convert date/time to a string
+
+    :param Optional[datetime.datetime] value: date/time value.
+    :return: string representing date/time value
+    """
+    return (
+        value.strftime("%Y-%m-%d %H:%M:%S")
+        if isinstance(value, datetime.datetime)
+        else str(value)
+    )

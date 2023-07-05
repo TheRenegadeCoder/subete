@@ -99,6 +99,21 @@ def test_image_type(language, expected_result, test_repo):
     assert program.image_type() == expected_result
 
 
+def test_doc_authors(test_repo):
+    program: subete.SampleProgram = test_repo["Yoix"]["Hello World"]
+    assert "rzuckerm" in program.doc_authors()
+
+
+def test_doc_created(test_repo):
+    program: subete.SampleProgram = test_repo["Yoix"]["Hello World"]
+    assert program.doc_created() is not None
+
+
+def test_doc_modified(test_repo):
+    program: subete.SampleProgram = test_repo["Yoix"]["Hello World"]
+    assert program.doc_modified() is not None
+
+
 def test_project_path(test_repo):
     program: subete.SampleProgram = test_repo["Python"]["Hello World"]
     assert program.project_path().endswith("/archive/p/python/hello_world.py")
@@ -129,8 +144,16 @@ def test_random_program(test_repo):
     assert test_repo.random_program() != test_repo.random_program()
 
 
+def test_approved_projects(test_repo):
+    assert len(test_repo.approved_projects()) > 0
+
+
 def test_total_approved_projects(test_repo):
     assert test_repo.total_approved_projects() > 0
+
+
+def test_sorted_language_letters(test_repo):
+    assert "p" in test_repo.sorted_language_letters()
 
 
 def test_program_has_docs(test_repo):
@@ -140,6 +163,41 @@ def test_program_has_docs(test_repo):
 
 def test_sample_programs_repo_dir(test_repo):
     assert test_repo.sample_programs_repo_dir() == SAMPLE_PROGRAMS_TEMP_DIR.name
+
+
+def test_language_has_docs(test_repo):
+    language: subete.LanguageCollection = test_repo["Befunge"]
+    assert language.has_docs()
+
+
+def test_language_doc_author(test_repo):
+    language: subete.LanguageCollection = test_repo["Befunge"]
+    assert "Stuart Irwin" in language.doc_authors()
+
+
+def test_language_doc_created(test_repo):
+    language: subete.LanguageCollection = test_repo["Befunge"]
+    assert language.doc_created() is not None
+
+
+def test_language_doc_modified(test_repo):
+    language: subete.LanguageCollection = test_repo["Befunge"]
+    assert language.doc_modified() is not None
+
+
+def test_project_doc_author(test_repo):
+    project: subete.Project = test_repo["Python"]["Selection Sort"].project()
+    assert "Parker Johansen" in project.doc_authors()
+
+
+def test_project_doc_created(test_repo):
+    project: subete.Project = test_repo["Python"]["Selection Sort"].project()
+    assert project.doc_created() is not None
+
+
+def test_project_doc_modified(test_repo):
+    project: subete.Project = test_repo["Python"]["Selection Sort"].project()
+    assert project.doc_modified() is not None
 
 
 @pytest.fixture(scope="module")
