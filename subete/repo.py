@@ -1189,7 +1189,7 @@ class Project:
 
     def __init__(self, name: str, project_tests: Optional[Dict]):
         self._project_tests = project_tests
-        self._name: str = Project._generate_name(name)
+        self._name: str = name
         self._requirements_url: str = self._generate_requirements_url()
         self._docs_path: str = None
         self._docs_files: List[str] = None
@@ -1277,18 +1277,6 @@ class Project:
         """
         doc_url_base = "https://sampleprograms.io/projects"
         return f"{doc_url_base}/{self.pathlike_name()}"
-
-    @staticmethod
-    def _generate_name(name: str) -> str:
-        """
-        Creates the project name from some input string.
-
-        :param str name: the name of the project in its pathlike form (e.g., hello-world)
-        :return: the name of the project in its pathlike form (e.g., hello-world)
-        """
-        if "export" in name or "import" in name:
-            return "import-export"
-        return name
 
     def doc_authors(self) -> Set[str]:
         """

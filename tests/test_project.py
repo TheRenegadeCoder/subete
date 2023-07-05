@@ -1,4 +1,3 @@
-import pytest
 import subete
 
 
@@ -15,12 +14,6 @@ def test_name():
 def test_pathlike_name():
     test = subete.Project("hello-world", {"words": ["hello", "world"], "requires_parameters": False})
     assert test.pathlike_name() == "hello-world"
-
-
-@pytest.mark.parametrize("name", ["import-blah", "blah-export"])
-def test_pathlike_name_when_import_or_export(name):
-    test = subete.Project(name, {"words": name.split("-"), "requires_parameters": False})
-    assert test.pathlike_name() == "import-export"
 
 
 def test_has_testing():
