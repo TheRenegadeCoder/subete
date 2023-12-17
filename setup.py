@@ -30,8 +30,8 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     python_requires=">=3.7",
     install_requires=[
-        "PyYAML>=5",
-        "GitPython>=3"
+        "PyYAML>=6,<7",
+        "GitPython>=3,<4"
     ],
     classifiers=[
         "License :: OSI Approved :: MIT License",
