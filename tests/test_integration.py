@@ -10,8 +10,8 @@ SAMPLE_PROGRAMS_WEBSITE_TEMP_DIR = tempfile.TemporaryDirectory()
 
 
 def test_doc_url_multiword_lang(test_repo):
-    language: subete.LanguageCollection = test_repo["Google Apps Script"]
-    assert language.lang_docs_url() == "https://sampleprograms.io/languages/google-apps-script"
+    language: subete.LanguageCollection = test_repo["Commodore Basic"]
+    assert language.lang_docs_url() == "https://sampleprograms.io/languages/commodore-basic"
 
 
 def test_doc_url_symbol_lang(test_repo):
@@ -20,9 +20,9 @@ def test_doc_url_symbol_lang(test_repo):
 
 
 def test_testinfo_url_multiword_lang(test_repo):
-    language: subete.LanguageCollection = test_repo["Google Apps Script"]
+    language: subete.LanguageCollection = test_repo["Commodore Basic"]
     assert language.testinfo_url(
-    ) == "https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/g/google-apps-script/testinfo.yml"
+    ) == "https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/c/commodore-basic/testinfo.yml"
 
 
 def test_testinfo_url_symbol_lang(test_repo):
@@ -31,8 +31,14 @@ def test_testinfo_url_symbol_lang(test_repo):
     ) == "https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/c/c-sharp/testinfo.yml"
 
 
+def test_untesting_info_url(test_repo):
+    language: subete.LanguageCollection = test_repo["Mathematica"]
+    assert language.untestable_info_url(
+    ) == "https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/m/mathematica/untestable.yml"
+
+
 def test_requirements_url_multiword_lang(test_repo):
-    program: subete.SampleProgram = test_repo["Google Apps Script"]["Hello World"]
+    program: subete.SampleProgram = test_repo["Commodore Basic"]["Hello World"]
     assert program.project().requirements_url(
     ) == "https://sampleprograms.io/projects/hello-world"
 
@@ -44,9 +50,9 @@ def test_requirements_url_symbol_lang(test_repo):
 
 
 def test_documentation_url_multiword_lang(test_repo):
-    program: subete.SampleProgram = test_repo["Google Apps Script"]["Hello World"]
+    program: subete.SampleProgram = test_repo["Commodore Basic"]["Hello World"]
     assert program.documentation_url(
-    ) == "https://sampleprograms.io/projects/hello-world/google-apps-script"
+    ) == "https://sampleprograms.io/projects/hello-world/commodore-basic"
 
 
 def test_documentation_url_symbol_lang(test_repo):
@@ -56,9 +62,9 @@ def test_documentation_url_symbol_lang(test_repo):
 
 
 def test_article_issue_url_multiword_lang(test_repo):
-    program: subete.SampleProgram = test_repo["Google Apps Script"]["Hello World"]
+    program: subete.SampleProgram = test_repo["Commodore Basic"]["Hello World"]
     assert program.article_issue_query_url(
-    ) == "https://github.com//TheRenegadeCoder/sample-programs-website/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+hello+world+google+apps+script"
+    ) == "https://github.com//TheRenegadeCoder/sample-programs-website/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+hello+world+commodore+basic"
 
 
 def test_article_issue_url_symbol_lang(test_repo):
@@ -120,7 +126,7 @@ def test_project_path(test_repo):
 
 
 def test_project_has_test(test_repo):
-    program: subete.SampleProgram = test_repo["Google Apps Script"]["Hello World"]
+    program: subete.SampleProgram = test_repo["Commodore Basic"]["Hello World"]
     assert program.project().has_testing()
 
 
@@ -134,6 +140,10 @@ def test_repo_total_programs(test_repo):
 
 def test_repo_total_tests(test_repo):
     assert test_repo.total_tests() > 0
+
+
+def test_repo_total_untestables(test_repo):
+    assert test_repo.total_untestables() > 0
 
 
 def test_repo_languages_by_letter(test_repo):
