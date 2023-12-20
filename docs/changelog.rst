@@ -4,6 +4,14 @@ Changelog
 Below you'll find all the changes that have been made to the code with
 newest changes first.
 
+0.18.x
+------
+
+* v0.18.0
+  * Add ability to get information about untestable languages.
+  * Indicate support for python 3.11.
+  * Upgrade PyYAML dependency to 6.x.
+
 0.17.x
 ------
 

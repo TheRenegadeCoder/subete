@@ -9,6 +9,10 @@ TEST_PROJECTS: List[subete.Project] = [
     subete.Project("reverse-string", {"words": ["reverse", "string"], "requires_parameters": True}),
 ]
 
+UNTESTABLE_PATH: str = "tests/mathematica"
+UNTESTABLE_LANG: str = "mathematica"
+UNTESTABLE_FILES: List[str] = ["reverse-string.nb", "untestable.yml"]
+
 
 def test_language_collection_str():
     test = subete.LanguageCollection(TEST_LANG, TEST_PATH, TEST_FILES, TEST_PROJECTS)
@@ -23,6 +27,11 @@ def test_language_collection_name():
 def test_language_collection_test_file():
     test = subete.LanguageCollection(TEST_LANG, TEST_PATH, TEST_FILES, TEST_PROJECTS)
     assert test.testinfo() is not None
+
+
+def test_language_collection_untestable_file():
+    test = subete.LanguageCollection(UNTESTABLE_LANG, UNTESTABLE_PATH, UNTESTABLE_FILES, TEST_PROJECTS)
+    assert test.untestable_info() is not None
 
 
 def test_language_collection_readme():

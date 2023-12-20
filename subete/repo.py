@@ -54,6 +54,7 @@ class Repo:
         self._languages: Dict[str, LanguageCollection] = self._collect_languages()
         self._total_snippets: int = sum(x.total_programs() for _, x in self._languages.items())
         self._total_tests: int = sum(1 for _, x in self._languages.items() if x.has_testinfo())
+        self._total_untestables: int = sum(1 for _, x in self._languages.items() if x.has_untestable_info())
 
         # Post generation updates
         self._load_git_data()
@@ -128,6 +129,20 @@ class Repo:
         :return: the total number of tested languages as an int
         """
         return self._total_tests
+
+    def total_untestables(self) -> int:
+        """
+        Retrieves the total number of untestable languages in the repo. This value
+        is based on the number of untestable info files in the repo.
+
+        Assuming you have a Repo object called repo, here's how you would use 
+        this method::
+
+            count: int = repo.total_untestables()
+
+        :return: the total number of tested languages as an int
+        """
+        return self._total_untestables
 
     def approved_projects(self) -> List[Project]:
         """
@@ -392,9 +407,11 @@ class LanguageCollection:
         self._first_letter: str = name[0]
         self._sample_programs: Dict[str, SampleProgram] = self._collect_sample_programs()
         self._test_file_path: Optional[str] = self._collect_test_file()
+        self._untestable_file_path: Optional[str] = self._collect_untestable_file()
         self._read_me_path: Optional[str] = self._collect_readme()
         self._lang_docs_url: str = f"https://sampleprograms.io/languages/{self._name}"
         self._testinfo_url: str = f"https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/{self._name[0]}/{self._name}/testinfo.yml"
+        self._untestable_info_url: str = f"https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/{self._name[0]}/{self._name}/untestable.yml"
         self._total_snippets: int = len(self._sample_programs)
         self._total_dir_size: int = sum(
             x.size() for _, x in self._sample_programs.items()
@@ -520,6 +537,40 @@ class LanguageCollection:
         logger.info(f"Retrieving testinfo state for {self}: {self._name}")
         return bool(self._test_file_path)
 
+    def untestable_info(self) -> Optional[dict]:
+        """
+        Retrieves the data from the untestable info file. The YAML data
+        is loaded into a Python dictionary.
+
+        Assuming you have a LanguageCollection object called language, 
+        here's how you would use this method::
+
+            data: dict = language.untestable_info()
+
+        :return: the untestable info data as a dictionary
+        """
+        logger.info(f"Retrieving untestable info for {self}: {self._name}")
+        untestable_data = None
+        if self._untestable_file_path:
+            with open(self._untestable_file_path) as untestable_file:
+                untestable_data = yaml.safe_load(untestable_file)
+        return untestable_data
+
+    def has_untestable_info(self) -> bool:
+        """
+        Retrieves the state of the untestable info file. Helpful when
+        trying to figure out if this language is untestable.
+
+        Assuming you have a LanguageCollection object called language, 
+        here's how you would use this method::
+
+            state: bool = language.has_untestable_info()
+
+        :return: True if a test info file exists; False otherwise
+        """
+        logger.info(f"Retrieving untestable info state for {self}: {self._name}")
+        return bool(self._untestable_file_path)
+
     def readme(self) -> Optional[str]:
         """
         Retrieves the README contents. README contents are in
@@ -642,6 +693,27 @@ class LanguageCollection:
         logger.info(f"Retrieving testinfo URL for {self}: {self._testinfo_url}")
         return self._testinfo_url
 
+    def untestable_info_url(self) -> str:
+        """
+        Retrieves the URL to the untestable file for this language on GitHub. 
+        The untestable URL is assumed to exist and therefore not validated. The 
+        untestable info URL is in the following form:
+
+        ``https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/{letter}/{lang}/untestable.yml``
+
+        For example, here is a link to the
+        `Mathematica untestable info file <https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/m/mathematica/untestable.yml>`_.
+
+        Assuming you have a LanguageCollection object called language, 
+        here's how you would use this method::
+
+            link: str = language.untestable_info_url()  
+
+        :return: the testinfo URL as a string
+        """
+        logger.info(f"Retrieving untestable info URL for {self}: {self._untestable_info_url}")
+        return self._untestable_info_url
+
     def missing_programs(self) -> List[Project]:
         """
         Retrieves the list of missing sample programs for this language.
@@ -705,6 +777,17 @@ class LanguageCollection:
         if "testinfo.yml" in self._file_list:
             logger.debug(f"New test file collected for {self}")
             return os.path.join(self._path, "testinfo.yml")
+
+    def _collect_untestable_file(self) -> Optional[str]:
+        """
+        Generates the path to a untestable file for this language collection
+        if it exists.
+
+        :return: the path to a untestable info file
+        """
+        if "untestable.yml" in self._file_list:
+            logger.debug(f"New untestable file collected for {self}")
+            return os.path.join(self._path, "untestable.yml")
 
     def _collect_readme(self) -> Optional[str]:
         """
