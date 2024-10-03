@@ -16,7 +16,7 @@ def test_bad_repo_languages(bad_test_repo):
 
 
 def test_bad_repo_total_programs(bad_test_repo):
-    assert bad_test_repo.total_programs() == 1
+    assert bad_test_repo.total_programs() == 0
 
 
 def test_bad_repo_total_tests(bad_test_repo):

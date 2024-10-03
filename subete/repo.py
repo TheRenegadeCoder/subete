@@ -761,7 +761,11 @@ class LanguageCollection:
             _, file_ext = os.path.splitext(file)
             file_ext = file_ext.lower()
             if file_ext not in (".md", "", ".yml"):
-                program = SampleProgram(self._path, file, self)
+                try:
+                    program = SampleProgram(self._path, file, self)
+                except KeyError:
+                    continue
+
                 sample_programs[program.project_name()] = program
                 logger.debug(f"New sample program collected: {program}")
         sample_programs = dict(sorted(sample_programs.items()))
@@ -860,7 +864,10 @@ class SampleProgram:
         self._path: str = path
         self._file_name: str = file_name
         self._language: LanguageCollection = language
-        self._project: Project = self._generate_project()
+        self._project: Optional[Project] = self._generate_project()
+        if not self._project:
+            raise KeyError(f"Project cannot be found for {file_name}")
+
         self._sample_program_doc_url: str = self._generate_doc_url()
         self._sample_program_issue_url: str = self._generate_issue_url()
         self._line_count: int = len(self.code().splitlines())

@@ -7,6 +7,9 @@ newest changes first.
 0.18.x
 ------
 
+* v0.18.1
+  * Do not index sample programs that do not correspond to a valid project.
+
 * v0.18.0
   * Add ability to get information about untestable languages.
   * Indicate support for python 3.11.
