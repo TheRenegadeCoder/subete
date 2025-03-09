@@ -74,6 +74,19 @@ def test_generate_project_hyphen_branch():
     assert test.project_pathlike_name() == "rot13"
 
 
+def test_generate_project_multiple_extensions():
+    test = subete.SampleProgram(
+        "tests/ti-basic",
+        "hello-world.8xp.txt",
+        LanguageCollection(
+            "ti-basic",
+            "tests/ti-basic",
+            ["hello-world.8xp.txt", "testinfo.yml", "README.md"],
+            TEST_PROJECTS
+        )
+    )
+    assert test.project_pathlike_name() == "hello-world"
+
 def test_sample_program_equality():
     test1 = subete.SampleProgram(TEST_PATH, TEST_FILES[0], TEST_LANG_COLLECTION)
     test2 = subete.SampleProgram(TEST_PATH, TEST_FILES[0], TEST_LANG_COLLECTION)
