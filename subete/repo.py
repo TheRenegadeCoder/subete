@@ -758,7 +758,9 @@ class LanguageCollection:
         """
         sample_programs = {}
         for file in self._file_list:
-            _, file_ext = os.path.splitext(file)
+            filename, file_ext = os.path.splitext(file)
+            if "." in filename:
+                file_ext = os.path.splitext(filename)[1] + file_ext
             file_ext = file_ext.lower()
             if file_ext not in (".md", "", ".yml"):
                 try:
@@ -1187,6 +1189,8 @@ class SampleProgram:
         """
         projects = self._language._projects
         stem = os.path.splitext(self._file_name)[0]
+        if "." in stem:
+            stem = os.path.splitext(stem)[0]
         if len(stem.split("-")) > 1:
             url = stem.lower()
         elif len(stem.split("_")) > 1:
