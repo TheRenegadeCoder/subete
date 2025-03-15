@@ -4,6 +4,13 @@ Changelog
 Below you'll find all the changes that have been made to the code with
 newest changes first.
 
+0.20.x
+------
+
+* v0.20.0
+    * Drop support for python 3.8
+    * Modifiy project to use poetry
+
 0.19.x
 ------
 
