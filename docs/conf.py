@@ -55,5 +55,5 @@ html_favicon = '_static/favicon.ico'
 issues_github_path = "TheRenegadeCoder/subete"
 
 html_theme_options = {
-    "display_version": True
+    "version_selector": True
 }

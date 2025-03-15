@@ -8,20 +8,20 @@ newest changes first.
 ------
 
 * v0.19.0
-  * Support extensions with mulitple dots (like TI-Basic which has an extension
-    of `.8xp.txt`)
-  * Drop support for python 3.7.
+    * Support extensions with mulitple dots (like TI-Basic which has an extension
+        of ``.8xp.txt``)
+    * Drop support for python 3.7.
 
 0.18.x
 ------
 
 * v0.18.1
-  * Do not index sample programs that do not correspond to a valid project.
+    * Do not index sample programs that do not correspond to a valid project.
 
 * v0.18.0
-  * Add ability to get information about untestable languages.
-  * Indicate support for python 3.11.
-  * Upgrade PyYAML dependency to 6.x.
+    * Add ability to get information about untestable languages.
+    * Indicate support for python 3.11.
+    * Upgrade PyYAML dependency to 6.x.
 
 0.17.x
 ------
