@@ -11,7 +11,7 @@ def main():
     project = config["project"]
     release = project["version"]
     version = ".".join(release.split(".")[:2])
-    destdir = "dochtml" if len(sys.argv) > 1 else sys.argv[1]
+    destdir = "dochtml" if len(sys.argv) < 2 else sys.argv[1]
     subprocess.run(
         [
             "sphinx-build",
