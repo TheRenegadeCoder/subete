@@ -114,6 +114,7 @@ dmypy.json
 .pyre/
 
 # Sphinx
+dirhtml/
 dochtml/
 doctrees/
 .vscode/
