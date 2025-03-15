@@ -9,9 +9,5 @@ build:
          - python -m pip install poetry
       post_install:
          - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH poetry install --with docs
-
-sphinx:
-   configuration: docs/conf.py
-   builder: dirhtml
-
-formats: all
+      build:
+         - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH poetry run scripts/build-docs.py $READTHEDOCS_OUTPUT/html

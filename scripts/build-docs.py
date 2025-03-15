@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from pathlib import Path
 import subprocess
+import sys
 
 import tomli
 
@@ -10,6 +11,7 @@ def main():
     project = config["project"]
     release = project["version"]
     version = ".".join(release.split(".")[:2])
+    destdir = "dochtml" if len(sys.argv) > 1 else sys.argv[1]
     subprocess.run(
         [
             "sphinx-build",
@@ -22,7 +24,7 @@ def main():
             "-A",
             f"version={version}",
             "docs",
-            "dochtml",
+            destdir,
         ],
         check=True,
     )
