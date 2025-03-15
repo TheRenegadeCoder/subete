@@ -1,4 +1,9 @@
-from .repo import *
+from .repo import (
+    Repo,
+    LanguageCollection,
+    SampleProgram,
+    Project,
+)
 
 
 def load(sample_programs_repo_dir: Optional[str] = None, sample_programs_website_repo_dir: Optional[str] = None) -> Repo:
