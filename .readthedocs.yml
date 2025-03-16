@@ -1,12 +1,13 @@
 version: 2
 
-sphinx:
-   configuration: docs/conf.py
-   builder: dirhtml
-
-formats: all
-
-python:
-   version: "3.8"
-   install:
-   - requirements: requirements.txt
+build:
+   os: ubuntu-latest
+   tools:
+      python: "3.12"
+   jobs:
+      post_create_environment:
+         - python -m pip install poetry
+      post_install:
+         - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH poetry install --with docs
+      build:
+         - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH poetry run scripts/build-docs.py $READTHEDOCS_OUTPUT/html

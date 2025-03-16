@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-import imghdr
 import logging
 import os
 import random
@@ -13,6 +12,8 @@ from contextlib import contextmanager
 
 import git
 import yaml
+
+from . import imghdr
 
 logger = logging.getLogger(__name__)
 
