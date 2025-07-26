@@ -4,6 +4,13 @@ Changelog
 Below you'll find all the changes that have been made to the code with
 newest changes first.
 
+0.21.x
+------
+
+* v0.21.0
+    * Add ability to get language percentage and color
+    * Add requests dependency
+
 0.20.x
 ------
 

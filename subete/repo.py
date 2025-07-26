@@ -7,7 +7,7 @@ import random
 import re
 import tempfile
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Set
+from typing import Dict, Generator, List, Optional, Tuple, Set
 from contextlib import contextmanager
 
 import git
@@ -1417,7 +1417,7 @@ class Project:
 
 
 @contextmanager
-def _maybe_create_delete_git_blame_ignore_revs(root_dir: str) -> None:
+def _maybe_create_delete_git_blame_ignore_revs(root_dir: str) -> Generator[None, None, None]:
     """
     Create `.git-blame-ignore-revs` if it does not exist and delete it
     it did not exist previously.

@@ -3,7 +3,7 @@ name = "subete"
 version = "0.20.0"
 description = "The Sample Programs API in Python"
 authors = [
-    {name = "TheRenegadeCoder",email = "ron.zuckerman@adtran.com"}
+    {name = "Jeremy Grifski", email = "jeremy.grifski@therenegadecoder.com"}
 ]
 readme = "README.md"
 requires-python = ">=3.9,<4.0"
@@ -11,6 +11,7 @@ license = {text = "LICENSE"}
 dependencies = [
     "pyyaml (>=6,<7)",
     "gitpython (>=3,<4)",
+    "requests (>=2.32.4,<3.0.0)",
 ]
 dynamic = [ "classifiers" ]
 
