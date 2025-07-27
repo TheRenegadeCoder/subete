@@ -7,13 +7,22 @@ import random
 import re
 import tempfile
 from pathlib import Path
-from typing import Dict, Generator, List, Optional, Tuple, Set
+from typing import Any, Dict, Generator, List, Optional, Tuple, Set
 from contextlib import contextmanager
 
 import git
+import requests
 import yaml
 
 from . import imghdr
+
+LINGUIST_LANGUAGES_URL = (
+    "https://raw.githubusercontent.com/github-linguist/linguist/"
+    "refs/heads/main/lib/linguist/languages.yml"
+)
+DEFAULT_LANGUAGE_COLOR: str = "#CCCCCC"
+OTHER_LANGUAGE_COLOR: str = "#EDEDED"
+
 
 logger = logging.getLogger(__name__)
 
@@ -53,13 +62,15 @@ class Repo:
         self._tested_projects: dict = self._collect_tested_projects()
         self._projects: List[Project] = self._collect_projects()
         self._languages: Dict[str, LanguageCollection] = self._collect_languages()
-        self._total_snippets: int = sum(x.total_programs() for _, x in self._languages.items())
-        self._total_tests: int = sum(1 for _, x in self._languages.items() if x.has_testinfo())
-        self._total_untestables: int = sum(1 for _, x in self._languages.items() if x.has_untestable_info())
+        self._total_snippets: int = sum(x.total_programs() for x in self._languages.values())
+        self._total_tests: int = sum(1 for x in self._languages.values() if x.has_testinfo())
+        self._total_untestables: int = sum(1 for x in self._languages.values() if x.has_untestable_info())
+        self._total_size: int = sum(x.total_size() for x in self._languages.values())
 
         # Post generation updates
         self._load_git_data()
         self._load_docs_data()
+        self._load_language_colors()
 
         # Closes repositories
         self._sample_programs_repo.close()
@@ -227,6 +238,30 @@ class Repo:
         unsorted_letters = os.listdir(self._archive_dir)
         return sorted(unsorted_letters, key=lambda s: s.casefold())
 
+    def language_percentage(self, language: str) -> float:
+        """
+        Calculates the percentage of a specified language.
+
+        Assuming you have a Repo object called repo, here's how you would use 
+        this method::
+
+            percentage: float = repo.get_language_percentage("Python")
+
+        :param str language: the name of the language to lookup
+        :return: the percentage of the language
+        """
+        return 100.0 * self._languages[language].total_size() / self._total_size
+
+    def set_additional_language_colors(self, colors_path: str):
+        """
+        Set additional language colors for a specified language.
+        """
+        colors = yaml.safe_load(Path(colors_path).read_text(encoding="utf-8"))
+        for key, color in colors.items():
+            language_name = key.replace("*", r"\*")
+            if language_name in self._languages:
+                self._languages[language_name]._color = color.upper()
+
     def _collect_languages(self) -> Dict[str, LanguageCollection]:
         """
         Builds a list of language collections.
@@ -380,6 +415,45 @@ class Repo:
                             f"{program._doc_authors}"
                         )
 
+    def _load_language_colors(self):
+        response = requests.get(LINGUIST_LANGUAGES_URL)
+        response.raise_for_status()
+        data = yaml.safe_load(response.text)
+        languages_config = {
+            language.replace("-", " ").lower(): values for language, values in data.items()
+        }
+        language: LanguageCollection
+        for language in self:
+            # Use color for this language (if any)
+            language_name = language.name().lower().replace("\\", "")
+            language_name_no_spaces = language_name.replace(" ", "")
+            color = _get_color_from_config(languages_config.get(language_name))
+
+            # If no color, use color for language without spaces (if any)
+            if not color:
+                for key, language_config in languages_config.items():
+                    if key.replace(" ", "") == language_name_no_spaces:
+                        color = _get_color_from_config(language_config)
+                        break
+
+            # If no color, use color for an alias (if any)
+            if not color:
+                for language_config in languages_config.values():
+                    for alias in language_config.get("aliases", []):
+                        if alias.lower() in [language_name, language_name_no_spaces]:
+                            color = _get_color_from_config(language_config)
+                            break
+
+            if color:
+                language._color = color.upper()
+
+
+def _get_color_from_config(language_config: Dict[str, Any] | None):
+    if not language_config:
+        return None
+
+    return language_config.get("color", DEFAULT_LANGUAGE_COLOR)
+
 
 class LanguageCollection:
     """
@@ -421,6 +495,7 @@ class LanguageCollection:
             x.line_count() for _, x in self._sample_programs.items()
         )
         self._missing_programs: List[Project] = self._collect_missing_programs()
+        self._color: str = OTHER_LANGUAGE_COLOR
 
     def __str__(self) -> str:
         """
@@ -740,6 +815,19 @@ class LanguageCollection:
         :return: the number of missing sample programs
         """
         return len(self._missing_programs)
+
+    def color(self) -> str:
+        """
+        Retrieves the color associated with the language.
+
+        Assuming you have a LanguageCollection object called language,
+        here's how you would use this method::
+
+            color: str = language.color()
+        
+        :return: the color associated with the language article
+        """
+        return self._color
 
     def _collect_missing_programs(self) -> List[Project]:
         """
