@@ -9,6 +9,7 @@ newest changes first.
 
 * v0.21.0
     * Add ability to get language percentage and color
+    * Add ability to get total size of languages in bytes
     * Add requests dependency
 
 0.20.x

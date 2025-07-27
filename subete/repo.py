@@ -71,6 +71,7 @@ class Repo:
         self._load_git_data()
         self._load_docs_data()
         self._load_language_colors()
+        self._set_language_percentages()
 
         # Closes repositories
         self._sample_programs_repo.close()
@@ -156,6 +157,19 @@ class Repo:
         """
         return self._total_untestables
 
+    def total_size(self) -> int:
+        """
+        Retrieves the total size of the languages in the repo in bytes.
+
+        Assuming you have a Repo object called repo, here's how you would use 
+        this method::
+
+            size: int = repo.total_size()
+
+        :return: the total size of the languages as an int
+        """
+        return self._total_size
+
     def approved_projects(self) -> List[Project]:
         """
         Retrieves the list of approved projects in the repo. Projects are
@@ -237,20 +251,6 @@ class Repo:
         """
         unsorted_letters = os.listdir(self._archive_dir)
         return sorted(unsorted_letters, key=lambda s: s.casefold())
-
-    def language_percentage(self, language: str) -> float:
-        """
-        Calculates the percentage of a specified language.
-
-        Assuming you have a Repo object called repo, here's how you would use 
-        this method::
-
-            percentage: float = repo.get_language_percentage("Python")
-
-        :param str language: the name of the language to lookup
-        :return: the percentage of the language
-        """
-        return 100.0 * self._languages[language].total_size() / self._total_size
 
     def set_additional_language_colors(self, colors_path: str):
         """
@@ -447,6 +447,14 @@ class Repo:
             if color:
                 language._color = color.upper()
 
+    def _set_language_percentages(self):
+        if not self._total_size:
+            return
+
+        language: LanguageCollection
+        for language in self:
+            language._percentage = 100.0 * language.total_size() / self._total_size
+
 
 class LanguageCollection:
     """
@@ -489,6 +497,7 @@ class LanguageCollection:
         )
         self._missing_programs: List[Project] = self._collect_missing_programs()
         self._color: str = OTHER_LANGUAGE_COLOR
+        self._percentage: float = 0.0
 
     def __str__(self) -> str:
         """
@@ -704,7 +713,20 @@ class LanguageCollection:
         logger.info(
             f"Retrieving total line count for {self}: {self._total_line_count}")
         return self._total_line_count
-    
+
+    def percentage(self) -> float:
+        """
+        Calculates the percentage of language collection.
+
+        Assuming you have a LanguageCollection object called language, 
+        here's how you would use this method::
+
+            percentage: int = language.percentage() 
+
+        :return: the percentage of the language collection as a float
+        """
+        return self._percentage
+
     def has_docs(self) -> bool:
         """
         Retrieves the documentation state of this language. Note that documentation
@@ -1515,7 +1537,7 @@ def _maybe_create_delete_git_blame_ignore_revs(root_dir: str) -> Generator[None,
         yield
     finally:
         # Delete .git-blame-ignore-revs if it did not exist before
-        if not blame_path_exists:
+        if not blame_path_exists:  # pragma: no cover
             blame_path.unlink()
 
 
@@ -1583,7 +1605,7 @@ def _get_doc_common_info(
             doc_authors |= doc_file_authors
             doc_times += doc_file_times
 
-    if doc_times:
+    if doc_times:  # pragma: no cover
         doc_created = min(doc_times)
         doc_modified = max(doc_times)
 

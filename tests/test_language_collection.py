@@ -24,12 +24,22 @@ def test_language_collection_name():
     assert test.name() == "Python"
 
 
-def test_language_collection_test_file():
+def test_language_collection_testinfo_file_for_testable_language():
     test = subete.LanguageCollection(TEST_LANG, TEST_PATH, TEST_FILES, TEST_PROJECTS)
     assert test.testinfo() is not None
 
 
-def test_language_collection_untestable_file():
+def test_language_collection_testinfo_file_for_untestable_language():
+    test = subete.LanguageCollection(UNTESTABLE_LANG, UNTESTABLE_PATH, UNTESTABLE_FILES, TEST_PROJECTS)
+    assert test.testinfo() is None
+
+
+def test_language_collection_untestable_file_for_testable_language():
+    test = subete.LanguageCollection(TEST_LANG, TEST_PATH, TEST_FILES, TEST_PROJECTS)
+    assert test.untestable_info() is None
+
+
+def test_language_collection_untestable_file_for_untestable_language():
     test = subete.LanguageCollection(UNTESTABLE_LANG, UNTESTABLE_PATH, UNTESTABLE_FILES, TEST_PROJECTS)
     assert test.untestable_info() is not None
 
@@ -37,6 +47,11 @@ def test_language_collection_untestable_file():
 def test_language_collection_readme():
     test = subete.LanguageCollection(TEST_LANG, TEST_PATH, TEST_FILES, TEST_PROJECTS)
     assert test.readme() is not None
+
+
+def test_language_collection_no_readme():
+    test = subete.LanguageCollection(UNTESTABLE_LANG, UNTESTABLE_PATH, UNTESTABLE_FILES, TEST_PROJECTS)
+    assert test.readme() is None
 
 
 def test_language_collection_sample_programs():

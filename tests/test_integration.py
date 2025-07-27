@@ -146,6 +146,10 @@ def test_repo_total_untestables(test_repo):
     assert test_repo.total_untestables() > 0
 
 
+def test_repo_total_size(test_repo):
+    assert test_repo.total_size() > 0
+
+
 def test_repo_languages_by_letter(test_repo):
     assert len(test_repo.languages_by_letter("p")) > 0
 
@@ -164,10 +168,6 @@ def test_total_approved_projects(test_repo):
 
 def test_sorted_language_letters(test_repo):
     assert "p" in test_repo.sorted_language_letters()
-
-
-def test_language_percentage(test_repo):
-    assert test_repo.language_percentage("Python") > 0.0
 
 
 def test_program_has_docs(test_repo):
@@ -219,6 +219,11 @@ def test_language_doc_modified(test_repo):
 def test_language_color(language, expected_color, test_repo):
     language: subete.LanguageCollection = test_repo[language]
     assert language.color() == expected_color
+
+
+def test_language_percentage(test_repo):
+    language: subete.LanguageCollection = test_repo["Python"]
+    assert 0.0 < language.percentage() < 100.0
 
 
 def test_project_doc_author(test_repo):
