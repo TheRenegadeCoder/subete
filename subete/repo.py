@@ -427,13 +427,13 @@ class Repo:
             # Use color for this language (if any)
             language_name = language.name().lower().replace("\\", "")
             language_name_no_spaces = language_name.replace(" ", "")
-            color = _get_color_from_config(languages_config.get(language_name))
+            color = _get_color_from_language_config(languages_config.get(language_name))
 
             # If no color, use color for language without spaces (if any)
             if not color:
                 for key, language_config in languages_config.items():
                     if key.replace(" ", "") == language_name_no_spaces:
-                        color = _get_color_from_config(language_config)
+                        color = _get_color_from_language_config(language_config)
                         break
 
             # If no color, use color for an alias (if any)
@@ -441,18 +441,11 @@ class Repo:
                 for language_config in languages_config.values():
                     for alias in language_config.get("aliases", []):
                         if alias.lower() in [language_name, language_name_no_spaces]:
-                            color = _get_color_from_config(language_config)
+                            color = _get_color_from_language_config(language_config)
                             break
 
             if color:
                 language._color = color.upper()
-
-
-def _get_color_from_config(language_config: Dict[str, Any] | None):
-    if not language_config:
-        return None
-
-    return language_config.get("color", DEFAULT_LANGUAGE_COLOR)
 
 
 class LanguageCollection:
@@ -1609,3 +1602,16 @@ def _datetime_to_str(value: Optional[datetime.datetime]) -> str:
         if isinstance(value, datetime.datetime)
         else str(value)
     )
+
+
+def _get_color_from_language_config(language_config: Optional[Dict[str, Any]]) -> Optional[str]:
+    """
+    Get color from language configuration.
+
+    :param Optional[Dict[str, Any]] language config: Language configuration
+    :return: None if not language configuration else color
+    """
+    if not language_config:
+        return None
+
+    return language_config.get("color", DEFAULT_LANGUAGE_COLOR)
