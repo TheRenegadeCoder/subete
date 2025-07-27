@@ -254,7 +254,15 @@ class Repo:
 
     def set_additional_language_colors(self, colors_path: str):
         """
-        Set additional language colors for a specified language.
+        Set additional language colors for a specified language. This is used for
+        languages that are not in GitHub Linguist. See this for details:
+        
+        https://github.com/github-linguist/linguist/blob/main/lib/linguist/languages.yml
+
+        Assuming you have a Repo object called repo, here's how you would use 
+        this method::
+
+            repo.set_additional_language_colors("additional-language-colors.yml")
 
         :param str colors_path: Path to additional colors YAML file. The format of this
             file a dictionary whose key is the language name, and whose value is the
