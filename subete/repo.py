@@ -255,6 +255,14 @@ class Repo:
     def set_additional_language_colors(self, colors_path: str):
         """
         Set additional language colors for a specified language.
+
+        :param str colors_path: Path to additional colors YAML file. The format of this
+            file a dictionary whose key is the language name (e.g., "Commodore Basic"),
+            and whose value is the RGB color code. For example:
+
+            C*: "#6725A3"
+            Commodore Basic: "#141AC9"
+            ...
         """
         colors = yaml.safe_load(Path(colors_path).read_text(encoding="utf-8"))
         for key, color in colors.items():
