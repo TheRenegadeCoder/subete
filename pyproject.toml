@@ -1,6 +1,6 @@
 [project]
 name = "subete"
-version = "0.20.0"
+version = "0.21.0"
 description = "The Sample Programs API in Python"
 authors = [
     {name = "Jeremy Grifski", email = "jeremy.grifski@therenegadecoder.com"}
