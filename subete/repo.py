@@ -256,7 +256,7 @@ class Repo:
         """
         Set additional language colors for a specified language. This is used for
         languages that are not in GitHub Linguist. See this for details:
-        
+
         https://github.com/github-linguist/linguist/blob/main/lib/linguist/languages.yml
 
         Assuming you have a Repo object called repo, here's how you would use 
@@ -458,7 +458,8 @@ class Repo:
             if not color:
                 for language_config in languages_config.values():
                     for alias in language_config.get("aliases", []):
-                        if alias.lower() in [language_name, language_name_no_spaces]:
+                        alias_no_spaces = alias.lower().replace("-", " ").replace(" ", "")
+                        if language_name_no_spaces == alias_no_spaces:
                             color = _get_color_from_language_config(language_config)
                             break
 
