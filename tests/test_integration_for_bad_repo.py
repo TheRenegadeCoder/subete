@@ -23,6 +23,14 @@ def test_bad_repo_total_tests(bad_test_repo):
     assert bad_test_repo.total_tests() == 0
 
 
+def test_bad_repo_total_untestables(bad_test_repo):
+    assert bad_test_repo.total_untestables() == 0
+
+
+def test_bad_repo_total_size(bad_test_repo):
+    assert bad_test_repo.total_size() == 0
+
+
 @pytest.fixture(scope="module")
 def bad_test_repo():
     with tempfile.TemporaryDirectory() as repo_dir, tempfile.TemporaryDirectory() as website_repo_dir:
