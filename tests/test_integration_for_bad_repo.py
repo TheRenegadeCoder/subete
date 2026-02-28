@@ -56,7 +56,8 @@ def bad_test_repo():
         website_repo.index.add([project_doc_file])
         website_repo.index.commit("Initial commit")
 
-        yield subete.load(repo_dir, website_repo_dir)
-
-        repo.close()
-        website_repo.close()
+        try:
+            yield subete.load(repo_dir, website_repo_dir)
+        finally:
+            repo.close()
+            website_repo.close()

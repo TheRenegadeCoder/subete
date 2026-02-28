@@ -243,11 +243,12 @@ def test_project_doc_modified(test_repo):
 
 @pytest.fixture(scope="module")
 def test_repo():
-    with patch("subete.repo.tempfile.TemporaryDirectory") as mock:
-        mock.side_effect = [SAMPLE_PROGRAMS_TEMP_DIR, SAMPLE_PROGRAMS_WEBSITE_TEMP_DIR]
-        repo = subete.load()
-        repo.set_additional_language_colors("tests/additional-language-colors.yml")
-        yield repo
-
-    SAMPLE_PROGRAMS_TEMP_DIR.cleanup()
-    SAMPLE_PROGRAMS_WEBSITE_TEMP_DIR.cleanup()
+    try:
+        with patch("subete.repo.tempfile.TemporaryDirectory") as mock:
+            mock.side_effect = [SAMPLE_PROGRAMS_TEMP_DIR, SAMPLE_PROGRAMS_WEBSITE_TEMP_DIR]
+            repo = subete.load()
+            repo.set_additional_language_colors("tests/additional-language-colors.yml")
+            yield repo
+    finally:
+        SAMPLE_PROGRAMS_TEMP_DIR.cleanup()
+        SAMPLE_PROGRAMS_WEBSITE_TEMP_DIR.cleanup()
