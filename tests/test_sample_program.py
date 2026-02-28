@@ -1,4 +1,7 @@
 from typing import List
+
+from glotter_core.project import CoreProject
+
 import subete
 from subete.repo import LanguageCollection
 
@@ -6,9 +9,18 @@ TEST_PATH: str = "tests/python/"
 TEST_LANG: str = "python"
 TEST_FILES: List[str] = ["hello_world.py", "testinfo.yml", "README.md"]
 TEST_PROJECTS: List[subete.Project] = [
-    subete.Project("hello-world", {"words": ["hello", "world"], "requires_parameters": False}), 
-    subete.Project("reverse-string", {"words": ["reverse", "string"], "requires_parameters": True}),
-    subete.Project("rot13", {"words": ["rot13"], "requires_parameters": False}),
+    subete.Project(
+        "hello-world",
+        CoreProject({"words": ["hello", "world"], "requires_parameters": False})
+    ),
+    subete.Project(
+        "reverse-string",
+        CoreProject({"words": ["reverse", "string"], "requires_parameters": True})
+    ),
+    subete.Project(
+        "rot13",
+        CoreProject({"words": ["rot13"], "requires_parameters": False})
+    ),
 ]
 TEST_LANG_COLLECTION: subete.LanguageCollection = subete.LanguageCollection(
     TEST_LANG, 

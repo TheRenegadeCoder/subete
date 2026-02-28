@@ -4,6 +4,12 @@ Changelog
 Below you'll find all the changes that have been made to the code with
 newest changes first.
 
+0.22.x
+------
+* v0.22.0
+    * Add glotter2-core dependency
+    * Modify `Project` class to use `CoreProject` from glotter2-core
+
 0.21.x
 ------
 

@@ -13,6 +13,8 @@ from contextlib import contextmanager
 import git
 import requests
 import yaml
+from glotter_core.project import CoreProject
+from glotter_core.settings import CoreSettings
 
 from . import imghdr
 
@@ -56,10 +58,11 @@ class Repo:
         
         # Sets up paths to relevant directories
         self._docs_source_dir: str = os.path.join(self._sample_programs_website_repo_dir, "sources")
-        self._archive_dir: str = os.path.join(self._sample_programs_repo_dir, "archive")
         
         # Performs data collection from the repos
-        self._tested_projects: dict = self._collect_tested_projects()
+        settings = self._get_settings()
+        self._archive_dir = settings.source_root
+        self._tested_projects: Dict[str, CoreProject] = settings.projects
         self._projects: List[Project] = self._collect_projects()
         self._languages: Dict[str, LanguageCollection] = self._collect_languages()
         self._total_snippets: int = sum(x.total_programs() for x in self._languages.values())
@@ -280,6 +283,20 @@ class Repo:
             if language_name in self._languages:
                 self._languages[language_name]._color = color.upper()
 
+    def _get_settings(self) -> CoreSettings:
+        """
+        Get project settings.
+
+        :return: Project setting
+        """
+
+        current_cwd = os.getcwd()
+        try:
+            os.chdir(self._sample_programs_repo_dir)
+            return CoreSettings()
+        finally:
+            os.chdir(current_cwd)
+
     def _collect_languages(self) -> Dict[str, LanguageCollection]:
         """
         Builds a list of language collections.
@@ -288,6 +305,9 @@ class Repo:
         """
         languages = {}
         for root, directories, files in os.walk(self._archive_dir):
+            if ".git" in Path(root).parts:
+                continue
+
             if not directories:
                 language = LanguageCollection(os.path.basename(root), root, files, self._projects)
                 languages[str(language)] = language
@@ -307,25 +327,9 @@ class Repo:
         for project_dir in Path(self._docs_source_dir, "projects").iterdir():
             if project_dir.is_dir():
                 project_test = self._tested_projects.get("".join(project_dir.name.split("-")))
-                logger.info(f"Generating project from: {project_dir.name}, {project_test}")
+                logger.info(f"Generating project from: {project_dir.name}")
                 projects.append(Project(project_dir.name, project_test))
         return projects
-
-    def _collect_tested_projects(self) -> dict:
-        """
-        Generates the dictionary of tested projects from the
-        Glotter YAML file. 
-
-        :return: contents of Glotter YAML file or empty dictionary
-        """
-        p = Path(self._sample_programs_repo_dir) / ".glotter.yml"
-        if p.exists():
-            with open(p, "r") as f:
-                data = yaml.safe_load(f)["projects"]
-            logger.info(f"Collected tested projects: {data}")
-            return data
-        else:
-            return {}
 
     def _load_git_data(self) -> None:
         """
@@ -1401,10 +1405,10 @@ class Project:
     An object representing a Project in the Sample Programs repo.
 
     :param str name: the name of the project in its pathlike form (e.g., hello-world) 
-    :param project_tests: a dictionary containing the test rules for the project
+    :param project_tests: a CoreProject object containing test rules for the project
     """
 
-    def __init__(self, name: str, project_tests: Optional[Dict]):
+    def __init__(self, name: str, project_tests: Optional[CoreProject]):
         self._project_tests = project_tests
         self._name: str = name
         self._requirements_url: str = self._generate_requirements_url()
@@ -1415,11 +1419,11 @@ class Project:
         self._doc_modified: Optional[datetime.datetime] = None
 
     def __str__(self) -> str:
-        logger.info(f"Generating name from {self._name}")
+        logger.debug(f"Generating name from {self._name}")
         return (
-            self._name.replace("-", " ").title() 
-            if len(self._name) > 3 
-            else self._name.upper()
+            self._project_tests.display_name
+            if self._project_tests
+            else self._name.replace("-", " ").title()
         )
 
     def __eq__(self, __o: object) -> bool:
@@ -1447,7 +1451,7 @@ class Project:
 
         :return: the name of the project as a string
         """
-        logger.info(f'Retrieving project name for {self}')
+        logger.debug(f'Retrieving project name for {self}')
         return str(self)
 
     def pathlike_name(self) -> str:
@@ -1482,7 +1486,7 @@ class Project:
 
         :return: the requirments URL as a string 
         """
-        logger.info(f'Retrieving requirements URL for {self}: {self._requirements_url}')
+        logger.debug(f'Retrieving requirements URL for {self}: {self._requirements_url}')
         return self._requirements_url
 
     def _generate_requirements_url(self) -> str:

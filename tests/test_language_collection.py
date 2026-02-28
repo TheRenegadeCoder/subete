@@ -1,12 +1,21 @@
 from typing import List
+
+from glotter_core.project import CoreProject
+
 import subete
 
 TEST_PATH: str = "tests/python/"
 TEST_LANG: str = "python"
 TEST_FILES: List[str] = ["hello_world.py", "testinfo.yml", "README.md"]
 TEST_PROJECTS: List[subete.Project] = [
-    subete.Project("hello-world", {"words": ["hello", "world"], "requires_parameters": False}), 
-    subete.Project("reverse-string", {"words": ["reverse", "string"], "requires_parameters": True}),
+    subete.Project(
+        "hello-world",
+        CoreProject({"words": ["hello", "world"], "requires_parameters": False})
+    ),
+    subete.Project(
+        "reverse-string",
+        CoreProject({"words": ["reverse", "string"], "requires_parameters": True})
+    ),
 ]
 
 UNTESTABLE_PATH: str = "tests/mathematica"

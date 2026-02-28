@@ -1,6 +1,6 @@
 [project]
 name = "subete"
-version = "0.21.0"
+version = "0.21.1"
 description = "The Sample Programs API in Python"
 authors = [
     {name = "Jeremy Grifski", email = "jeremy.grifski@therenegadecoder.com"}
@@ -12,6 +12,7 @@ dependencies = [
     "pyyaml (>=6,<7)",
     "gitpython (>=3,<4)",
     "requests (>=2.32.4,<3.0.0)",
+    "glotter2-core @ file:///home/rzuckerm/git/rzuckerm/glotter2-core",
 ]
 dynamic = [ "classifiers" ]
 
@@ -39,6 +40,9 @@ sphinx = "^7.4.7"
 sphinx-rtd-theme = "^3.0.2"
 tomli = "^2.2.1"
 
+
+[tool.poetry.dependencies]
+glotter2-core = {develop = true}
 [tool.pytest.ini_options]
 log_cli = true
 log_cli_level = "WARNING"
