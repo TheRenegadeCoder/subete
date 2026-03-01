@@ -15,6 +15,8 @@ import requests
 import yaml
 from glotter_core.project import CoreProject
 from glotter_core.settings import CoreSettings
+from glotter_core.source import CoreLanguage, CoreSource, CoreSourceCategories, categorize_sources
+from glotter_core.testinfo import TestInfo
 
 from . import imghdr
 
@@ -33,7 +35,8 @@ class Repo:
     """
     An object representing the Sample Programs repository.
 
-    :param str source_dir: the location of the repo archive (e.g., C://.../sample-programs/archive)
+    :param str | None sample_programs_repo_dir: optional location of the sample programs repo directory
+    :param str | None sample_programs_website_repo_dir: optional location of the sample programs website repo directory
     """
 
     def __init__(self, sample_programs_repo_dir: Optional[str] = None, sample_programs_website_repo_dir: Optional[str] = None) -> None:
@@ -60,7 +63,7 @@ class Repo:
         self._docs_source_dir: str = os.path.join(self._sample_programs_website_repo_dir, "sources")
         
         # Performs data collection from the repos
-        settings = self._get_settings()
+        settings: CoreSettings = self._get_settings()
         self._archive_dir = settings.source_root
         self._tested_projects: Dict[str, CoreProject] = settings.projects
         self._projects: List[Project] = self._collect_projects()
@@ -278,8 +281,7 @@ class Repo:
                 ...
         """
         colors = yaml.safe_load(Path(colors_path).read_text(encoding="utf-8"))
-        for key, color in colors.items():
-            language_name = key.replace("*", r"\*")
+        for language_name, color in colors.items():
             if language_name in self._languages:
                 self._languages[language_name]._color = color.upper()
 
@@ -303,15 +305,19 @@ class Repo:
 
         :return: the list of language collections
         """
+        logger.info("Collecting languages")
+        categories: CoreSourceCategories = categorize_sources(
+            self._archive_dir,
+            self._tested_projects,
+            CoreSource
+        )
         languages = {}
-        for root, directories, files in os.walk(self._archive_dir):
-            if ".git" in Path(root).parts:
-                continue
+        language_info: CoreLanguage
+        for language, language_info in categories.by_language.items():
+            language = LanguageCollection(language, language_info, self._projects)
+            languages[str(language)] = language
+            logger.info(f"New language collected: {language}")
 
-            if not directories:
-                language = LanguageCollection(os.path.basename(root), root, files, self._projects)
-                languages[str(language)] = language
-                logger.debug(f"New language collected: {language}")
         languages = dict(sorted(languages.items()))
         return languages
 
@@ -484,19 +490,23 @@ class LanguageCollection:
     An object representing a collection of sample programs files for a particular programming language.
 
     :param str name: the name of the language (e.g., python)
-    :param str path: the path of the language (e.g., .../archive/p/python/)
-    :param list[str] file_list: the list of files in language collection
+    :param CoreLanguage language_info: infomation about language
     :param list[Project] projects: the list of approved projects according to the Sample Programs docs
     """
 
-    def __init__(self, name: str, path: str, file_list: List[str], projects: List[Project]) -> None:
+    def __init__(self, name: str, language_info: CoreLanguage, projects: List[Project]) -> None:
         assert isinstance(name, str), "name must be a string"
-        assert isinstance(path, str), "path must be a string"
-        assert isinstance(file_list, list), "file_list must be a list"
         assert isinstance(projects, list), "projects must be a list"
         self._name: str = name
-        self._path: str = path
-        self._file_list: List[str] = file_list
+        self._path: str = str(language_info.test_info_path.parent)
+        self._file_list: List[str] = [
+            path.name
+            for path in Path(self._path).iterdir()
+            if path.is_file()
+        ]
+        self._sources: List[CoreSource] = language_info.sources
+        self._test_info: TestInfo = language_info.test_info
+        self._test_info_path = str(language_info.test_info_path)
         self._projects: List[Project] = projects
         self._docs_path: Optional[str] = None
         self._docs_files: Optional[List[str]] = None
@@ -537,17 +547,7 @@ class LanguageCollection:
 
         :return: a readable representation of the language name
         """
-        text_to_symbol = {
-            "plus": "+",
-            "sharp": "#",
-            "star": r"\*"
-        }
-        tokens = [text_to_symbol.get(token, token)
-                  for token in self._name.split("-")]
-        if any(token in text_to_symbol.values() for token in tokens):
-            return "".join(tokens).title()
-        else:
-            return " ".join(tokens).title()
+        return self._test_info.language_display_name
 
     def __getitem__(self, program: str) -> str:
         """
@@ -601,27 +601,23 @@ class LanguageCollection:
 
         :return: the pathlike name of this programming language (e.g., c-plus-plus)
         """
-        logger.info(f"Retrieving pathlike name for {self}: {self._name}")
+        logger.debug(f"Retrieving pathlike name for {self}: {self._name}")
         return self._name
 
-    def testinfo(self) -> Optional[dict]:
+    def testinfo(self) -> Optional[TestInfo]:
         """
-        Retrieves the test data from the testinfo file. The YAML data
-        is loaded into a Python dictionary.
+        Retrieves test info.
 
         Assuming you have a LanguageCollection object called language, 
         here's how you would use this method::
 
-            data: dict = language.testinfo()
+            data: Optional[TestInfo] = language.testinfo()
 
-        :return: the test info data as a dictionary
+        :return: the test info data as a TestInfo object if the language is
+            testable, None otherwise
         """
-        logger.info(f"Retrieving testinfo for {self}: {self._name}")
-        test_data = None
-        if self._test_file_path:
-            with open(self._test_file_path) as test_file:
-                test_data = yaml.safe_load(test_file)
-        return test_data
+        logger.debug(f"Retrieving testinfo for {self}: {self._name}")
+        return self._test_info if self._test_info.is_testable else None
 
     def has_testinfo(self) -> bool:
         """
@@ -635,27 +631,23 @@ class LanguageCollection:
 
         :return: True if a test info file exists; False otherwise
         """
-        logger.info(f"Retrieving testinfo state for {self}: {self._name}")
-        return bool(self._test_file_path)
+        logger.debug(f"Retrieving testinfo state for {self}: {self._name}")
+        return self._test_info.is_testable
 
-    def untestable_info(self) -> Optional[dict]:
+    def untestable_info(self) -> Optional[TestInfo]:
         """
-        Retrieves the data from the untestable info file. The YAML data
-        is loaded into a Python dictionary.
+        Retrieves the untestable info.
 
         Assuming you have a LanguageCollection object called language, 
         here's how you would use this method::
 
-            data: dict = language.untestable_info()
+            data: Optional[TestInfo] = language.untestable_info()
 
-        :return: the untestable info data as a dictionary
+        :return: the untestable info data as a TestInfo object if the
+            language is untestable, None otherwise
         """
-        logger.info(f"Retrieving untestable info for {self}: {self._name}")
-        untestable_data = None
-        if self._untestable_file_path:
-            with open(self._untestable_file_path) as untestable_file:
-                untestable_data = yaml.safe_load(untestable_file)
-        return untestable_data
+        logger.debug(f"Retrieving untestable info for {self}: {self._name}")
+        return self._test_info if not self._test_info.is_testable else None
 
     def has_untestable_info(self) -> bool:
         """
@@ -669,8 +661,8 @@ class LanguageCollection:
 
         :return: True if a test info file exists; False otherwise
         """
-        logger.info(f"Retrieving untestable info state for {self}: {self._name}")
-        return bool(self._untestable_file_path)
+        logger.debug(f"Retrieving untestable info state for {self}: {self._name}")
+        return not self._test_info.is_testable
 
     def readme(self) -> Optional[str]:
         """
@@ -684,7 +676,7 @@ class LanguageCollection:
 
         :return: the README contents as a string
         """
-        logger.info(f"Retrieving README for {self}: {self._read_me_path}")
+        logger.debug(f"Retrieving README for {self}: {self._read_me_path}")
         if self._read_me_path:
             return Path(self._read_me_path).read_text()
 
@@ -699,8 +691,7 @@ class LanguageCollection:
 
         :return: the number of sample programs as an int
         """
-        logger.info(
-            f"Retrieving total programs for {self}: {self._total_snippets}")
+        logger.debug(f"Retrieving total programs for {self}: {self._total_snippets}")
         return self._total_snippets
 
     def total_size(self) -> int:
@@ -716,8 +707,7 @@ class LanguageCollection:
 
         :return: the total byte size of the language collection as an int
         """
-        logger.info(
-            f"Retrieving total size for {self}: {self._total_dir_size}")
+        logger.debug(f"Retrieving total size for {self}: {self._total_dir_size}")
         return self._total_dir_size
 
     def total_line_count(self) -> int:
@@ -733,8 +723,7 @@ class LanguageCollection:
 
         :return: the total line count of the language collection as an int
         """
-        logger.info(
-            f"Retrieving total line count for {self}: {self._total_line_count}")
+        logger.debug(f"Retrieving total line count for {self}: {self._total_line_count}")
         return self._total_line_count
 
     def percentage(self) -> float:
@@ -782,8 +771,7 @@ class LanguageCollection:
 
         :return: the language documentation URL as a string
         """
-        logger.info(
-            f"Retrieving language documentation URL for {self}: {self._lang_docs_url}")
+        logger.debug(f"Retrieving language documentation URL for {self}: {self._lang_docs_url}")
         return self._lang_docs_url
 
     def testinfo_url(self) -> str:
@@ -804,7 +792,7 @@ class LanguageCollection:
 
         :return: the testinfo URL as a string
         """
-        logger.info(f"Retrieving testinfo URL for {self}: {self._testinfo_url}")
+        logger.debug(f"Retrieving testinfo URL for {self}: {self._testinfo_url}")
         return self._testinfo_url
 
     def untestable_info_url(self) -> str:
@@ -825,7 +813,7 @@ class LanguageCollection:
 
         :return: the testinfo URL as a string
         """
-        logger.info(f"Retrieving untestable info URL for {self}: {self._untestable_info_url}")
+        logger.debug(f"Retrieving untestable info URL for {self}: {self._untestable_info_url}")
         return self._untestable_info_url
 
     def missing_programs(self) -> List[Project]:
@@ -884,19 +872,16 @@ class LanguageCollection:
         :return: a collection of sample programs
         """
         sample_programs = {}
-        for file in self._file_list:
-            filename, file_ext = os.path.splitext(file)
-            if "." in filename:
-                file_ext = os.path.splitext(filename)[1] + file_ext
-            file_ext = file_ext.lower()
-            if file_ext not in (".md", "", ".yml"):
-                try:
-                    program = SampleProgram(self._path, file, self)
-                except KeyError:
-                    continue
+        source: CoreSource
+        for source in self._sources:
+            try:
+                program = SampleProgram(source, self)
+            except KeyError:
+                continue
 
-                sample_programs[program.project_name()] = program
-                logger.debug(f"New sample program collected: {program}")
+            sample_programs[program.project_name()] = program
+            logger.info(f"New sample program collected: {program}")
+
         sample_programs = dict(sorted(sample_programs.items()))
         return sample_programs
 
@@ -907,9 +892,9 @@ class LanguageCollection:
 
         :return: the path to a test info file
         """
-        if "testinfo.yml" in self._file_list:
+        if self._test_info.is_testable:
             logger.debug(f"New test file collected for {self}")
-            return os.path.join(self._path, "testinfo.yml")
+            return self._test_info_path
 
     def _collect_untestable_file(self) -> Optional[str]:
         """
@@ -918,9 +903,9 @@ class LanguageCollection:
 
         :return: the path to a untestable info file
         """
-        if "untestable.yml" in self._file_list:
+        if not self._test_info.is_testable:
             logger.debug(f"New untestable file collected for {self}")
-            return os.path.join(self._path, "untestable.yml")
+            return self._test_info_path
 
     def _collect_readme(self) -> Optional[str]:
         """
@@ -980,22 +965,21 @@ class SampleProgram:
     """
     An object representing a sample program in the repo.
 
-    :param str path: the path to the sample program without the file name
-    :param str file_name: the name of the file including the extension
+    :param CoreSource source: source information
     :param LanguageCollection language: a reference to the programming language 
         collection of this sample program
     """
 
-    def __init__(self, path: str, file_name: str, language: LanguageCollection) -> None:
-        assert isinstance(path, str), "path must be a string"
-        assert isinstance(file_name, str), "file_name must be a string"
+    def __init__(self, source: CoreSource, language: LanguageCollection) -> None:
+        assert isinstance(source, CoreSource), "source must be a CoreSource"
         assert isinstance(language, LanguageCollection), "language must be a LanguageCollection"
-        self._path: str = path
-        self._file_name: str = file_name
+        self._source = source
+        self._file_name = source.filename
+        self._path = source.path
         self._language: LanguageCollection = language
         self._project: Optional[Project] = self._generate_project()
         if not self._project:
-            raise KeyError(f"Project cannot be found for {file_name}")
+            raise KeyError(f"Project cannot be found for {self._file_name}")
 
         self._sample_program_doc_url: str = self._generate_doc_url()
         self._sample_program_issue_url: str = self._generate_issue_url()
@@ -1110,7 +1094,7 @@ class SampleProgram:
 
         :return: the language collection that this program belongs to.
         """
-        logger.info(f'Retrieving language collection for {self}: {self._language}')
+        logger.debug(f'Retrieving language collection for {self}: {self._language}')
         return self._language
 
     def language_name(self) -> str:
@@ -1141,7 +1125,7 @@ class SampleProgram:
 
         :return: the language name as a path name (e.g., google-apps-script, python)
         """
-        logger.info(f'Retrieving language pathlike name for {self}: {self._language.pathlike_name()}')
+        logger.debug(f'Retrieving language pathlike name for {self}: {self._language.pathlike_name()}')
         return self._language.pathlike_name()
 
     def project(self) -> Project:
@@ -1155,7 +1139,7 @@ class SampleProgram:
 
         :return: the project object for this sample program
         """
-        logger.info(f'Retrieving project for {self}: {self._project}')
+        logger.debug(f'Retrieving project for {self}: {self._project}')
         return self._project
     
     def project_name(self) -> str:
@@ -1187,7 +1171,7 @@ class SampleProgram:
 
         :return: the project name as a path name (e.g., hello-world, convex-hull)
         """
-        logger.info(f'Retrieving project pathlike name for {self}: {self._project}')
+        logger.debug(f"Retrieving project pathlike name for {self}: {self._project}")
         return self._project.pathlike_name() if self._project else ""
 
     def project_path(self) -> str:
@@ -1218,7 +1202,7 @@ class SampleProgram:
 
         :return: the code for the sample program as a string
         """
-        logger.info(f"Retrieving code from {self._path}/{self._file_name}")
+        logger.debug(f"Retrieving code from {self._path}/{self._file_name}")
         return Path(self._path, self._file_name).read_text(errors="replace")
 
     def image_type(self) -> str:
@@ -1246,7 +1230,7 @@ class SampleProgram:
 
         :return: the number of lines for the sample program as an integer
         """
-        logger.info(f'Retrieving line count for {self}: {self._line_count}')
+        logger.debug(f"Retrieving line count for {self}: {self._line_count}")
         return self._line_count
     
     def has_docs(self) -> bool:
@@ -1282,7 +1266,7 @@ class SampleProgram:
 
         :return: the documentation URL as a string
         """
-        logger.info(f'Retrieving documentation URL for {self}: {self._sample_program_doc_url}')
+        logger.debug(f"Retrieving documentation URL for {self}: {self._sample_program_doc_url}")
         return self._sample_program_doc_url
 
     def article_issue_query_url(self) -> str:
@@ -1304,7 +1288,7 @@ class SampleProgram:
 
         :return: the issue query URL as a string
         """
-        logger.info(f'Retrieving article issue query URL for {self}: {self._sample_program_issue_url}')
+        logger.debug(f"Retrieving article issue query URL for {self}: {self._sample_program_issue_url}")
         return self._sample_program_issue_url
 
     def _generate_project(self) -> Optional[Project]:
@@ -1314,23 +1298,14 @@ class SampleProgram:
 
         :return: the sample program as a Project object or None if the project is not approved
         """
-        projects = self._language._projects
-        stem = os.path.splitext(self._file_name)[0]
-        if "." in stem:
-            stem = os.path.splitext(stem)[0]
-        if len(stem.split("-")) > 1:
-            url = stem.lower()
-        elif len(stem.split("_")) > 1:
-            url = stem.replace("_", "-").lower()
-        else:
-            # TODO: this is brutal. At some point, we should loop in the glotter test file.
-            url = "-".join(re.sub('([A-Z][a-z]+)', r' \1', re.sub('([A-Z]+)', r' \1', stem)).split()).lower()
-        logger.info(f"Constructed a normalized form of the program {url}")
-        for project in projects:
-            if url in project.pathlike_name():
+        logging.info(f"Finding project for {self._path}/{self._file_name}")
+        project = None
+        for project in self._language._projects:
+            key = project.pathlike_name().replace("-", "")
+            if key == self._source.project_type:
+                logger.info(f"Project for {self._path}/{self._file_name} is {project}")
                 return project
-        project_names = [project.pathlike_name() for project in projects]
-        logger.error(f"Could not find a project for {self._file_name} with name {url} in {project_names}.")
+
         return None
 
     def _generate_doc_url(self) -> str:
@@ -1405,7 +1380,8 @@ class Project:
     An object representing a Project in the Sample Programs repo.
 
     :param str name: the name of the project in its pathlike form (e.g., hello-world) 
-    :param project_tests: a CoreProject object containing test rules for the project
+    :param CoreProject | None project_tests: optional CoreProject object containing test
+        rules for the project
     """
 
     def __init__(self, name: str, project_tests: Optional[CoreProject]):
@@ -1451,7 +1427,7 @@ class Project:
 
         :return: the name of the project as a string
         """
-        logger.debug(f'Retrieving project name for {self}')
+        logger.debug(f"Retrieving project name for {self}")
         return str(self)
 
     def pathlike_name(self) -> str:

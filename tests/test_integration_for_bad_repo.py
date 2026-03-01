@@ -20,7 +20,7 @@ def test_bad_repo_total_programs(bad_test_repo):
 
 
 def test_bad_repo_total_tests(bad_test_repo):
-    assert bad_test_repo.total_tests() == 0
+    assert bad_test_repo.total_tests() == 1
 
 
 def test_bad_repo_total_untestables(bad_test_repo):
@@ -41,6 +41,18 @@ def bad_test_repo():
         sample_program_file = f"{archive_dir}/whatever.foo"
         Path(archive_dir).mkdir(parents=True)
         Path(sample_program_file).write_text("hello\n")
+        Path(archive_dir, "testinfo.yml").write_text(
+            """\
+folder:
+    extension: ".foo"
+    naming: "hyphen"
+
+container:
+    image: "foolang"
+    tag: "1"
+    cmd: "foolang {{ source.name }}{{ source.extension }}"
+"""
+        )
 
         repo.index.add([sample_program_file])
         repo.index.commit("Initial commit")

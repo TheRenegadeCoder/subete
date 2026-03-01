@@ -10,7 +10,7 @@ SAMPLE_PROGRAMS_WEBSITE_TEMP_DIR = tempfile.TemporaryDirectory()
 
 
 def test_doc_url_multiword_lang(test_repo):
-    language: subete.LanguageCollection = test_repo["Commodore Basic"]
+    language: subete.LanguageCollection = test_repo["Commodore BASIC"]
     assert language.lang_docs_url() == "https://sampleprograms.io/languages/commodore-basic"
 
 
@@ -20,7 +20,7 @@ def test_doc_url_symbol_lang(test_repo):
 
 
 def test_testinfo_url_multiword_lang(test_repo):
-    language: subete.LanguageCollection = test_repo["Commodore Basic"]
+    language: subete.LanguageCollection = test_repo["Commodore BASIC"]
     assert language.testinfo_url(
     ) == "https://github.com/TheRenegadeCoder/sample-programs/blob/main/archive/c/commodore-basic/testinfo.yml"
 
@@ -38,7 +38,7 @@ def test_untesting_info_url(test_repo):
 
 
 def test_requirements_url_multiword_lang(test_repo):
-    program: subete.SampleProgram = test_repo["Commodore Basic"]["Hello World"]
+    program: subete.SampleProgram = test_repo["Commodore BASIC"]["Hello World"]
     assert program.project().requirements_url(
     ) == "https://sampleprograms.io/projects/hello-world"
 
@@ -50,7 +50,7 @@ def test_requirements_url_symbol_lang(test_repo):
 
 
 def test_documentation_url_multiword_lang(test_repo):
-    program: subete.SampleProgram = test_repo["Commodore Basic"]["Hello World"]
+    program: subete.SampleProgram = test_repo["Commodore BASIC"]["Hello World"]
     assert program.documentation_url(
     ) == "https://sampleprograms.io/projects/hello-world/commodore-basic"
 
@@ -62,7 +62,7 @@ def test_documentation_url_symbol_lang(test_repo):
 
 
 def test_article_issue_url_multiword_lang(test_repo):
-    program: subete.SampleProgram = test_repo["Commodore Basic"]["Hello World"]
+    program: subete.SampleProgram = test_repo["Commodore BASIC"]["Hello World"]
     assert program.article_issue_query_url(
     ) == "https://github.com//TheRenegadeCoder/sample-programs-website/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+hello+world+commodore+basic"
 
@@ -126,7 +126,7 @@ def test_project_path(test_repo):
 
 
 def test_project_has_test(test_repo):
-    program: subete.SampleProgram = test_repo["Commodore Basic"]["Hello World"]
+    program: subete.SampleProgram = test_repo["Commodore BASIC"]["Hello World"]
     assert program.project().has_testing()
 
 
@@ -203,16 +203,16 @@ def test_language_doc_modified(test_repo):
     "language,expected_color",
     [
         # Not in Linguist
-        ("Algol68", subete.repo.OTHER_LANGUAGE_COLOR),
+        ("ALGOL 68", subete.repo.OTHER_LANGUAGE_COLOR),
         # In Linguist
         ("C", "#555555"),
         ("C++", "#F34B7D"),
         ("C#", "#178600"),
-        (r"F\*", "#572E30"),
+        ("F*", "#572E30"),
         ("Python", "#3572A5"),
         # Additional colors
-        (r"C\*", "#6725A3"),
-        ("Commodore Basic", "#141AC9"),
+        ("C*", "#6725A3"),
+        ("Commodore BASIC", "#141AC9"),
         ("Dale", "#8A9A5B"),
     ]
 )
