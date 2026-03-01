@@ -9,19 +9,18 @@ newest changes first.
 * v0.22.0
     * Add `glotter2-core <https://github.com/rzuckerm/glotter2-core>`_
       dependency
-    * Modify `Project` class constructor to use `CoreProject` class from
+    * Modify ``Project`` class constructor to use ``CoreProject`` class from
       glotter2-core
-    * Modify `LanguageCollection` class constructor to use `CoreLanguage`
+    * Modify ``LanguageCollection`` class constructor to use ``CoreLanguage``
       class from glotter2-core
-    * Modify `LanguageCollection.testinfo` and
-      `LanguageCollection.untestable_info` now returns `TestInfo` class
-      object from glotter2-core
-    * Modify `SampleProgram` class constructor to use `CoreSource` class
+    * ``LanguageCollection.testinfo`` and ``LanguageCollection.untestable_info``
+      methods now return ``TestInfo`` class object from glotter2-core
+    * Modify ``SampleProgram`` class constructor to use ``CoreSource`` class
       from glotter2-core
-    * Languages with `*` in the language name are no longer escaped with
-      `\\`
-    * Reduced the amount of logging noise by using `logging.debug` instead
-      of `logging.info`
+    * Languages with ``*`` in the language name are no longer escaped with
+      backslash
+    * Reduced the amount of logging noise by using ``logging.debug`` instead
+      of ``logging.info``
 
 0.21.x
 ------
