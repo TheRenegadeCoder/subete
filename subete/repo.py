@@ -1298,7 +1298,7 @@ class SampleProgram:
 
         :return: the sample program as a Project object or None if the project is not approved
         """
-        logging.info(f"Finding project for {self._path}/{self._file_name}")
+        logger.info(f"Finding project for {self._path}/{self._file_name}")
         project = None
         for project in self._language._projects:
             key = project.pathlike_name().replace("-", "")
