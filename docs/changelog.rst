@@ -6,6 +6,8 @@ newest changes first.
 
 0.22.x
 ------
+* v0.22.1
+  * Fix logging in `SampleProgram` class
 * v0.22.0
     * Add `glotter2-core <https://github.com/rzuckerm/glotter2-core>`_
       dependency
