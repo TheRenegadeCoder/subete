@@ -6,6 +6,8 @@ newest changes first.
 
 0.22.x
 ------
+* v0.22.2
+  * Fix language color for languages with dashes in the name
 * v0.22.1
   * Fix logging in `SampleProgram` class
 * v0.22.0
