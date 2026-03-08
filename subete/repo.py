@@ -453,7 +453,7 @@ class Repo:
         language: LanguageCollection
         for language in self:
             # Use color for this language (if any)
-            language_name = language.name().lower().replace("\\", "")
+            language_name = language.name().lower().replace("-", " ")
             language_name_no_spaces = language_name.replace(" ", "")
             color = _get_color_from_language_config(languages_config.get(language_name))
 

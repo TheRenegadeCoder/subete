@@ -209,6 +209,9 @@ def test_language_doc_modified(test_repo):
         ("C++", "#F34B7D"),
         ("C#", "#178600"),
         ("F*", "#572E30"),
+        ("m4", subete.repo.DEFAULT_LANGUAGE_COLOR),
+        ("Objective-C", "#438EFF"),
+        ("PHP", "#4F5D95"),
         ("Python", "#3572A5"),
         # Additional colors
         ("C*", "#6725A3"),
