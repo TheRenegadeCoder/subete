@@ -6,7 +6,7 @@ newest changes first.
 
 0.23.x
 ------
-* v0.23.1
+* v0.23.0
   * Add `sample_programs_repo_commit_hash` and
    `sample_programs_website_repo_commit_hash` methods to `Repo` class
 
