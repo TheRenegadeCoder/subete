@@ -120,6 +120,35 @@ class Repo:
         """
         return self._sample_programs_repo_dir
 
+    def sample_programs_repo_commit_hash(self) -> str:
+        """
+        Retreives the hash of the HEAD commit hash for the sample programs repository
+
+        Assuming you have a Repo object called repo, here's how you would use 
+        this method::
+
+            commit_hash: int = repo.sample_programs_repo_commit_hash()
+
+        :return: the HEAD commit hash for the sample programs repository 
+        """
+
+        return self._sample_programs_repo.head.commit.hexsha
+
+    def sample_programs_website_repo_commit_hash(self) -> str:
+        """
+        Retreives the hash of the HEAD commit hash for the sample programs website
+        repository
+
+        Assuming you have a Repo object called repo, here's how you would use 
+        this method::
+
+            commit_hash: int = repo.sample_programs_website_repo_commit_hash()
+
+        :return: the HEAD commit hash for the sample programs website repository 
+        """
+
+        return self._sample_programs_website_repo.head.commit.hexsha
+
     def total_programs(self) -> int:
         """
         Retrieves the total number of programs in the sample programs repo.
