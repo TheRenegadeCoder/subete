@@ -1,5 +1,6 @@
 from unittest.mock import patch
 import tempfile
+import re
 
 import pytest
 
@@ -7,6 +8,8 @@ import subete
 
 SAMPLE_PROGRAMS_TEMP_DIR = tempfile.TemporaryDirectory()
 SAMPLE_PROGRAMS_WEBSITE_TEMP_DIR = tempfile.TemporaryDirectory()
+
+EXPECTED_COMMIT_HASH_PATTERN = re.compile("[0-9a-f]{40,}", re.I);
 
 
 def test_doc_url_multiword_lang(test_repo):
@@ -132,6 +135,16 @@ def test_project_has_test(test_repo):
 
 def test_repo_languages(test_repo):
     assert len(list(test_repo)) > 0
+
+
+def test_repo_commit_hash(test_repo):
+    commit_hash = test_repo.sample_programs_repo_commit_hash()
+    assert EXPECTED_COMMIT_HASH_PATTERN.fullmatch(commit_hash) is not None
+
+
+def test_website_repo_commit_hash(test_repo):
+    commit_hash = test_repo.sample_programs_website_repo_commit_hash()
+    assert EXPECTED_COMMIT_HASH_PATTERN.fullmatch(commit_hash) is not None
 
 
 def test_repo_total_programs(test_repo):

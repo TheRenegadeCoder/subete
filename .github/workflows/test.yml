@@ -21,7 +21,7 @@ jobs:
       - name: Set up Poetry
         uses: abatilo/actions-poetry@v4
         with:
-          poetry-version: '2.3.2'
+          poetry-version: '2.4.1'
 
       - name: Install dependencies
         run: poetry install --with docs
@@ -35,7 +35,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
+        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
 
     steps:
     - uses: actions/checkout@v6
@@ -48,7 +48,7 @@ jobs:
     - name: Set up Poetry
       uses: abatilo/actions-poetry@v4
       with:
-        poetry-version: "2.3.2"
+        poetry-version: "2.4.1"
   
     - name: Install dependencies
       run: poetry install
